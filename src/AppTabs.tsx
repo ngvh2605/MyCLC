@@ -15,6 +15,8 @@ import AddEntryPage from "./pages/AddEntryPage";
 import EntryPage from "./pages/EntryPage";
 import AllEntryPage from "./pages/AllEntryPage";
 import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
+import EmailVerify from "./pages/ProfilePage/EmailVerify";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -22,35 +24,29 @@ const AppTabs: React.FC = () => {
     return <Redirect to="/index" />;
   }
   return (
-    <IonTabs>
-      <IonRouterOutlet>
-        <Route exact path="/my/home">
-          <HomePage />
-        </Route>
-        <Route exact path="/my/entries">
-          <AllEntryPage />
-        </Route>
-        <Route exact path="/my/entries/add">
-          <AddEntryPage />
-        </Route>
-        <Route exact path="/my/entries/view/:id">
-          <EntryPage />
-        </Route>
-        <Route exact path="/my/settings">
-          <SettingsPage />
-        </Route>
-      </IonRouterOutlet>
-      <IonTabBar slot="bottom">
-        <IonTabButton tab="home" href="/my/home">
-          <IonIcon icon={homeIcon} />
-          <IonLabel>Home</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="settings" href="/my/settings">
-          <IonIcon icon={settingsIcon} />
-          <IonLabel>Settings</IonLabel>
-        </IonTabButton>
-      </IonTabBar>
-    </IonTabs>
+    <IonRouterOutlet>
+      <Route exact path="/my/home">
+        <HomePage />
+      </Route>
+      <Route exact path="/my/entries">
+        <AllEntryPage />
+      </Route>
+      <Route exact path="/my/entries/add">
+        <AddEntryPage />
+      </Route>
+      <Route exact path="/my/entries/view/:id">
+        <EntryPage />
+      </Route>
+      <Route exact path="/my/settings">
+        <SettingsPage />
+      </Route>
+      <Route exact path="/my/profile">
+        <ProfilePage />
+      </Route>
+      <Route exact path="/my/profile/email">
+        <EmailVerify />
+      </Route>
+    </IonRouterOutlet>
   );
 };
 

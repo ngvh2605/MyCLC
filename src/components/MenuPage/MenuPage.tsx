@@ -1,6 +1,7 @@
 import {
   IonAvatar,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonImg,
@@ -19,6 +20,7 @@ import {
   person,
   newspaperOutline,
   settingsOutline,
+  personOutline,
 } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useHistory } from "react-router";
@@ -42,6 +44,10 @@ const MenuPage = () => {
           <IonItem>
             <IonIcon icon={newspaperOutline} color="primary" slot="start" />
             <IonLabel>CLC News</IonLabel>
+          </IonItem>
+          <IonItem routerLink="/my/profile">
+            <IonIcon icon={personOutline} color="primary" slot="start" />
+            <IonLabel>Hồ sơ</IonLabel>
           </IonItem>
           <IonItem>
             <IonIcon icon={settingsOutline} color="primary" slot="start" />

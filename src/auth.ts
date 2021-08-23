@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { auth as firebaseAuth } from './firebase';
+import React, { useContext, useEffect, useState } from "react";
+import { auth as firebaseAuth } from "./firebase";
 
 interface Auth {
   loggedIn: boolean;
   userId?: string;
+  userEmail?: string;
 }
 
 interface AuthInit {
@@ -21,9 +22,13 @@ export function useAuthInit(): AuthInit {
   const [authInit, setAuthInit] = useState<AuthInit>({ loading: true });
   useEffect(() => {
     return firebaseAuth.onAuthStateChanged((firebaseUser) => {
-      const auth = firebaseUser ?
-        { loggedIn: true, userId: firebaseUser.uid } :
-        { loggedIn: false };
+      const auth = firebaseUser
+        ? {
+            loggedIn: true,
+            userId: firebaseUser.uid,
+            userEmail: firebaseUser.email,
+          }
+        : { loggedIn: false };
       setAuthInit({ loading: false, auth });
     });
   }, []);
