@@ -1,5 +1,7 @@
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -43,13 +45,16 @@ const RegisterPage: React.FC = () => {
   };
 
   if (loggedIn) {
-    return <Redirect to="/my/entries" />;
+    return <Redirect to="/my/home" />;
   }
   return (
     <IonPage id="register-page">
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Register</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>
+          <IonTitle>Đăng ký</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

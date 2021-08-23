@@ -1,6 +1,10 @@
 import {
+  IonAlert,
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
@@ -25,28 +29,47 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordType, setPasswordType] = useState<any>("password");
-  const [passwordIcon, setPasswordIcon] = useState(eye);
+  const [passwordIcon, setPasswordIcon] = useState(eyeOff);
   const [status, setStatus] = useState({ loading: false, error: false });
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
   const handleLogin = async () => {
-    try {
-      setStatus({ loading: true, error: false });
-      const credential = await auth.signInWithEmailAndPassword(email, password);
-      console.log("credential:", credential);
-    } catch (error) {
-      setStatus({ loading: false, error: true });
-      console.log("error:", error);
+    if (email.includes("@") == false || email.includes(".") == false) {
+      setAlertMessage("Định dạng email không hợp lệ");
+      setShowAlert(true);
+    } else if (password.length < 8) {
+      setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
+      setShowAlert(true);
+    } else {
+      try {
+        setStatus({ loading: true, error: false });
+        const credential = await auth.signInWithEmailAndPassword(
+          email,
+          password
+        );
+        console.log("credential:", credential);
+      } catch (error) {
+        setStatus({ loading: false, error: true });
+        console.log("error:", error);
+        setAlertMessage("Email hoặc mật khẩu không đúng");
+        setShowAlert(true);
+      }
     }
   };
 
   if (loggedIn) {
-    return <Redirect to="/my/entries" />;
+    return <Redirect to="/my/home" />;
   }
   return (
     <IonPage id="login-page">
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Login</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>
+          <IonTitle>Đăng nhập</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -64,17 +87,20 @@ const LoginPage: React.FC = () => {
               slot="end"
               size="small"
               color="medium"
-              hidden={email == "" ? true : false}
+              hidden={!email ? true : false}
               onClick={() => setEmail("")}
             />
           </IonItem>
 
           <IonItem>
-            <IonLabel position="floating">Password</IonLabel>
+            <IonLabel position="floating">Mật khẩu</IonLabel>
             <IonInput
               type={passwordType}
               value={password}
               onIonChange={(event) => setPassword(event.detail.value)}
+              onKeyPress={(event) => {
+                if (event.key == "Enter") handleLogin();
+              }}
             />
             <IonIcon
               icon={passwordIcon}
@@ -82,14 +108,14 @@ const LoginPage: React.FC = () => {
               slot="end"
               size="small"
               color="medium"
-              hidden={password == "" ? true : false}
+              hidden={!password ? true : false}
               onClick={() => {
                 if (passwordType == "password") {
                   setPasswordType("text");
-                  setPasswordIcon(eyeOff);
+                  setPasswordIcon(eye);
                 } else {
                   setPasswordType("password");
-                  setPasswordIcon(eye);
+                  setPasswordIcon(eyeOff);
                 }
               }}
             />
@@ -97,15 +123,30 @@ const LoginPage: React.FC = () => {
         </IonList>
 
         <br />
-        {status.error && <IonText color="danger">Invalid credentials</IonText>}
-        <IonButton expand="block" onClick={handleLogin}>
-          Login
+        <IonButton
+          className="ion-margin"
+          expand="block"
+          onClick={handleLogin}
+          disabled={email && password ? false : true}
+        >
+          Đăng nhập
         </IonButton>
+        <br />
+        <br />
         <IonButton expand="block" fill="clear" routerLink="/register">
-          Don't have an account?
+          Quên mật khẩu?
         </IonButton>
 
         <IonLoading isOpen={status.loading} />
+
+        <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          cssClass="my-custom-class"
+          header={"Lỗi"}
+          message={alertMessage}
+          buttons={["OK"]}
+        />
       </IonContent>
     </IonPage>
   );

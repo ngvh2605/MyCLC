@@ -16,11 +16,6 @@ import {
   IonMenuButton,
   IonMenu,
   IonButton,
-  IonInfiniteScroll,
-  IonCard,
-  IonCardHeader,
-  IonInfiniteScrollContent,
-  useIonViewWillEnter,
 } from "@ionic/react";
 import { add as addIcon } from "ionicons/icons";
 import React, { useState, useEffect } from "react";
@@ -29,7 +24,7 @@ import { formatDate } from "../../date";
 import { firestore } from "../../firebase";
 import { Entry, toEntry } from "../../models";
 
-const HomePage: React.FC = () => {
+const AllEntryPage: React.FC = () => {
   const { userId } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   useEffect(() => {
@@ -54,11 +49,24 @@ const HomePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonFab
-          vertical="bottom"
-          horizontal="end"
-          style={{ position: "fixed" }}
-        >
+        <IonList>
+          {entries.map((entry) => (
+            <IonItem
+              button
+              key={entry.id}
+              routerLink={`/my/entries/view/${entry.id}`}
+            >
+              <IonThumbnail slot="end">
+                <IonImg src={entry.pictureUrl} />
+              </IonThumbnail>
+              <IonLabel>
+                <h2>{formatDate(entry.date)}</h2>
+                <h3>{entry.title}</h3>
+              </IonLabel>
+            </IonItem>
+          ))}
+        </IonList>
+        <IonFab vertical="bottom" horizontal="end">
           <IonFabButton routerLink="/my/entries/add">
             <IonIcon icon={addIcon} />
           </IonFabButton>
@@ -68,4 +76,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default AllEntryPage;
