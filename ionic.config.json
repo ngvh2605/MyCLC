@@ -1,0 +1,7 @@
+{
+  "name": "myclc",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
