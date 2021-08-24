@@ -17,6 +17,7 @@ import AllEntryPage from "./pages/AllEntryPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import EmailVerify from "./pages/ProfilePage/EmailVerify";
+import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -45,6 +46,9 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/profile/email">
         <EmailVerify />
+      </Route>
+      <Route exact path="/my/profile/phone">
+        <PhoneVerify />
       </Route>
     </IonRouterOutlet>
   );

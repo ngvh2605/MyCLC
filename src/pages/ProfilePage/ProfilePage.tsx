@@ -23,6 +23,7 @@ import { mailOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { database } from "../../firebase";
 import { useAuth } from "../../auth";
+import { useHistory } from "react-router";
 
 interface VerifyStatus {
   emailVerify: boolean;
@@ -32,15 +33,29 @@ interface VerifyStatus {
 }
 
 const ProfilePage: React.FC = () => {
-  const { userId } = useAuth();
+  const { userId, emailVerified } = useAuth();
+  const history = useHistory();
+  const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
+    emailVerify: false,
+    phoneVerify: false,
+    personalInfo: false,
+    hasAvatar: false,
+  });
 
-  const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>();
+  useEffect(() => {
+    readStatus();
+  }, []);
+
+  useEffect(() => {
+    checkEmailVerify();
+  }, [verifyStatus]);
 
   const readStatus = () => {
     const userData = database.ref();
     userData
       .child("users")
       .child(userId)
+      .child("verify")
       .get()
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -54,9 +69,15 @@ const ProfilePage: React.FC = () => {
       });
   };
 
-  useEffect(() => {
+  const checkEmailVerify = async () => {
+    if (emailVerified && !verifyStatus.emailVerify) {
+      const userData = database.ref();
+      await userData.child("users").child(userId).child("verify").update({
+        emailVerify: true,
+      });
+    }
     readStatus();
-  }, []);
+  };
 
   return (
     <IonPage>
@@ -69,13 +90,7 @@ const ProfilePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton
-          onClick={() => {
-            readStatus();
-          }}
-        >
-          Read
-        </IonButton>
+        <IonButton onClick={() => {}}>Read</IonButton>
         <IonAvatar
           className="ion-margin"
           style={{
@@ -94,19 +109,26 @@ const ProfilePage: React.FC = () => {
         <IonList lines="none">
           <IonItem
             detail={!verifyStatus?.emailVerify}
-            routerLink="/my/profile/email"
+            disabled={verifyStatus?.emailVerify}
+            onClick={() => {
+              history.push("/my/profile/email");
+            }}
           >
             <IonCheckbox
-              disabled={verifyStatus?.emailVerify}
               checked={verifyStatus?.emailVerify}
               hidden={!verifyStatus?.emailVerify}
               slot="end"
             />
             <IonLabel>Xác minh Email</IonLabel>
           </IonItem>
-          <IonItem detail={!verifyStatus?.phoneVerify}>
+          <IonItem
+            detail={!verifyStatus?.phoneVerify}
+            disabled={verifyStatus?.phoneVerify}
+            onClick={() => {
+              history.push("/my/profile/phone");
+            }}
+          >
             <IonCheckbox
-              disabled={verifyStatus?.phoneVerify}
               checked={verifyStatus?.phoneVerify}
               hidden={!verifyStatus?.phoneVerify}
               slot="end"

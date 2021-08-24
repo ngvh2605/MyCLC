@@ -5,6 +5,7 @@ interface Auth {
   loggedIn: boolean;
   userId?: string;
   userEmail?: string;
+  emailVerified?: boolean;
 }
 
 interface AuthInit {
@@ -27,6 +28,7 @@ export function useAuthInit(): AuthInit {
             loggedIn: true,
             userId: firebaseUser.uid,
             userEmail: firebaseUser.email,
+            emailVerified: firebaseUser.emailVerified,
           }
         : { loggedIn: false };
       setAuthInit({ loading: false, auth });

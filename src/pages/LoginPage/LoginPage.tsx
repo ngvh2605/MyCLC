@@ -33,13 +33,16 @@ const LoginPage: React.FC = () => {
   const [status, setStatus] = useState({ loading: false, error: false });
 
   const [showAlert, setShowAlert] = useState(false);
+  const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   const handleLogin = async () => {
     if (email.includes("@") == false || email.includes(".") == false) {
+      setAlertHeader("Lỗi!");
       setAlertMessage("Định dạng email không hợp lệ");
       setShowAlert(true);
     } else if (password.length < 8) {
+      setAlertHeader("Lỗi!");
       setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
       setShowAlert(true);
     } else {
@@ -53,6 +56,7 @@ const LoginPage: React.FC = () => {
       } catch (error) {
         setStatus({ loading: false, error: true });
         console.log("error:", error);
+        setAlertHeader("Lỗi!");
         setAlertMessage("Email hoặc mật khẩu không đúng");
         setShowAlert(true);
       }
@@ -143,7 +147,7 @@ const LoginPage: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
           cssClass="my-custom-class"
-          header={"Lỗi"}
+          header={alertHeader}
           message={alertMessage}
           buttons={["OK"]}
         />
