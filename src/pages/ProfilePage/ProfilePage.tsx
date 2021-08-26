@@ -36,10 +36,10 @@ const ProfilePage: React.FC = () => {
   const { userId, emailVerified } = useAuth();
   const history = useHistory();
   const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
-    emailVerify: false,
-    phoneVerify: false,
-    personalInfo: false,
-    hasAvatar: false,
+    emailVerify: true,
+    phoneVerify: true,
+    personalInfo: true,
+    hasAvatar: true,
   });
 
   useEffect(() => {
@@ -90,7 +90,13 @@ const ProfilePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton onClick={() => {}}>Read</IonButton>
+        <IonButton
+          onClick={() => {
+            console.log(verifyStatus);
+          }}
+        >
+          Read
+        </IonButton>
         <IonAvatar
           className="ion-margin"
           style={{
@@ -134,6 +140,20 @@ const ProfilePage: React.FC = () => {
               slot="end"
             />
             <IonLabel>Xác minh Số điện thoại</IonLabel>
+          </IonItem>
+          <IonItem
+            detail={!verifyStatus?.personalInfo}
+            disabled={verifyStatus?.personalInfo}
+            onClick={() => {
+              history.push("/my/profile/personal");
+            }}
+          >
+            <IonCheckbox
+              checked={verifyStatus?.personalInfo}
+              hidden={!verifyStatus?.personalInfo}
+              slot="end"
+            />
+            <IonLabel>Xác thực danh tính</IonLabel>
           </IonItem>
         </IonList>
       </IonContent>

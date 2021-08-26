@@ -22,22 +22,14 @@ import { closeCircle } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth } from "../../../firebase";
+import { auth as firebaseAuth, database } from "../../../firebase";
 import "./PhoneVerify.scss";
 
 import country from "./country.json";
 
-interface Country {
-  name: string;
-  dialCode: string;
-  isoCode: string;
-  flag: string;
-}
-
 const PhoneVerify: React.FC = () => {
-  const { userEmail, emailVerified } = useAuth();
+  const { userId } = useAuth();
   const history = useHistory();
-  const [status, setStatus] = useState({ loading: false, error: false });
   const [phone, setPhone] = useState("");
   const [dialCode, setDialCode] = useState("+84");
 
@@ -46,40 +38,60 @@ const PhoneVerify: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    console.log(country);
     let list: any = [];
     for (var i in country) {
       list.push(country[i]["country"]);
     }
-
-    console.log("list", list);
   }, []);
 
   function sendVerifyPhone() {
-    //setStatus({ loading: true, error: false });
-
     let recaptcha = new firebase.auth.RecaptchaVerifier("recaptcha", {
-      size: "invisible",
+      size: "normal",
     });
-    let number = "+61406908552";
-    firebaseAuth
-      .signInWithPhoneNumber(number, recaptcha)
-      .then(function (e) {
-        let code = prompt("Enter the OTP", "");
-        if (code == null) return;
+    let number = dialCode + phone;
+    console.log(number);
+    let phoneAuth = new firebase.auth.PhoneAuthProvider();
 
-        e.confirm(code)
-          .then(function (result) {
-            console.log(result.user, "user");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+    phoneAuth
+      .verifyPhoneNumber(number, recaptcha)
+      .then(function (verificationId) {
+        var verificationCode = window.prompt(
+          "Please enter the verification " +
+            "code that was sent to your mobile device."
+        );
+        return firebase.auth.PhoneAuthProvider.credential(
+          verificationId,
+          verificationCode
+        );
       })
-      .catch(function (error) {
-        console.error(error);
+      .then(function (phoneCredential) {
+        return firebaseAuth.currentUser.linkWithCredential(phoneCredential);
+      })
+      .then(() => {
+        writePhoneData();
+        setAlertHeader("Chúc mừng!");
+        setAlertMessage("Bạn đã xác minh số điện thoại thành công");
+        setShowAlert(true);
+      })
+      .catch((error) => {
+        setAlertHeader("Lỗi!");
+        setAlertMessage("Mã xác thực không chính xác. Vui lòng thử lại sau");
+        setShowAlert(true);
+
+        console.log(error);
       });
   }
+
+  const writePhoneData = async () => {
+    const userData = database.ref();
+    await userData.child("users").child(userId).child("personal").update({
+      dialCode: dialCode,
+      phoneNumber: phone,
+    });
+    await userData.child("users").child(userId).child("verify").update({
+      phoneVerify: true,
+    });
+  };
 
   return (
     <IonPage id="phone-verify-page">
@@ -116,24 +128,24 @@ const PhoneVerify: React.FC = () => {
             <IonLabel position="floating">Số điện thoại</IonLabel>
             <IonInput
               type="number"
+              required
               value={phone}
               onIonChange={(event) => setPhone(event.detail.value)}
             />
           </IonItem>
         </IonList>
 
-        <div id="recaptcha" hidden></div>
+        <div id="recaptcha" className="g-recaptcha"></div>
         <IonButton
           className="ion-margin"
           expand="block"
           onClick={() => {
             sendVerifyPhone();
           }}
+          disabled={phone.length < 9}
         >
           Gửi mã xác minh
         </IonButton>
-
-        <IonLoading isOpen={status.loading} />
 
         <IonAlert
           isOpen={showAlert}
