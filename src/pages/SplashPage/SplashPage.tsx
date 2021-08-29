@@ -1,4 +1,16 @@
-import { IonButton, IonContent, IonPage } from "@ionic/react";
+import {
+  IonButton,
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonImg,
+  IonLabel,
+  IonPage,
+  IonSlide,
+  IonSlides,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
 import React from "react";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
@@ -12,21 +24,100 @@ const SplashPage: React.FC = () => {
   }
   return (
     <IonPage>
+      <IonHeader className="ion-no-border">
+        <IonToolbar>
+          <IonImg
+            src="/assets/image/Logo.svg"
+            style={{ width: "20%", marginLeft: "auto", marginRight: "auto" }}
+          />
+        </IonToolbar>
+      </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton
-          expand="block"
-          onClick={() => {
-            history.push("/register");
-          }}
-        >
-          Đăng ký
-        </IonButton>
-        <IonButton expand="block" routerLink="/login">
-          Đăng nhập
-        </IonButton>
+        <IonSlides style={{ height: "100%" }} pager={true}>
+          <IonSlide>
+            <div className="ion-margin" style={{}}>
+              <IonImg
+                src="/assets/image/slides1.svg"
+                style={{ height: window.screen.height / 4, marginBottom: 10 }}
+              />
+              <IonLabel
+                style={{
+                  fontSize: "x-large",
+                  margin: "auto",
+                  lineHeight: "40px",
+                }}
+              >
+                <b>Cập nhập những tin tức mới nhất tại Chuyên Lào Cai</b>
+              </IonLabel>
+            </div>
+          </IonSlide>
+          <IonSlide>
+            <div className="ion-margin" style={{}}>
+              <IonImg
+                src="/assets/image/slides2.svg"
+                style={{ height: window.screen.height / 4, marginBottom: 10 }}
+              />
+              <IonLabel
+                style={{
+                  fontSize: "x-large",
+                  margin: "auto",
+                  lineHeight: "40px",
+                }}
+              >
+                <b>Lịch hoạt động nhà trường và sự kiện các câu lạc bộ</b>
+              </IonLabel>
+            </div>
+          </IonSlide>
+          <IonSlide>
+            <div className="ion-margin" style={{}}>
+              <IonImg
+                src="/assets/image/slides3.svg"
+                style={{ height: window.screen.height / 4, marginBottom: 10 }}
+              />
+              <IonLabel
+                style={{
+                  fontSize: "x-large",
+                  margin: "auto",
+                  lineHeight: "40px",
+                }}
+              >
+                <b>Kết nối học sinh và cựu học sinh khắp nơi trên thế giới</b>
+              </IonLabel>
+            </div>
+          </IonSlide>
+        </IonSlides>
       </IonContent>
+      <IonFooter className="ion-no-border">
+        <IonToolbar>
+          <div className="ion-margin">
+            <IonButton
+              expand="block"
+              shape="round"
+              onClick={() => {
+                history.push("/register");
+              }}
+            >
+              Đăng ký
+            </IonButton>
+
+            <IonButton
+              expand="block"
+              shape="round"
+              fill="outline"
+              style={{ marginTop: 20, marginBottom: 20 }}
+              onClick={() => {
+                history.push("/login");
+              }}
+            >
+              Đăng nhập
+            </IonButton>
+          </div>
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };
 
+const logo = "";
+const slide1 = "";
 export default SplashPage;

@@ -15,6 +15,7 @@
     "@ionic/react-router": "^5.6.0",
     "firebase": "^8.2.10",
     "ionicons": "^5.5.0",
+    "qrcode.react": "^1.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router": "^5.2.0",

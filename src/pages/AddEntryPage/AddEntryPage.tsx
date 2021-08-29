@@ -37,7 +37,7 @@ const AddEntryPage: React.FC = () => {
   const history = useHistory();
   const [date, setDate] = useState("");
   const [title, setTitle] = useState("");
-  const [pictureUrl, setPictureUrl] = useState("/assets/placeholder.png");
+  const [pictureUrl, setPictureUrl] = useState("/assets/image/placeholder.png");
   const [description, setDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>();
   useEffect(

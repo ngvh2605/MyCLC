@@ -4,12 +4,16 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
+  IonIcon,
+  IonLabel,
   IonLoading,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { chevronBack } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
@@ -54,7 +58,15 @@ const EmailVerify: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton />
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon
+                icon={chevronBack}
+                slot="start"
+                color="primary"
+                style={{ marginRight: 0 }}
+              />
+              <IonLabel color="primary">Huỷ</IonLabel>
+            </IonButton>
           </IonButtons>
           <IonTitle>Xác minh Email</IonTitle>
         </IonToolbar>
@@ -68,15 +80,6 @@ const EmailVerify: React.FC = () => {
         </p>
         <br />
         <br />
-        <IonButton
-          className="ion-margin"
-          expand="block"
-          onClick={() => {
-            sendVerifyEmail();
-          }}
-        >
-          Gửi mã xác minh
-        </IonButton>
 
         <IonLoading isOpen={status.loading} />
 
@@ -84,7 +87,7 @@ const EmailVerify: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => {
             setShowAlert(false);
-            history.goBack();
+            history.replace("/my/profile");
           }}
           cssClass="my-custom-class"
           header={alertHeader}
@@ -92,6 +95,22 @@ const EmailVerify: React.FC = () => {
           buttons={["OK"]}
         />
       </IonContent>
+      <IonFooter>
+        <IonToolbar>
+          <div className="ion-margin">
+            <IonButton
+              className="ion-margin"
+              expand="block"
+              shape="round"
+              onClick={() => {
+                sendVerifyEmail();
+              }}
+            >
+              Gửi mã xác minh
+            </IonButton>
+          </div>
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };

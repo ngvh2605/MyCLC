@@ -4,6 +4,7 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
@@ -16,9 +17,10 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import firebase from "firebase";
-import { closeCircle } from "ionicons/icons";
+import { chevronBack, closeCircle } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
@@ -26,16 +28,21 @@ import { auth as firebaseAuth, database } from "../../../firebase";
 import "./PhoneVerify.scss";
 
 import country from "./country.json";
+import { alertController } from "@ionic/core";
 
 const PhoneVerify: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
   const [phone, setPhone] = useState("");
   const [dialCode, setDialCode] = useState("+84");
+  const [pin, setPin] = useState("");
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
+
+  const [changeDisabled, setChangeDisabled] = useState(false);
+  const [present] = useIonAlert();
 
   useEffect(() => {
     let list: any = [];
@@ -55,32 +62,59 @@ const PhoneVerify: React.FC = () => {
     phoneAuth
       .verifyPhoneNumber(number, recaptcha)
       .then(function (verificationId) {
-        var verificationCode = window.prompt(
-          "Please enter the verification " +
-            "code that was sent to your mobile device."
-        );
-        return firebase.auth.PhoneAuthProvider.credential(
-          verificationId,
-          verificationCode
-        );
-      })
-      .then(function (phoneCredential) {
-        return firebaseAuth.currentUser.linkWithCredential(phoneCredential);
-      })
-      .then(() => {
-        writePhoneData();
-        setAlertHeader("Chúc mừng!");
-        setAlertMessage("Bạn đã xác minh số điện thoại thành công");
-        setShowAlert(true);
-      })
-      .catch((error) => {
-        setAlertHeader("Lỗi!");
-        setAlertMessage("Mã xác thực không chính xác. Vui lòng thử lại sau");
-        setShowAlert(true);
+        getPinCode()
+          .then((verificationCode) => {
+            return firebase.auth.PhoneAuthProvider.credential(
+              verificationId,
+              verificationCode + ""
+            );
+          })
+          .then(function (phoneCredential) {
+            return firebaseAuth.currentUser.linkWithCredential(phoneCredential);
+          })
+          .then(() => {
+            writePhoneData();
+            setAlertHeader("Chúc mừng!");
+            setAlertMessage("Bạn đã xác minh số điện thoại thành công");
+            setShowAlert(true);
+          })
+          .catch((error) => {
+            setAlertHeader("Lỗi!");
+            setAlertMessage(
+              "Mã xác thực không chính xác. Vui lòng thử lại sau"
+            );
+            setShowAlert(true);
 
-        console.log(error);
+            console.log(error);
+          });
       });
   }
+
+  const getPinCode = async () => {
+    return new Promise(async (resolve) => {
+      const confirm = await alertController.create({
+        header: "Nhập mã OTP",
+        backdropDismiss: false,
+        inputs: [
+          {
+            placeholder: "6 chữ số",
+            name: "text",
+            type: "number",
+          },
+        ],
+        buttons: [
+          {
+            text: "OK",
+            handler: (data) => {
+              return resolve(data.text);
+            },
+          },
+        ],
+      });
+
+      await confirm.present();
+    });
+  };
 
   const writePhoneData = async () => {
     const userData = database.ref();
@@ -98,7 +132,15 @@ const PhoneVerify: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton />
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon
+                icon={chevronBack}
+                slot="start"
+                color="primary"
+                style={{ marginRight: 0 }}
+              />
+              <IonLabel color="primary">Huỷ</IonLabel>
+            </IonButton>
           </IonButtons>
           <IonTitle>Xác minh Số điện thoại</IonTitle>
         </IonToolbar>
@@ -111,6 +153,7 @@ const PhoneVerify: React.FC = () => {
           onIonChange={(e) => {
             setDialCode(e.detail.value);
           }}
+          disabled={changeDisabled}
         >
           {country.country.map((item) => (
             <IonSelectOption value={item.dialCode} key={item.name}>
@@ -131,27 +174,20 @@ const PhoneVerify: React.FC = () => {
               required
               value={phone}
               onIonChange={(event) => setPhone(event.detail.value)}
+              disabled={changeDisabled}
             />
           </IonItem>
         </IonList>
 
+        <br />
+        <br />
         <div id="recaptcha" className="g-recaptcha"></div>
-        <IonButton
-          className="ion-margin"
-          expand="block"
-          onClick={() => {
-            sendVerifyPhone();
-          }}
-          disabled={phone.length < 9}
-        >
-          Gửi mã xác minh
-        </IonButton>
 
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => {
             setShowAlert(false);
-            history.goBack();
+            history.replace("/my/profile");
           }}
           cssClass="my-custom-class"
           header={alertHeader}
@@ -159,6 +195,25 @@ const PhoneVerify: React.FC = () => {
           buttons={["OK"]}
         />
       </IonContent>
+      <IonFooter>
+        <IonToolbar>
+          <div className="ion-margin">
+            <IonButton
+              className="ion-margin"
+              expand="block"
+              type="submit"
+              shape="round"
+              onClick={() => {
+                sendVerifyPhone();
+                setChangeDisabled(true);
+              }}
+              disabled={phone.length < 9 || changeDisabled}
+            >
+              Gửi mã xác minh
+            </IonButton>
+          </div>
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };

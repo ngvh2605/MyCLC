@@ -7,6 +7,7 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
+  IonImg,
   IonInput,
   IonItem,
   IonLabel,
@@ -17,15 +18,16 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { closeCircle, eye, eyeOff } from "ionicons/icons";
+import { chevronBack, closeCircle, eye, eyeOff } from "ionicons/icons";
 import React, { useState } from "react";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import { auth } from "../../firebase";
 import "./LoginPage.scss";
 
 const LoginPage: React.FC = () => {
   const { loggedIn } = useAuth();
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordType, setPasswordType] = useState<any>("password");
@@ -68,81 +70,81 @@ const LoginPage: React.FC = () => {
   }
   return (
     <IonPage id="login-page">
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton />
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon
+                icon={chevronBack}
+                slot="start"
+                color="primary"
+                style={{ marginRight: 0 }}
+              />
+              <IonLabel color="primary">Huỷ</IonLabel>
+            </IonButton>
           </IonButtons>
-          <IonTitle>Đăng nhập</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonList>
-          <IonItem>
-            <IonLabel position="floating">Email</IonLabel>
-            <IonInput
-              type="email"
-              value={email}
-              onIonChange={(event) => setEmail(event.detail.value)}
-            />
-            <IonIcon
-              icon={closeCircle}
-              className="passwordIcon"
-              slot="end"
-              size="small"
-              color="medium"
-              hidden={!email ? true : false}
-              onClick={() => setEmail("")}
-            />
-          </IonItem>
-
-          <IonItem>
-            <IonLabel position="floating">Mật khẩu</IonLabel>
-            <IonInput
-              type={passwordType}
-              value={password}
-              onIonChange={(event) => setPassword(event.detail.value)}
-              onKeyPress={(event) => {
-                if (event.key == "Enter") handleLogin();
-              }}
-            />
-            <IonIcon
-              icon={passwordIcon}
-              className="passwordIcon"
-              slot="end"
-              size="small"
-              color="medium"
-              hidden={!password ? true : false}
-              onClick={() => {
-                if (passwordType == "password") {
-                  setPasswordType("text");
-                  setPasswordIcon(eye);
-                } else {
-                  setPasswordType("password");
-                  setPasswordIcon(eyeOff);
-                }
-              }}
-            />
-          </IonItem>
-        </IonList>
-
-        <br />
-        <IonButton
-          className="ion-margin"
-          expand="block"
-          onClick={handleLogin}
-          disabled={email && password ? false : true}
-        >
-          Đăng nhập
-        </IonButton>
+        <IonImg
+          src="/assets/image/Logo.svg"
+          style={{ width: "20%", marginLeft: "auto", marginRight: "auto" }}
+        />
         <br />
         <br />
-        <IonButton expand="block" fill="clear" routerLink="/register">
-          Quên mật khẩu?
-        </IonButton>
+        <form>
+          <IonList>
+            <IonItem>
+              <IonLabel position="floating">Email</IonLabel>
+              <IonInput
+                type="email"
+                value={email}
+                autocomplete="on"
+                onIonChange={(event) => setEmail(event.detail.value)}
+              />
+              <IonIcon
+                icon={closeCircle}
+                className="ion-align-self-end"
+                slot="end"
+                size="small"
+                color="medium"
+                hidden={!email ? true : false}
+                onClick={() => setEmail("")}
+              />
+            </IonItem>
 
+            <IonItem>
+              <IonLabel position="floating">Mật khẩu</IonLabel>
+              <IonInput
+                type={passwordType}
+                value={password}
+                autocomplete="on"
+                onIonChange={(event) => setPassword(event.detail.value)}
+                onKeyPress={(event) => {
+                  if (event.key == "Enter") handleLogin();
+                }}
+              />
+              <IonIcon
+                icon={passwordIcon}
+                className="ion-align-self-end"
+                slot="end"
+                size="small"
+                color="medium"
+                hidden={!password ? true : false}
+                onClick={() => {
+                  if (passwordType == "password") {
+                    setPasswordType("text");
+                    setPasswordIcon(eye);
+                  } else {
+                    setPasswordType("password");
+                    setPasswordIcon(eyeOff);
+                  }
+                }}
+              />
+            </IonItem>
+          </IonList>
+        </form>
         <IonLoading isOpen={status.loading} />
-
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
@@ -152,6 +154,31 @@ const LoginPage: React.FC = () => {
           buttons={["OK"]}
         />
       </IonContent>
+      <IonFooter className="ion-no-border">
+        <IonToolbar>
+          <div className="ion-margin">
+            <IonButton
+              expand="block"
+              type="submit"
+              shape="round"
+              onClick={handleLogin}
+              disabled={email && password ? false : true}
+            >
+              Đăng nhập
+            </IonButton>
+
+            <IonButton
+              expand="block"
+              shape="round"
+              fill="clear"
+              routerLink="/login"
+              style={{ marginTop: 10, marginBottom: 10 }}
+            >
+              Quên mật khẩu?
+            </IonButton>
+          </div>
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };

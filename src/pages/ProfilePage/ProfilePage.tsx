@@ -1,8 +1,10 @@
 import {
+  IonAlert,
   IonAvatar,
   IonButton,
   IonButtons,
   IonCheckbox,
+  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
@@ -10,6 +12,7 @@ import {
   IonIcon,
   IonImg,
   IonItem,
+  IonItemDivider,
   IonLabel,
   IonList,
   IonMenuButton,
@@ -19,7 +22,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { mailOutline } from "ionicons/icons";
+import { mailOutline, pencil } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { database } from "../../firebase";
 import { useAuth } from "../../auth";
@@ -41,42 +44,69 @@ const ProfilePage: React.FC = () => {
     personalInfo: true,
     hasAvatar: true,
   });
+  const [fullName, setFullName] = useState("");
+
+  var QRCode = require("qrcode.react");
+
+  const [QRvalue, setQRvalue] = useState(userId);
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     readStatus();
-  }, []);
+  }, [history]);
 
   useEffect(() => {
     checkEmailVerify();
   }, [verifyStatus]);
 
   const readStatus = () => {
-    const userData = database.ref();
+    const userData = database.ref().child("users").child(userId);
     userData
-      .child("users")
-      .child(userId)
       .child("verify")
       .get()
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setVerifyStatus(snapshot.val());
+          const data = snapshot.val();
+          setVerifyStatus(data);
         } else {
+          setVerifyStatus({
+            emailVerify: false,
+            phoneVerify: false,
+            personalInfo: false,
+            hasAvatar: false,
+          });
           console.log("No data available");
         }
       })
       .catch((error) => {
         console.error(error);
       });
+
+    userData
+      .child("personal")
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          try {
+            setFullName(data.fullName);
+          } catch {}
+        } else {
+          console.log("No data available");
+        }
+      });
   };
 
   const checkEmailVerify = async () => {
-    if (emailVerified && !verifyStatus.emailVerify) {
+    if (emailVerified && !verifyStatus?.emailVerify) {
       const userData = database.ref();
       await userData.child("users").child(userId).child("verify").update({
         emailVerify: true,
       });
     }
-    readStatus();
   };
 
   return (
@@ -86,17 +116,15 @@ const ProfilePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+          <IonButtons slot="end">
+            <IonButton onClick={() => history.push("/my/profile/personal")}>
+              <IonIcon icon={pencil} color="primary" />
+            </IonButton>
+          </IonButtons>
           <IonTitle>Hồ sơ</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton
-          onClick={() => {
-            console.log(verifyStatus);
-          }}
-        >
-          Read
-        </IonButton>
         <IonAvatar
           className="ion-margin"
           style={{
@@ -105,13 +133,34 @@ const ProfilePage: React.FC = () => {
             marginLeft: "auto",
             marginRight: "auto",
           }}
+          onClick={() => {
+            setAlertHeader("Chỉnh sửa avatar");
+            setAlertMessage(
+              "Cảm ơn bạn đã thử ấn vào đây. Chức năng này sẽ được ra mắt trong phiên bản tiếp theo!"
+            );
+            setShowAlert(true);
+          }}
         >
-          <IonImg src="/assets/placeholder.png" />
+          <IonImg src="/assets/image/placeholder.png" />
         </IonAvatar>
         <p style={{ textAlign: "center", fontSize: "large" }}>
-          <b>CLC Multimedia</b>
+          <b>{fullName}</b>
         </p>
-        <p>Xác minh</p>
+        <br />
+        <IonItemDivider color="primary">
+          <IonLabel>Xác minh 3 bước</IonLabel>
+        </IonItemDivider>
+        <IonChip
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
+        >
+          <IonLabel text-wrap className="ion-padding">
+            Để xây dựng một cộng đồng kết nối Chuyên Lào Cai - MyCLC an toàn và
+            bền vững. Bạn cần thực hiện đủ 3 bước xác minh để có thể sử dụng
+            được các chức năng khác!
+          </IonLabel>
+        </IonChip>
         <IonList lines="none">
           <IonItem
             detail={!verifyStatus?.emailVerify}
@@ -156,6 +205,37 @@ const ProfilePage: React.FC = () => {
             <IonLabel>Xác thực danh tính</IonLabel>
           </IonItem>
         </IonList>
+        <br />
+        <IonItemDivider color="primary">
+          <IonLabel>Mã QR của bạn</IonLabel>
+        </IonItemDivider>
+        <IonChip
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
+        >
+          <IonLabel text-wrap className="ion-padding">
+            Mã QR này sử dụng cho các tính năng kết nối và check in khi tham gia
+            các sự kiện sẽ được ra mắt trong thời gian tới
+          </IonLabel>
+        </IonChip>
+        <br />
+        <br />
+        <div style={{ marginLeft: "auto", marginRight: "auto", width: 150 }}>
+          <QRCode value={QRvalue} size={150} />
+        </div>
+        <br />
+        <br />
+        <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => {
+            setShowAlert(false);
+          }}
+          cssClass="my-custom-class"
+          header={alertHeader}
+          message={alertMessage}
+          buttons={["OK"]}
+        />
       </IonContent>
     </IonPage>
   );
