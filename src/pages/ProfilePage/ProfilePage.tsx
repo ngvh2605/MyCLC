@@ -60,44 +60,35 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     checkEmailVerify();
-  }, [verifyStatus]);
+  }, [verifyStatus, emailVerified]);
 
   const readStatus = () => {
     const userData = database.ref().child("users").child(userId);
-    userData
-      .child("verify")
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          setVerifyStatus(data);
-        } else {
-          setVerifyStatus({
-            emailVerify: false,
-            phoneVerify: false,
-            personalInfo: false,
-            hasAvatar: false,
-          });
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    userData.child("verify").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setVerifyStatus(data);
+      } else {
+        setVerifyStatus({
+          emailVerify: false,
+          phoneVerify: false,
+          personalInfo: false,
+          hasAvatar: false,
+        });
+        console.log("No data available");
+      }
+    });
 
-    userData
-      .child("personal")
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          try {
-            setFullName(data.fullName);
-          } catch {}
-        } else {
-          console.log("No data available");
-        }
-      });
+    userData.child("personal").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        try {
+          setFullName(data.fullName);
+        } catch {}
+      } else {
+        console.log("No data available");
+      }
+    });
   };
 
   const checkEmailVerify = async () => {
@@ -163,15 +154,15 @@ const ProfilePage: React.FC = () => {
         </IonChip>
         <IonList lines="none">
           <IonItem
-            detail={!verifyStatus?.emailVerify}
-            disabled={verifyStatus?.emailVerify}
+            detail={!emailVerified}
+            disabled={emailVerified}
             onClick={() => {
               history.push("/my/profile/email");
             }}
           >
             <IonCheckbox
-              checked={verifyStatus?.emailVerify}
-              hidden={!verifyStatus?.emailVerify}
+              checked={emailVerified}
+              hidden={!emailVerified}
               slot="end"
             />
             <IonLabel>Xác minh Email</IonLabel>

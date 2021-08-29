@@ -66,33 +66,32 @@ const MenuPage = () => {
   }, []);
 
   const readStatus = () => {
-    const userData = database.ref();
-    userData
-      .child("users")
-      .child(userId)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          try {
-            setVerifyStatus(data.verify);
-          } catch {}
-          try {
-            setFullName(data.personal.fullName);
-          } catch {}
-        } else {
-          setVerifyStatus({
-            emailVerify: false,
-            phoneVerify: false,
-            personalInfo: false,
-            hasAvatar: false,
-          });
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const userData = database.ref().child("users").child(userId);
+    userData.child("verify").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setVerifyStatus(data);
+      } else {
+        setVerifyStatus({
+          emailVerify: false,
+          phoneVerify: false,
+          personalInfo: false,
+          hasAvatar: false,
+        });
+        console.log("No data available");
+      }
+    });
+
+    userData.child("personal").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        try {
+          setFullName(data.fullName);
+        } catch {}
+      } else {
+        console.log("No data available");
+      }
+    });
   };
 
   const menuClose = () => {

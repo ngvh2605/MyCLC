@@ -3,6 +3,7 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -72,6 +73,8 @@ const EmailVerify: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <br />
+        <br />
         <p style={{ textAlign: "center" }}>
           Địa chỉ Email của bạn:
           <br />
@@ -80,6 +83,17 @@ const EmailVerify: React.FC = () => {
         </p>
         <br />
         <br />
+
+        <IonChip
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
+        >
+          <IonLabel text-wrap className="ion-padding">
+            Lưu ý: Sau khi đã xác minh email, bạn cần refresh lại trang ứng dụng
+            để cập nhật trạng thái đã xác minh
+          </IonLabel>
+        </IonChip>
 
         <IonLoading isOpen={status.loading} />
 
