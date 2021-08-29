@@ -29,7 +29,7 @@ const AppTabs: React.FC = () => {
     return <Redirect to="/index" />;
   }
   return (
-    <Switch>
+    <IonRouterOutlet>
       <Route exact path="/my/home">
         <HomePage />
       </Route>
@@ -65,10 +65,12 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/about">
         <AboutPage />
       </Route>
-      <Route path="*">
-        <NotFoundPage />
-      </Route>
-    </Switch>
+      <Switch>
+        <Route path="*">
+          <NotFoundPage />
+        </Route>
+      </Switch>
+    </IonRouterOutlet>
   );
 };
 
