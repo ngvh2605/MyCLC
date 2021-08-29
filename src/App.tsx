@@ -28,24 +28,19 @@ const App: React.FC = () => {
         <IonReactRouter>
           <MenuPage />
           <Switch>
-            <IonRouterOutlet id="main">
-              <Route exact path="/login">
-                <LoginPage />
-              </Route>
-              <Route exact path="/index">
-                <SplashPage />
-              </Route>
-              <Route exact path="/register">
-                <RegisterPage />
-              </Route>
-              <Route path="/my">
-                <AppTabs />
-              </Route>
-              <Redirect exact path="/" to="/my/home" />
-              <Route>
-                <NotFoundPage />
-              </Route>
-            </IonRouterOutlet>
+            <Redirect exact path="/" to="/my/home" />
+            <Route exact path="/login">
+              <LoginPage />
+            </Route>
+            <Route exact path="/index">
+              <SplashPage />
+            </Route>
+            <Route exact path="/register">
+              <RegisterPage />
+            </Route>
+            <Route path="*">
+              <AppTabs />
+            </Route>
           </Switch>
         </IonReactRouter>
       </AuthContext.Provider>

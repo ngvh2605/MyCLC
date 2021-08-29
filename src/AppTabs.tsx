@@ -8,7 +8,7 @@ import {
 } from "@ionic/react";
 import { home as homeIcon, settings as settingsIcon } from "ionicons/icons";
 import React from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import { useAuth } from "./auth";
 import HomePage from "./pages/HomePage";
 import AddEntryPage from "./pages/AddEntryPage";
@@ -21,6 +21,7 @@ import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
 import EventPage from "./pages/EventPage";
 import AboutPage from "./pages/AboutPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -28,7 +29,7 @@ const AppTabs: React.FC = () => {
     return <Redirect to="/index" />;
   }
   return (
-    <IonRouterOutlet>
+    <Switch>
       <Route exact path="/my/home">
         <HomePage />
       </Route>
@@ -64,7 +65,10 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/about">
         <AboutPage />
       </Route>
-    </IonRouterOutlet>
+      <Route path="*">
+        <NotFoundPage />
+      </Route>
+    </Switch>
   );
 };
 
