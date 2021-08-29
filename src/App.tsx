@@ -27,21 +27,23 @@ const App: React.FC = () => {
       <AuthContext.Provider value={auth}>
         <IonReactRouter>
           <MenuPage />
-          <Switch>
-            <Redirect exact path="/" to="/my/home" />
-            <Route exact path="/login">
-              <LoginPage />
-            </Route>
-            <Route exact path="/index">
-              <SplashPage />
-            </Route>
-            <Route exact path="/register">
-              <RegisterPage />
-            </Route>
-            <Route path="*">
-              <AppTabs />
-            </Route>
-          </Switch>
+          <IonRouterOutlet id="main">
+            <Switch>
+              <Redirect exact path="/" to="/my/home" />
+              <Route exact path="/login">
+                <LoginPage />
+              </Route>
+              <Route exact path="/index">
+                <SplashPage />
+              </Route>
+              <Route exact path="/register">
+                <RegisterPage />
+              </Route>
+              <Route path="*">
+                <AppTabs />
+              </Route>
+            </Switch>
+          </IonRouterOutlet>
         </IonReactRouter>
       </AuthContext.Provider>
     </IonApp>
