@@ -24,9 +24,9 @@ const App: React.FC = () => {
   console.log(`rendering App with auth:`, auth);
   return (
     <IonApp>
-      <MenuPage />
       <AuthContext.Provider value={auth}>
         <IonReactRouter>
+          <MenuPage />
           <Switch>
             <IonRouterOutlet id="main">
               <Route exact path="/login">

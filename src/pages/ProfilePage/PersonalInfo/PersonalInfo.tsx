@@ -8,6 +8,7 @@ import {
   IonDatetime,
   IonFooter,
   IonHeader,
+  IonIcon,
   IonInput,
   IonItem,
   IonItemDivider,
@@ -22,13 +23,14 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { chevronBack } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { auth as firebaseAuth, database } from "../../../firebase";
 
 const PersonalInfo: React.FC = () => {
-  const { userId } = useAuth();
+  const { userId, userEmail } = useAuth();
   const history = useHistory();
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -36,6 +38,8 @@ const PersonalInfo: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
+
+  const [phone, setPhone] = useState("");
 
   const [fullName, setFullName] = useState("");
   const [birth, setBirth] = useState("");
@@ -139,6 +143,7 @@ const PersonalInfo: React.FC = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
+          setPhone("(" + data.dialCode + ") " + data.phoneNumber);
           setFullName(data.fullName);
           setBirth(data.birth);
           setGender(data.gender);
@@ -310,13 +315,28 @@ const PersonalInfo: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton />
+            <IonButton onClick={() => history.goBack()}>
+              <IonIcon
+                icon={chevronBack}
+                slot="start"
+                color="primary"
+                style={{ marginRight: 0 }}
+              />
+              <IonLabel color="primary">Huỷ</IonLabel>
+            </IonButton>
           </IonButtons>
+
           <IonTitle>Thông tin cá nhân</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton onClick={() => console.log(checkCode())}>Clcik</IonButton>
+        <IonItem detail={false} lines="none">
+          <IonLabel color="medium">Email: {userEmail}</IonLabel>
+        </IonItem>
+        <IonItem detail={false} lines="none">
+          <IonLabel color="medium">Số điện thoại: {phone}</IonLabel>
+        </IonItem>
+
         <IonChip
           color="danger"
           style={{ height: "max-content", marginBottom: 10 }}
@@ -331,6 +351,7 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Họ và tên</IonLabel>
             <IonInput
+              autocapitalize="words"
               type="text"
               value={fullName}
               onIonChange={(e) => {
@@ -341,7 +362,7 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Ngày sinh</IonLabel>
             <IonDatetime
-              displayFormat="MM DD YYYY"
+              displayFormat="DD MM YYYY"
               value={birth}
               onIonChange={(e) => setBirth(e.detail.value)}
             ></IonDatetime>
@@ -540,7 +561,7 @@ const PersonalInfo: React.FC = () => {
           onDidDismiss={() => {
             setShowAlert(false);
             if (alertHeader != "Lỗi!") {
-              history.goBack();
+              history.replace("/my/profile");
             }
           }}
           cssClass="my-custom-class"
@@ -551,16 +572,20 @@ const PersonalInfo: React.FC = () => {
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          <IonButton
-            className="ion-margin"
-            expand="block"
-            onClick={() => {
-              handleSaveInfo();
-            }}
-            disabled={buttonDisabled}
-          >
-            Lưu thông tin
-          </IonButton>
+          <div className="ion-margin">
+            <IonButton
+              className="ion-margin"
+              expand="block"
+              type="submit"
+              shape="round"
+              onClick={() => {
+                handleSaveInfo();
+              }}
+              disabled={buttonDisabled}
+            >
+              Lưu thông tin
+            </IonButton>
+          </div>
         </IonToolbar>
       </IonFooter>
     </IonPage>

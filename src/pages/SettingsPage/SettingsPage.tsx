@@ -1,7 +1,9 @@
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
+  IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -14,7 +16,10 @@ const SettingsPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Settings</IonTitle>
+          <IonButtons slot="start">
+            <IonMenuButton />
+          </IonButtons>
+          <IonTitle>Cài đặt</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
