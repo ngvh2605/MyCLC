@@ -203,7 +203,7 @@ const MenuPage = () => {
         <IonToolbar>
           <IonList lines="none" className="ion-margin">
             <IonItem>
-              <IonLabel>Phiên bản: 1.2</IonLabel>
+              <IonLabel>Phiên bản: 1.3</IonLabel>
             </IonItem>
             <IonItem
               onClick={() => {

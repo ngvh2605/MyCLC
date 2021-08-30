@@ -39,19 +39,6 @@ const AboutPage: React.FC = () => {
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
-  //is first time login
-  useEffect(() => {
-    if (
-      firebaseAuth.currentUser.metadata.creationTime ===
-      firebaseAuth.currentUser.metadata.lastSignInTime
-    ) {
-      setAlertHeader("Chúc mừng!");
-      setAlertMessage(
-        "Bạn đã đăng ký tài khoản thành công. Hãy vào Hồ sơ và thực hiện đủ 3 bước xác minh để có quyền sử dụng các chức năng khác"
-      );
-      setShowAlert(true);
-    }
-  }, []);
   return (
     <IonPage>
       <IonHeader>
