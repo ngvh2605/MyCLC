@@ -132,15 +132,7 @@ const PhoneVerify: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => history.goBack()}>
-              <IonIcon
-                icon={chevronBack}
-                slot="start"
-                color="primary"
-                style={{ marginRight: 0 }}
-              />
-              <IonLabel color="primary">Huỷ</IonLabel>
-            </IonButton>
+            <IonBackButton text="Huỷ" defaultHref="/my/profile" />
           </IonButtons>
           <IonTitle>Xác minh Số điện thoại</IonTitle>
         </IonToolbar>

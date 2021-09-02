@@ -1,5 +1,6 @@
 import {
   IonAlert,
+  IonAvatar,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -8,6 +9,7 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
+  IonImg,
   IonLabel,
   IonLoading,
   IonPage,
@@ -20,7 +22,7 @@ import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { auth as firebaseAuth } from "../../../firebase";
 
-const EmailVerify: React.FC = () => {
+const AvatarPage: React.FC = () => {
   const { userEmail, emailVerified } = useAuth();
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -61,29 +63,28 @@ const EmailVerify: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton text="Huỷ" defaultHref="/my/profile" />
           </IonButtons>
-          <IonTitle>Xác minh Email</IonTitle>
+          <IonTitle>Sửa ảnh đại diện</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <br />
-        <br />
-        <p style={{ textAlign: "center" }}>
-          Địa chỉ Email của bạn:
-          <br />
-          <br />
-          <b>{userEmail}</b>
-        </p>
-        <br />
-        <br />
-
+        <IonAvatar
+          className="ion-margin"
+          style={{
+            width: window.screen.height / 3,
+            height: window.screen.height / 3,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          <IonImg src="/assets/image/placeholder.png" />
+        </IonAvatar>
         <IonChip
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Lưu ý: Sau khi đã xác minh email, bạn cần refresh lại trang ứng dụng
-            để cập nhật trạng thái đã xác minh
+            Nên chọn ảnh đại diện hình vuông hoặc đã được crop sẵn
           </IonLabel>
         </IonChip>
 
@@ -112,7 +113,7 @@ const EmailVerify: React.FC = () => {
                 sendVerifyEmail();
               }}
             >
-              Gửi mã xác minh
+              Áp dụng
             </IonButton>
           </div>
         </IonToolbar>
@@ -121,4 +122,4 @@ const EmailVerify: React.FC = () => {
   );
 };
 
-export default EmailVerify;
+export default AvatarPage;

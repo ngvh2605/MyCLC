@@ -142,6 +142,14 @@ const HomePage: React.FC = () => {
             </IonLabel>
           </IonCardContent>
         </IonCard>
+
+        {/*  
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton routerLink="/my/entries/add">
+            <IonIcon icon={addIcon} />
+          </IonFabButton>
+        </IonFab>
+        */}
       </IonContent>
 
       <IonAlert

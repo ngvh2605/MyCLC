@@ -22,6 +22,7 @@ import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
 import EventPage from "./pages/EventPage";
 import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import AvatarPage from "./pages/ProfilePage/AvatarPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -60,6 +61,9 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/profile/personal">
         <PersonalInfo />
       </Route>
+      <Route exact path="/my/profile/avatar">
+        <AvatarPage />
+      </Route>
 
       <Route exact path="/my/event">
         <EventPage />
@@ -68,6 +72,7 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/about">
         <AboutPage />
       </Route>
+
       <Switch>
         <Route path="*">
           <NotFoundPage />
