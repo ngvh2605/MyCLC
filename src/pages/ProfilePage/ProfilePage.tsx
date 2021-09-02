@@ -56,7 +56,7 @@ const ProfilePage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
-  const { progress, loading, url, handleUpload } = useUploadFile(userId);
+  const { progress, url, handleUpload } = useUploadFile(userId);
 
   useEffect(() => {
     console.log('progress', progress);

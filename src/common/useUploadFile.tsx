@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { storage } from '../firebase';
 
-const useUploadFile = (userId) => {
+const useUploadFile = (userId?: string) => {
   const [progress, setProgress] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const [url, setUrl] = useState<string>('');
 
   const handleUpload = (image: any, type?: 'avatar') => {
     if (image) {
       const imgName = `${Date.now()}_${image?.name}`;
-      const folderPath = `/users/${userId}/pictures/${type ? type + '/' : ''}`;
+      const rootFolder = `/${userId ? `users/${userId}` : 'public'}`;
+      const folderPath = `${rootFolder}/pictures/${type ? type + '/' : ''}`;
       const uploadTask = storage.ref(`${folderPath}${imgName}`).put(image);
       uploadTask.on(
         'state_changed',
@@ -18,7 +18,6 @@ const useUploadFile = (userId) => {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
           setProgress(progress);
-          progress === 100 ? setLoading(true) : setLoading(false);
         },
         (error) => {
           console.log(error);
@@ -39,10 +38,9 @@ const useUploadFile = (userId) => {
   const reset = () => {
     setProgress(0);
     setUrl('');
-    setLoading(false);
   };
 
-  return { progress, loading, url, handleUpload, reset };
+  return { progress, url, handleUpload, reset };
 };
 
 export default useUploadFile;
