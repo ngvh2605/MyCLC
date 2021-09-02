@@ -1,6 +1,7 @@
 import {
   IonAlert,
   IonAvatar,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCheckbox,
@@ -22,7 +23,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { mailOutline, pencil } from "ionicons/icons";
+import { camera, mailOutline, pencil } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { database } from "../../firebase";
 import { useAuth } from "../../auth";
@@ -37,8 +38,6 @@ interface VerifyStatus {
   hasAvatar: boolean;
 }
 
-const DEFAULT_AVATAR_URL = "/assets/image/placeholder.png";
-
 const ProfilePage: React.FC = () => {
   const { userId, emailVerified } = useAuth();
   const history = useHistory();
@@ -49,6 +48,7 @@ const ProfilePage: React.FC = () => {
     hasAvatar: true,
   });
   const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   var QRCode = require("qrcode.react");
 
@@ -57,11 +57,6 @@ const ProfilePage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const { progress, url, handleUpload } = useUploadFile(userId);
-
-  useEffect(() => {
-    console.log("progress", progress);
-  }, [progress]);
 
   useEffect(() => {
     readStatus();
@@ -91,9 +86,8 @@ const ProfilePage: React.FC = () => {
     userData.child("personal").on("value", (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        try {
-          setFullName(data.fullName);
-        } catch {}
+        if (data.fullName) setFullName(data.fullName);
+        if (data.avatar) setAvatarUrl(data.avatar);
       } else {
         console.log("No data available");
       }
@@ -107,12 +101,6 @@ const ProfilePage: React.FC = () => {
         emailVerify: true,
       });
     }
-  };
-
-  const handleUploadFile = (e) => {
-    const { files } = e.target;
-    console.log(files[0].name);
-    handleUpload(files[0], "avatar");
   };
 
   return (
@@ -131,6 +119,17 @@ const ProfilePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonFab horizontal="center" style={{ paddingLeft: 45, paddingTop: 88 }}>
+          <IonFabButton
+            style={{ width: 30, height: 30 }}
+            onClick={() => {
+              history.push("/my/profile/avatar");
+            }}
+          >
+            <IonIcon icon={camera} style={{ width: 18, height: 18 }} />
+          </IonFabButton>
+        </IonFab>
+
         <IonAvatar
           className="ion-margin"
           style={{
@@ -139,28 +138,13 @@ const ProfilePage: React.FC = () => {
             marginLeft: "auto",
             marginRight: "auto",
           }}
+          onClick={() => {
+            history.push("/my/profile/avatar");
+          }}
         >
-          <label>
-            <img
-              src={url || DEFAULT_AVATAR_URL}
-              alt=""
-              style={{
-                borderRadius: 90,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-            <input
-              type="file"
-              id="upload"
-              accept="image/png, image/gif, image/jpeg"
-              style={{ display: "none" }}
-              multiple={false}
-              onChange={handleUploadFile}
-            />
-          </label>
+          <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
         </IonAvatar>
+
         <p style={{ textAlign: "center", fontSize: "large" }}>
           <b>{fullName}</b>
         </p>

@@ -1,3 +1,4 @@
+import { Camera, CameraResultType, CameraSource } from "@capacitor/core";
 import {
   IonAlert,
   IonAvatar,
@@ -13,48 +14,103 @@ import {
   IonLabel,
   IonLoading,
   IonPage,
+  IonProgressBar,
   IonTitle,
   IonToolbar,
+  isPlatform,
 } from "@ionic/react";
 import { chevronBack } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth } from "../../../firebase";
+import { auth as firebaseAuth, database } from "../../../firebase";
+import useUploadFile from "../../../common/useUploadFile";
 
 const AvatarPage: React.FC = () => {
-  const { userEmail, emailVerified } = useAuth();
+  const { userId } = useAuth();
   const history = useHistory();
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [status, setStatus] = useState({ loading: false, error: false });
+  const fileInputRef = useRef<HTMLInputElement>();
+  const { progress, url, handleUpload } = useUploadFile(userId);
 
+  const [isDisabled, setIsDisabled] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
-  function sendVerifyEmail() {
-    setStatus({ loading: true, error: false });
+  useEffect(() => {
+    readData();
+  }, []);
 
-    firebaseAuth.onAuthStateChanged((firebaseUser) => {
-      firebaseUser
-        .sendEmailVerification()
-        .then(() => {
-          setStatus({ loading: false, error: false });
-          setAlertHeader("Đã gửi email xác minh!");
-          setAlertMessage(
-            "Vui lòng kiểm tra hộp thư đến hoặc hộp thư rác và làm theo hướng dẫn"
-          );
-          setShowAlert(true);
-        })
-        .catch((error) => {
-          setStatus({ loading: false, error: true });
+  useEffect(() => {
+    if (progress === 100) {
+    }
+  }, [progress]);
 
-          console.log(error);
-          setAlertHeader("Lỗi!");
-          setAlertMessage("Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ");
-          setShowAlert(true);
-        });
+  useEffect(
+    () => () => {
+      if (avatarUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarUrl);
+      }
+    },
+    [avatarUrl]
+  );
+
+  useEffect(() => {
+    if (progress === 100) {
+      setStatus({ loading: false, error: false });
+      setAlertHeader("Chúc mừng!");
+      setAlertMessage("Ảnh đại diện của bạn đã được cập nhật thành công");
+      setShowAlert(true);
+    }
+  }, [progress]);
+
+  const readData = () => {
+    const userData = database.ref().child("users").child(userId);
+
+    userData.child("personal").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (data.avatar) setAvatarUrl(data.avatar);
+        else setAvatarUrl("/assets/image/placeholder.png");
+      } else {
+        console.log("No data available");
+      }
     });
-  }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files.length > 0) {
+      const file = event.target.files.item(0);
+      const pictureUrl = URL.createObjectURL(file);
+      setAvatarUrl(pictureUrl);
+      setIsDisabled(false);
+    }
+  };
+
+  const handlePictureClick = async () => {
+    if (isPlatform("capacitor")) {
+      try {
+        const photo = await Camera.getPhoto({
+          resultType: CameraResultType.Uri,
+          source: CameraSource.Prompt,
+          width: 600,
+        });
+        setAvatarUrl(photo.webPath);
+        setIsDisabled(false);
+      } catch (error) {
+        console.log("Camera error:", error);
+      }
+    } else {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleUploadFile = async (url: string) => {
+    setStatus({ loading: true, error: false });
+    await handleUpload(url, "avatar");
+  };
 
   return (
     <IonPage>
@@ -76,18 +132,32 @@ const AvatarPage: React.FC = () => {
             marginRight: "auto",
           }}
         >
-          <IonImg src="/assets/image/placeholder.png" />
+          <img
+            src={avatarUrl || "/assets/image/placeholder.png"}
+            alt=""
+            onClick={handlePictureClick}
+          />
         </IonAvatar>
+        <input
+          type="file"
+          id="upload"
+          accept="image/*"
+          hidden
+          multiple={false}
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
         <IonChip
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Nên chọn ảnh đại diện hình vuông hoặc đã được crop sẵn
+            Ấn vào khung ảnh để thay đổi. Nên chọn ảnh đại diện hình vuông hoặc
+            đã được crop sẵn
           </IonLabel>
         </IonChip>
-
+        <br />
         <IonLoading isOpen={status.loading} />
 
         <IonAlert
@@ -110,8 +180,9 @@ const AvatarPage: React.FC = () => {
               expand="block"
               shape="round"
               onClick={() => {
-                sendVerifyEmail();
+                handleUploadFile(avatarUrl);
               }}
+              disabled={isDisabled}
             >
               Áp dụng
             </IonButton>

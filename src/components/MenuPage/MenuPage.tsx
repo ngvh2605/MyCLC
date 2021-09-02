@@ -58,6 +58,7 @@ const MenuPage = () => {
   });
 
   const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     if (userId) {
@@ -85,9 +86,8 @@ const MenuPage = () => {
     userData.child("personal").on("value", (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        try {
-          setFullName(data.fullName);
-        } catch {}
+        if (data.fullName) setFullName(data.fullName);
+        if (data.avatar) setAvatarUrl(data.avatar);
       } else {
         console.log("No data available");
       }
@@ -107,7 +107,7 @@ const MenuPage = () => {
             <IonRow className="ion-align-items-center">
               <IonCol size="3.5">
                 <IonAvatar className="ion-margin">
-                  <IonImg src="/assets/image/placeholder.png" />
+                  <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
                 </IonAvatar>
               </IonCol>
               <IonCol>
