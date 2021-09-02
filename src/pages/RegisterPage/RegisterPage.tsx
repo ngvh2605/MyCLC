@@ -44,7 +44,7 @@ const RegisterPage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
 
   const handleRegister = async () => {
-    if (email.includes("@") == false || email.includes(".") == false) {
+    if (email.includes("@") === false || email.includes(".") === false) {
       setAlertHeader("Lỗi!");
       setAlertMessage("Định dạng email không hợp lệ");
       setShowAlert(true);
@@ -52,7 +52,7 @@ const RegisterPage: React.FC = () => {
       setAlertHeader("Lỗi!");
       setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
       setShowAlert(true);
-    } else if (password != passwordRe) {
+    } else if (password !== passwordRe) {
       setAlertHeader("Lỗi!");
       setAlertMessage("Mật khẩu nhập lại không khớp");
       setShowAlert(true);
@@ -69,7 +69,7 @@ const RegisterPage: React.FC = () => {
         setStatus({ loading: false, error: true });
         console.log("error:", error);
         if (
-          error.message ==
+          error.message ===
           "The email address is already in use by another account."
         ) {
           setAlertHeader("Lỗi!");
@@ -143,7 +143,7 @@ const RegisterPage: React.FC = () => {
                 color="medium"
                 hidden={!password ? true : false}
                 onClick={() => {
-                  if (passwordType == "password") {
+                  if (passwordType === "password") {
                     setPasswordType("text");
                     setPasswordIcon(eye);
                   } else {
@@ -162,7 +162,7 @@ const RegisterPage: React.FC = () => {
                 autocomplete="on"
                 onIonChange={(event) => setPasswordRe(event.detail.value)}
                 onKeyPress={(event) => {
-                  if (event.key == "Enter") handleRegister();
+                  if (event.key === "Enter") handleRegister();
                 }}
               />
               <IonIcon
@@ -173,7 +173,7 @@ const RegisterPage: React.FC = () => {
                 color="medium"
                 hidden={!passwordRe ? true : false}
                 onClick={() => {
-                  if (passwordTypeRe == "password") {
+                  if (passwordTypeRe === "password") {
                     setPasswordTypeRe("text");
                     setPasswordIconRe(eye);
                   } else {

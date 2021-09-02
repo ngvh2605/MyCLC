@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
 
   const handleLogin = async () => {
-    if (email.includes("@") == false || email.includes(".") == false) {
+    if (email.includes("@") === false || email.includes(".") === false) {
       setAlertHeader("Lỗi!");
       setAlertMessage("Định dạng email không hợp lệ");
       setShowAlert(true);
@@ -113,7 +113,7 @@ const LoginPage: React.FC = () => {
                 autocomplete="on"
                 onIonChange={(event) => setPassword(event.detail.value)}
                 onKeyPress={(event) => {
-                  if (event.key == "Enter") handleLogin();
+                  if (event.key === "Enter") handleLogin();
                 }}
               />
               <IonIcon
@@ -124,7 +124,7 @@ const LoginPage: React.FC = () => {
                 color="medium"
                 hidden={!password ? true : false}
                 onClick={() => {
-                  if (passwordType == "password") {
+                  if (passwordType === "password") {
                     setPasswordType("text");
                     setPasswordIcon(eye);
                   } else {

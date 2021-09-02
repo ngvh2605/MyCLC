@@ -75,7 +75,7 @@ const PersonalInfo: React.FC = () => {
   }, [grade, gradeStart]);
 
   useEffect(() => {
-    if (role == "club") {
+    if (role === "club") {
       getClubCode();
     }
   }, [role]);
@@ -113,24 +113,24 @@ const PersonalInfo: React.FC = () => {
           setBirth(data.birth);
           setGender(data.gender);
           setRole(data.role);
-          if (data.role == "student") {
+          if (data.role === "student") {
             setGrade(data.studentClass);
             setGradeStart(data.studentStart);
             setGradeEnd(data.studentEnd);
           }
-          if (data.role == "teacher") {
+          if (data.role === "teacher") {
             setTeacherSubject(data.teacherSubject);
             if (data.teacherClass) setTeacherClass(data.teacherClass);
           }
-          if (data.role == "club") {
+          if (data.role === "club") {
             setClubCode(data.clubCode);
             setClubLink(data.clubLink);
           }
-          if (data.role == "parent") {
+          if (data.role === "parent") {
             setChildName(data.childName);
             setChildClass(data.childClass);
           }
-          if (data.role == "other") {
+          if (data.role === "other") {
             setOther(data.otherSpecify);
             setOtherPurpose(data.otherPurpose);
           }
@@ -201,7 +201,7 @@ const PersonalInfo: React.FC = () => {
       role: role,
     });
 
-    if (role == "student") {
+    if (role === "student") {
       await userData.child("users").child(userId).child("personal").update({
         studentClass: grade,
         studentStart: gradeStart,
@@ -214,7 +214,7 @@ const PersonalInfo: React.FC = () => {
       setAlertMessage("Thông tin của bạn đã được lưu thành công");
       setShowAlert(true);
     }
-    if (role == "teacher") {
+    if (role === "teacher") {
       await userData.child("users").child(userId).child("personal").update({
         teacherSubject: teacherSubject,
         teacherClass: teacherClass,
@@ -226,7 +226,7 @@ const PersonalInfo: React.FC = () => {
       setAlertMessage("Thông tin của bạn đã được lưu thành công");
       setShowAlert(true);
     }
-    if (role == "club") {
+    if (role === "club") {
       if (codeList) {
         if (checkCode()) {
           await userData.child("users").child(userId).child("personal").update({
@@ -249,7 +249,7 @@ const PersonalInfo: React.FC = () => {
         }
       }
     }
-    if (role == "parent") {
+    if (role === "parent") {
       await userData.child("users").child(userId).child("personal").update({
         childName: childName,
         childClass: childClass,
@@ -261,7 +261,7 @@ const PersonalInfo: React.FC = () => {
       setAlertMessage("Thông tin của bạn đã được lưu thành công");
       setShowAlert(true);
     }
-    if (role == "other") {
+    if (role === "other") {
       await userData.child("users").child(userId).child("personal").update({
         otherSpecify: other,
         otherPurpose: otherPurpose,
@@ -360,7 +360,7 @@ const PersonalInfo: React.FC = () => {
               <IonSelectOption value="other">Khác</IonSelectOption>
             </IonSelect>
           </IonItem>
-          <IonItem hidden={role != "other"}>
+          <IonItem hidden={role !== "other"}>
             <IonLabel position="floating">Hãy nêu rõ bạn là ai</IonLabel>
             <IonInput
               type="text"
@@ -368,7 +368,7 @@ const PersonalInfo: React.FC = () => {
               onIonChange={(e) => setOther(e.detail.value)}
             />
           </IonItem>
-          <IonItem hidden={role != "other"}>
+          <IonItem hidden={role !== "other"}>
             <IonLabel position="floating">
               Mục đích bạn sử dụng app này
             </IonLabel>
@@ -384,7 +384,7 @@ const PersonalInfo: React.FC = () => {
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
           className="ion-margin"
-          hidden={role != "club"}
+          hidden={role !== "club"}
         >
           <IonLabel text-wrap className="ion-padding">
             LƯU Ý: Để tạo tài khoản Câu lạc bộ/Tổ chức cần có mã giới thiệu từ
@@ -393,7 +393,7 @@ const PersonalInfo: React.FC = () => {
         </IonChip>
 
         {/* Câu lạc bộ */}
-        <IonList hidden={role != "club"}>
+        <IonList hidden={role !== "club"}>
           <IonItem>
             <IonLabel position="floating">Mã giới thiệu</IonLabel>
             <IonInput
@@ -416,7 +416,7 @@ const PersonalInfo: React.FC = () => {
         </IonList>
 
         {/* Học sinh/Cựu học sinh */}
-        <IonList hidden={role != "student"}>
+        <IonList hidden={role !== "student"}>
           <IonItem>
             <IonLabel position="floating">Khối chuyên</IonLabel>
             <IonSelect
@@ -463,7 +463,7 @@ const PersonalInfo: React.FC = () => {
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
           className="ion-margin"
-          hidden={!gradeClass || role != "student"}
+          hidden={!gradeClass || role !== "student"}
         >
           <IonLabel text-wrap className="ion-padding">
             {"Bạn là học sinh lớp: " + gradeClass}
@@ -472,7 +472,7 @@ const PersonalInfo: React.FC = () => {
         <IonLoading isOpen={status.loading} />
 
         {/* Giáo viên/Nhân viên */}
-        <IonList hidden={role != "teacher"}>
+        <IonList hidden={role !== "teacher"}>
           <IonItem>
             <IonLabel position="floating">
               Vị trí/Chức vụ/Môn học giảng dạy
@@ -494,7 +494,7 @@ const PersonalInfo: React.FC = () => {
         </IonList>
 
         {/* Phụ huynh/Người giám hộ */}
-        <IonList hidden={role != "parent"}>
+        <IonList hidden={role !== "parent"}>
           <IonItem>
             <IonLabel position="floating">Họ và tên Con</IonLabel>
             <IonInput
@@ -517,7 +517,7 @@ const PersonalInfo: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => {
             setShowAlert(false);
-            if (alertHeader != "Lỗi!") {
+            if (alertHeader !== "Lỗi!") {
               history.replace("/my/profile");
             }
           }}

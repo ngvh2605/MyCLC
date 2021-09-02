@@ -23,10 +23,12 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { mailOutline, pencil } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { database } from "../../firebase";
 import { useAuth } from "../../auth";
 import { useHistory } from "react-router";
+import useUploadFile from "../../common/useUploadFile";
+import { deleteAllSubItemFirebase } from "../../utils/helpers/helpers";
 
 interface VerifyStatus {
   emailVerify: boolean;
@@ -34,6 +36,8 @@ interface VerifyStatus {
   personalInfo: boolean;
   hasAvatar: boolean;
 }
+
+const DEFAULT_AVATAR_URL = "/assets/image/placeholder.png";
 
 const ProfilePage: React.FC = () => {
   const { userId, emailVerified } = useAuth();
@@ -53,6 +57,11 @@ const ProfilePage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
+  const { progress, url, handleUpload } = useUploadFile(userId);
+
+  useEffect(() => {
+    console.log("progress", progress);
+  }, [progress]);
 
   useEffect(() => {
     readStatus();
@@ -100,6 +109,12 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleUploadFile = (e) => {
+    const { files } = e.target;
+    console.log(files[0].name);
+    handleUpload(files[0], "avatar");
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -124,15 +139,27 @@ const ProfilePage: React.FC = () => {
             marginLeft: "auto",
             marginRight: "auto",
           }}
-          onClick={() => {
-            setAlertHeader("Chỉnh sửa avatar");
-            setAlertMessage(
-              "Cảm ơn bạn đã thử ấn vào đây. Chức năng này sẽ được ra mắt trong phiên bản tiếp theo!"
-            );
-            setShowAlert(true);
-          }}
         >
-          <IonImg src="/assets/image/placeholder.png" />
+          <label>
+            <img
+              src={url || DEFAULT_AVATAR_URL}
+              alt=""
+              style={{
+                borderRadius: 90,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+            <input
+              type="file"
+              id="upload"
+              accept="image/png, image/gif, image/jpeg"
+              style={{ display: "none" }}
+              multiple={false}
+              onChange={handleUploadFile}
+            />
+          </label>
         </IonAvatar>
         <p style={{ textAlign: "center", fontSize: "large" }}>
           <b>{fullName}</b>
