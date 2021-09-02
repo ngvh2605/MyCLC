@@ -28,6 +28,7 @@ import { database } from '../../firebase';
 import { useAuth } from '../../auth';
 import { useHistory } from 'react-router';
 import useUploadFile from '../../common/useUploadFile';
+import { deleteAllSubItemFirebase } from '../../utils/helpers/helpers';
 
 interface VerifyStatus {
   emailVerify: boolean;
