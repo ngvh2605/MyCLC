@@ -19,6 +19,7 @@ import {
   IonMenuButton,
   IonModal,
   IonPage,
+  IonSkeletonText,
   IonText,
   IonTitle,
   IonToolbar,
@@ -138,11 +139,12 @@ const ProfilePage: React.FC = () => {
             marginLeft: "auto",
             marginRight: "auto",
           }}
-          onClick={() => {
-            history.push("/my/profile/avatar");
-          }}
         >
-          <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
+          <IonSkeletonText animated hidden={avatarUrl ? true : false} />
+          <IonImg
+            hidden={avatarUrl ? false : true}
+            src={avatarUrl || "/assets/image/placeholder.png"}
+          />
         </IonAvatar>
 
         <p style={{ textAlign: "center", fontSize: "large" }}>

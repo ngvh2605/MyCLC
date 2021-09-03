@@ -15,6 +15,7 @@ import {
   IonLoading,
   IonPage,
   IonProgressBar,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   isPlatform,
@@ -25,6 +26,25 @@ import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { auth as firebaseAuth, database } from "../../../firebase";
 import useUploadFile from "../../../common/useUploadFile";
+import jimp from "jimp";
+
+async function resizeImage(url: string, callback) {
+  // Read the image.
+  const image = await jimp.read(url);
+
+  // Resize the image to width 150 and auto height.
+  console.log(image.getWidth(), image.getHeight());
+  const width = image.getWidth();
+  const height = image.getHeight();
+  if (width < height) {
+    await image.resize(jimp.AUTO, 400);
+  } else await image.resize(400, jimp.AUTO);
+  // Save and overwrite the image
+  //await image.writeAsync("test/image.png");
+  await image.getBase64Async(jimp.MIME_JPEG).then((newImage) => {
+    callback(newImage);
+  });
+}
 
 const AvatarPage: React.FC = () => {
   const { userId } = useAuth();
@@ -84,8 +104,11 @@ const AvatarPage: React.FC = () => {
     if (event.target.files.length > 0) {
       const file = event.target.files.item(0);
       const pictureUrl = URL.createObjectURL(file);
-      setAvatarUrl(pictureUrl);
+
       setIsDisabled(false);
+      resizeImage(pictureUrl, function (result: string) {
+        setAvatarUrl(result);
+      });
     }
   };
 
@@ -97,7 +120,9 @@ const AvatarPage: React.FC = () => {
           source: CameraSource.Prompt,
           width: 600,
         });
-        setAvatarUrl(photo.webPath);
+        resizeImage(photo.webPath, function (result: string) {
+          setAvatarUrl(result);
+        });
         setIsDisabled(false);
       } catch (error) {
         console.log("Camera error:", error);
@@ -132,7 +157,9 @@ const AvatarPage: React.FC = () => {
             marginRight: "auto",
           }}
         >
+          <IonSkeletonText animated hidden={avatarUrl ? true : false} />
           <img
+            hidden={avatarUrl ? false : true}
             src={avatarUrl || "/assets/image/placeholder.png"}
             alt=""
             onClick={handlePictureClick}

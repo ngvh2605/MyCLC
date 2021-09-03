@@ -13,6 +13,7 @@ import {
   IonMenu,
   IonPage,
   IonRow,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -107,7 +108,11 @@ const MenuPage = () => {
             <IonRow className="ion-align-items-center">
               <IonCol size="3.5">
                 <IonAvatar className="ion-margin">
-                  <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
+                  <IonSkeletonText animated hidden={avatarUrl ? true : false} />
+                  <IonImg
+                    hidden={avatarUrl ? false : true}
+                    src={avatarUrl || "/assets/image/placeholder.png"}
+                  />
                 </IonAvatar>
               </IonCol>
               <IonCol>
@@ -203,7 +208,7 @@ const MenuPage = () => {
         <IonToolbar>
           <IonList lines="none" className="ion-margin">
             <IonItem>
-              <IonLabel>Phiên bản: 1.3</IonLabel>
+              <IonLabel>Phiên bản: 1.4</IonLabel>
             </IonItem>
             <IonItem
               onClick={() => {
