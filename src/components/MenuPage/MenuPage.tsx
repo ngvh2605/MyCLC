@@ -65,7 +65,7 @@ const MenuPage = () => {
     if (userId) {
       readStatus();
     }
-  }, []);
+  }, [userId]);
 
   const readStatus = () => {
     const userData = database.ref().child("users").child(userId);

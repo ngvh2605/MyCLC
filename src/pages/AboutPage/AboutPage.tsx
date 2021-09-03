@@ -259,6 +259,61 @@ const AboutPage: React.FC = () => {
             </IonLabel>
           </IonCardContent>
         </IonCard>
+
+        <IonCard>
+          <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+            <IonAvatar slot="start">
+              <IonImg src="/assets/image/vuanh.jpg" />
+            </IonAvatar>
+            <IonChip color="primary" slot="end">
+              <IonLabel style={{ verticalAlign: "middle" }}>
+                <span style={{ fontSize: "small" }}>Admin</span>
+              </IonLabel>
+            </IonChip>
+            <IonLabel text-wrap color="dark">
+              <p>
+                <b>Bùi Vũ Anh</b>
+              </p>
+              <IonLabel color="medium">Thành viên dự án</IonLabel>
+            </IonLabel>
+          </IonItem>
+
+          <IonCardContent style={{ paddingTop: 0 }}>
+            <IonCardSubtitle color="primary">Giới thiệu</IonCardSubtitle>
+            <IonLabel color="dark">
+              • Cựu học sinh Chuyên Lý K12
+              <br />• Tốt nghiệp Cử nhân CNTT tại Đại học Công nghệ - ĐHQG Hà
+              Nội
+              <br />• Hiện đang làm việc tại Công ty VNTravel Group
+            </IonLabel>
+          </IonCardContent>
+          <IonCardContent style={{ paddingTop: 0 }}>
+            <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
+            <IonLabel color="dark">
+              Email: anh.bv@tripi.vn
+              <a
+                href="https://www.linkedin.com/in/v%C5%A9-anh-0a76771ab/"
+                target="_blank"
+                style={{ textDecoration: "none" }}
+              >
+                <IonChip color="secondary">
+                  <IonIcon icon={logoLinkedin} />
+                  <IonLabel>Connect on LinkedIn</IonLabel>
+                </IonChip>
+              </a>
+              <a
+                href="https://www.facebook.com/vuanh2999"
+                target="_blank"
+                style={{ textDecoration: "none" }}
+              >
+                <IonChip color="secondary">
+                  <IonIcon icon={logoFacebook} />
+                  <IonLabel>Facebook</IonLabel>
+                </IonChip>
+              </a>
+            </IonLabel>
+          </IonCardContent>
+        </IonCard>
       </IonContent>
 
       <IonAlert
