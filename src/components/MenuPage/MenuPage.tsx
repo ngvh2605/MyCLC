@@ -91,6 +91,8 @@ const MenuPage = () => {
         if (data.avatar) setAvatarUrl(data.avatar);
       } else {
         console.log("No data available");
+        setFullName("");
+        setAvatarUrl("");
       }
     });
   };
@@ -116,7 +118,10 @@ const MenuPage = () => {
                 </IonAvatar>
               </IonCol>
               <IonCol>
-                <IonLabel>
+                <IonLabel hidden={fullName ? true : false}>
+                  <IonSkeletonText animated style={{ width: "70%" }} />
+                </IonLabel>
+                <IonLabel hidden={fullName ? false : true}>
                   <b>{fullName}</b>
                 </IonLabel>
               </IonCol>

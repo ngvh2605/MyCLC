@@ -146,8 +146,21 @@ const ProfilePage: React.FC = () => {
             src={avatarUrl || "/assets/image/placeholder.png"}
           />
         </IonAvatar>
-
-        <p style={{ textAlign: "center", fontSize: "large" }}>
+        <p
+          style={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            width: 150,
+            marginTop: 25,
+          }}
+          hidden={fullName ? true : false}
+        >
+          <IonSkeletonText animated style={{ width: "100%", height: 15 }} />
+        </p>
+        <p
+          style={{ textAlign: "center", fontSize: "large" }}
+          hidden={fullName ? false : true}
+        >
           <b>{fullName}</b>
         </p>
         <br />
