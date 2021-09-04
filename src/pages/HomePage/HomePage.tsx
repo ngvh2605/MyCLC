@@ -54,7 +54,7 @@ import { formatDate } from '../../date';
 import { firestore } from '../../firebase';
 import { News, toNews, Comment, toComment } from '../../models';
 import { auth as firebaseAuth } from '../../firebase';
-
+import { getPost, getComment } from './services';
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
 
@@ -69,22 +69,10 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchNews = async () => {
       setLoading(true);
-      const newsRef = firestore.collection('news');
-      const { docs } = await newsRef
-        .orderBy('timestamp', 'desc')
-        .limit(7)
-        .get();
-      const temp = docs.map(toNews);
-
+      const temp = await getPost();
       let array: News[] = [];
       for (const item of temp) {
-        const { docs } = await firestore
-          .collection('news')
-          .doc(item.id)
-          .collection('comment')
-          .get();
-        const comments: Comment[] = docs.map(toComment);
-        array.push({ ...item, comment: comments });
+        array.push({ ...item, comment: await getComment(item.id) });
       }
       setLoading(false);
       setNews(array);
