@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import firebase from "firebase/app";
 
 export interface Entry {
   id: string;
@@ -10,4 +10,30 @@ export interface Entry {
 
 export function toEntry(doc: firebase.firestore.DocumentSnapshot): Entry {
   return { id: doc.id, ...doc.data() } as Entry;
+}
+
+export interface Comment {
+  id: string;
+  author: string;
+  body: string;
+  timestamp?: string;
+}
+
+export function toComment(doc: firebase.firestore.DocumentSnapshot): Comment {
+  return { id: doc.id, ...doc.data() } as Comment;
+}
+
+export interface News {
+  id: string;
+  author: string;
+  timestamp: string;
+  title?: string;
+  body: string;
+  pictureUrl?: string;
+  reaction?: string[];
+  comment?: Comment[];
+}
+
+export function toNews(doc: firebase.firestore.DocumentSnapshot): News {
+  return { id: doc.id, ...doc.data() } as News;
 }

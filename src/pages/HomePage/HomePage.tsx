@@ -48,14 +48,53 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth";
 import { formatDate } from "../../date";
 import { firestore } from "../../firebase";
-import { Entry, toEntry } from "../../models";
+import { News, toNews, Comment, toComment } from "../../models";
 import { auth as firebaseAuth } from "../../firebase";
 
 const HomePage: React.FC = () => {
+  const { userId } = useAuth();
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const [temp, setTemp] = useState<News[]>([]);
+  const [news, setNews] = useState<News[]>([]);
+
+  useEffect(() => {
+    const newsRef = firestore.collection("news");
+    newsRef
+      .orderBy("timestamp", "desc")
+      .limit(7)
+      .onSnapshot(({ docs }) => {
+        setTemp(docs.map(toNews));
+        setLoading(true);
+      });
+  }, [userId]);
+
+  useEffect(() => {
+    let array: News[] = [];
+    temp.forEach(async (item) => {
+      await firestore
+        .collection("news")
+        .doc(item.id)
+        .collection("comment")
+        .get()
+        .then(({ docs }) => {
+          const comments: Comment[] = docs.map(toComment);
+          console.log("comments", comments);
+
+          array.push({
+            ...temp[temp.indexOf(item)],
+            comment: comments,
+          });
+        });
+    });
+    setNews(array);
+  }, [temp]);
+
+  console.log("news", news);
   return (
     <IonPage>
       <IonHeader>
@@ -97,6 +136,49 @@ const HomePage: React.FC = () => {
             MyCLC nhé!
           </IonLabel>
         </IonChip>
+
+        <IonButton onClick={() => console.log(news)}>Why</IonButton>
+        {news.map((item) => (
+          <IonLabel>Here</IonLabel>
+        ))}
+        {news.map((item) => (
+          <IonCard>
+            <IonButton onClick={() => console.log(item)}>Why</IonButton>
+            <IonImg src={item.pictureUrl} />
+
+            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonAvatar slot="start">
+                <IonImg src="/assets/image/MultiLogo.png" />
+              </IonAvatar>
+              <IonChip color="primary" slot="end">
+                <IonLabel style={{ verticalAlign: "middle" }}>
+                  <span style={{ fontSize: "small" }}>Club</span>
+                </IonLabel>
+              </IonChip>
+              <IonLabel text-wrap color="dark">
+                <p>
+                  <b>CLC Multimedia</b>
+                </p>
+                <IonLabel color="medium">{item.timestamp.toString()}</IonLabel>
+              </IonLabel>
+            </IonItem>
+            <IonCardContent style={{ paddingTop: 0 }}>
+              <IonCardSubtitle color="primary">{item.title}</IonCardSubtitle>
+              <IonLabel color="dark" text-wrap>
+                {item.body}
+              </IonLabel>
+            </IonCardContent>
+            <IonList>
+              {item.comment &&
+                item.comment.map((comment) => (
+                  <IonItem>
+                    <IonLabel>{comment.body}</IonLabel>
+                  </IonItem>
+                ))}
+            </IonList>
+          </IonCard>
+        ))}
+
         <IonCard>
           <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156" />
 
