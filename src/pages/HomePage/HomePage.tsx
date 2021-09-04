@@ -54,7 +54,13 @@ import { formatDate } from '../../date';
 import { firestore } from '../../firebase';
 import { News, toNews, Comment, toComment } from '../../models';
 import { auth as firebaseAuth } from '../../firebase';
-import { getPost, getComment } from './services';
+import {
+  getNew,
+  getComment,
+  getLikedNewByUserId,
+  getLikedUserByNewId,
+  likeNews,
+} from './services';
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
 
@@ -66,16 +72,26 @@ const HomePage: React.FC = () => {
   const [temp, setTemp] = useState<News[]>([]); //ko cần đến state này, mình có thể làm tuần tự được
   const [news, setNews] = useState<News[]>([]);
 
+  const test = async () => {
+    const a = await getLikedNewByUserId(userId);//lấy ra những bài đã like của user hiện tại
+    const b = await getLikedUserByNewId('HCtGShJ3gaSJ8n1x2VuW');//lấy ra danh sách những người đã like bài viết này
+    console.log(a, b);
+    likeNews(userId, 'HCtGShJ3gaSJ8n1x2VuW');//like bài viết
+  };
+
   useEffect(() => {
     const fetchNews = async () => {
       setLoading(true);
-      const temp = await getPost();
+      const temp = await getNew();
       let array: News[] = [];
       for (const item of temp) {
         array.push({ ...item, comment: await getComment(item.id) });
       }
       setLoading(false);
       setNews(array);
+
+      // test here
+      //test();
     };
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
