@@ -35,9 +35,15 @@ import {
   IonProgressBar,
   IonSpinner,
   IonSkeletonText,
+  IonNote,
+  IonItemDivider,
 } from "@ionic/react";
 import {
   add as addIcon,
+  chatbubbleEllipses,
+  heart,
+  heartCircle,
+  heartOutline,
   mailOutline,
   mailUnreadOutline,
   notificationsOutline,
@@ -60,7 +66,12 @@ import {
   getLikedNewByUserId,
   getLikedUserByNewId,
   likeNews,
+  isNewLikedByUser,
 } from "./services";
+import "./HomePage.scss";
+import moment from "moment";
+import "moment/locale/vi";
+
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
 
@@ -76,9 +87,6 @@ const HomePage: React.FC = () => {
     const b = await getLikedUserByNewId("HCtGShJ3gaSJ8n1x2VuW"); //lấy ra danh sách những người đã like bài viết này
     console.log(a, b);
     likeNews(userId, "HCtGShJ3gaSJ8n1x2VuW"); //like bài viết
-    b.forEach((post) => {
-      if (post.id === userId) console.log(true);
-    });
   };
 
   useEffect(() => {
@@ -87,19 +95,23 @@ const HomePage: React.FC = () => {
       const temp = await getNew();
       let array: News[] = [];
       for (const item of temp) {
-        array.push({ ...item, comment: await getComment(item.id) });
+        array.push({
+          ...item,
+          comment: await getComment(item.id),
+          isLiked: await isNewLikedByUser(userId, item.id),
+        });
       }
       setLoading(false);
       setNews(array);
 
       // test here
-      test();
+      //test();
     };
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
 
   return (
-    <IonPage>
+    <IonPage id="home-page">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -147,7 +159,7 @@ const HomePage: React.FC = () => {
           ))}
           {news.map((item, index) => (
             <IonCard key={index}>
-              <IonButton onClick={() => console.log(item)}>Why</IonButton>
+              <IonButton onClick={() => {}}>Why</IonButton>
               <IonImg src={item.pictureUrl} />
 
               <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
@@ -164,16 +176,90 @@ const HomePage: React.FC = () => {
                     <b>CLC Multimedia</b>
                   </p>
                   <IonLabel color="medium">
-                    {item.timestamp.toString()}
+                    {moment(item.timestamp).locale("vi").fromNow()}
                   </IonLabel>
                 </IonLabel>
               </IonItem>
-              <IonCardContent style={{ paddingTop: 0 }}>
+              <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
                 <IonCardSubtitle color="primary">{item.title}</IonCardSubtitle>
                 <IonLabel color="dark" text-wrap>
                   {item.body}
                 </IonLabel>
               </IonCardContent>
+              <hr
+                className="ion-margin"
+                style={{
+                  borderBottom: "1px solid",
+                  opacity: 0.2,
+                  marginBottom: 10,
+                }}
+              />
+              <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
+                <IonRow className="ion-align-items-center">
+                  <IonCol
+                    className="ion-align-self-center"
+                    style={{ textAlign: "center" }}
+                  >
+                    <IonButton
+                      fill="clear"
+                      expand="full"
+                      style={{ height: "max-content" }}
+                    >
+                      <IonIcon
+                        icon={chatbubbleEllipses}
+                        color="primary"
+                        style={{ fontSize: "large" }}
+                        slot="start"
+                      />
+
+                      <IonLabel color="primary" style={{ fontSize: "small" }}>
+                        123
+                      </IonLabel>
+                    </IonButton>
+                  </IonCol>
+                  <IonCol
+                    className="ion-align-self-center"
+                    style={{ textAlign: "center" }}
+                  >
+                    {item.isLiked ? (
+                      <IonButton
+                        fill="clear"
+                        expand="full"
+                        style={{ height: "max-content" }}
+                      >
+                        <IonIcon
+                          icon={heart}
+                          color="danger"
+                          style={{ fontSize: "large" }}
+                          slot="start"
+                        />
+
+                        <IonLabel color="danger" style={{ fontSize: "small" }}>
+                          123
+                        </IonLabel>
+                      </IonButton>
+                    ) : (
+                      <IonButton
+                        fill="clear"
+                        expand="full"
+                        style={{ height: "max-content" }}
+                      >
+                        <IonIcon
+                          icon={heartOutline}
+                          color="dark"
+                          style={{ fontSize: "large" }}
+                          slot="start"
+                        />
+
+                        <IonLabel color="dark" style={{ fontSize: "small" }}>
+                          123
+                        </IonLabel>
+                      </IonButton>
+                    )}
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+              {/* 
               <IonList>
                 {item.comment &&
                   item.comment.map((comment, index) => (
@@ -182,6 +268,7 @@ const HomePage: React.FC = () => {
                     </IonItem>
                   ))}
               </IonList>
+              */}
             </IonCard>
           ))}
 

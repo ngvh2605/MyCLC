@@ -71,6 +71,5 @@ export const isNewLikedByUser = async (userId: string, newId: string) => {
     .where("newId", "==", newId)
     .where("userId", "==", userId)
     .get();
-  if (junctions) return true;
-  else return false;
+  return !junctions.empty;
 };

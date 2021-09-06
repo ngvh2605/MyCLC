@@ -32,6 +32,7 @@ export interface News {
   pictureUrl?: string;
   reaction?: string[];
   comment?: Comment[];
+  isLiked?: boolean;
 }
 
 export function toNews(doc: firebase.firestore.DocumentSnapshot): News {
