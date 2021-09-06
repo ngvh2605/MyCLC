@@ -1,25 +1,25 @@
-import { firestore, database } from '../../firebase';
-import { News, toNews, Comment, toComment } from '../../models';
+import { firestore, database } from "../../firebase";
+import { News, toNews, Comment, toComment } from "../../models";
 
 export const getComment = async (id: string) => {
   const { docs } = await firestore
-    .collection('news')
+    .collection("news")
     .doc(id)
-    .collection('comment')
+    .collection("comment")
     .get();
   return docs.map(toComment);
 };
 
 export const getNew = async () => {
-  const newsRef = firestore.collection('news');
-  const { docs } = await newsRef.orderBy('timestamp', 'desc').limit(7).get();
+  const newsRef = firestore.collection("news");
+  const { docs } = await newsRef.orderBy("timestamp", "desc").limit(7).get();
   return docs.map(toNews);
 };
 
 export const getLikedNewByUserId = async (id: string) => {
   const junctions = await firestore
-    .collection('user_like_new')
-    .where('userId', '==', id)
+    .collection("newsReaction")
+    .where("userId", "==", id)
     .get();
 
   const news = await Promise.all(
@@ -35,8 +35,8 @@ export const getLikedNewByUserId = async (id: string) => {
 
 export const getLikedUserByNewId = async (id: string) => {
   const junctions = await firestore
-    .collection('user_like_new')
-    .where('newId', '==', id)
+    .collection("newsReaction")
+    .where("newId", "==", id)
     .get();
 
   const userIds = await Promise.all(
@@ -48,19 +48,29 @@ export const getLikedUserByNewId = async (id: string) => {
       const user = (
         await database
           .ref()
-          .child('users')
+          .child("users")
           .child(userId)
-          .child('personal')
+          .child("personal")
           .get()
       ).val();
       return { id: userId, ...user };
     })
   );
-  
+
   return users;
 };
 
 export const likeNews = async (userId: string, newId: string) => {
-  const junctionRef = firestore.doc(`user_like_new/${newId}_${userId}`);
+  const junctionRef = firestore.doc(`newsReaction/${newId}_${userId}`);
   await junctionRef.set({ newId, userId });
+};
+
+export const isNewLikedByUser = async (userId: string, newId: string) => {
+  const junctions = await firestore
+    .collection("newsReaction")
+    .where("newId", "==", newId)
+    .where("userId", "==", userId)
+    .get();
+  if (junctions) return true;
+  else return false;
 };

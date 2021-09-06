@@ -35,7 +35,7 @@ import {
   IonProgressBar,
   IonSpinner,
   IonSkeletonText,
-} from '@ionic/react';
+} from "@ionic/react";
 import {
   add as addIcon,
   mailOutline,
@@ -47,36 +47,38 @@ import {
   warning,
   wifi,
   wine,
-} from 'ionicons/icons';
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../auth';
-import { formatDate } from '../../date';
-import { firestore } from '../../firebase';
-import { News, toNews, Comment, toComment } from '../../models';
-import { auth as firebaseAuth } from '../../firebase';
+} from "ionicons/icons";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../auth";
+import { formatDate } from "../../date";
+import { firestore } from "../../firebase";
+import { News, toNews, Comment, toComment } from "../../models";
+import { auth as firebaseAuth } from "../../firebase";
 import {
   getNew,
   getComment,
   getLikedNewByUserId,
   getLikedUserByNewId,
   likeNews,
-} from './services';
+} from "./services";
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
 
   const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [temp, setTemp] = useState<News[]>([]); //ko cần đến state này, mình có thể làm tuần tự được
   const [news, setNews] = useState<News[]>([]);
 
   const test = async () => {
-    const a = await getLikedNewByUserId(userId);//lấy ra những bài đã like của user hiện tại
-    const b = await getLikedUserByNewId('HCtGShJ3gaSJ8n1x2VuW');//lấy ra danh sách những người đã like bài viết này
+    const a = await getLikedNewByUserId(userId); //lấy ra những bài đã like của user hiện tại
+    const b = await getLikedUserByNewId("HCtGShJ3gaSJ8n1x2VuW"); //lấy ra danh sách những người đã like bài viết này
     console.log(a, b);
-    likeNews(userId, 'HCtGShJ3gaSJ8n1x2VuW');//like bài viết
+    likeNews(userId, "HCtGShJ3gaSJ8n1x2VuW"); //like bài viết
+    b.forEach((post) => {
+      if (post.id === userId) console.log(true);
+    });
   };
 
   useEffect(() => {
@@ -91,7 +93,7 @@ const HomePage: React.FC = () => {
       setNews(array);
 
       // test here
-      //test();
+      test();
     };
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
@@ -100,31 +102,31 @@ const HomePage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
+          <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
           <IonTitle>CLC News</IonTitle>
-          <IonButtons slot='end'>
+          <IonButtons slot="end">
             <IonButton
               onClick={() => {
-                setAlertHeader('Hòm thư');
+                setAlertHeader("Hòm thư");
                 setAlertMessage(
-                  'Cảm ơn bạn đã thử ấn vào đây! Chức năng này sẽ được ra mắt trong thời gian tới. Hãy cùng đón chờ nhé!'
+                  "Cảm ơn bạn đã thử ấn vào đây! Chức năng này sẽ được ra mắt trong thời gian tới. Hãy cùng đón chờ nhé!"
                 );
                 setShowAlert(true);
               }}
             >
-              <IonIcon icon={mailUnreadOutline} color='primary' />
+              <IonIcon icon={mailUnreadOutline} color="primary" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       {!loading ? (
-        <IonContent className='ion-padding'>
+        <IonContent className="ion-padding">
           <IonChip
-            color='primary'
-            style={{ height: 'max-content', marginBottom: 10 }}
-            className='ion-margin'
+            color="primary"
+            style={{ height: "max-content", marginBottom: 10 }}
+            className="ion-margin"
             hidden={
               !(
                 firebaseAuth.currentUser.metadata.creationTime ===
@@ -132,7 +134,7 @@ const HomePage: React.FC = () => {
               )
             }
           >
-            <IonLabel text-wrap className='ion-padding'>
+            <IonLabel text-wrap className="ion-padding">
               Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và
               thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác
               của MyCLC nhé!
@@ -148,27 +150,27 @@ const HomePage: React.FC = () => {
               <IonButton onClick={() => console.log(item)}>Why</IonButton>
               <IonImg src={item.pictureUrl} />
 
-              <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-                <IonAvatar slot='start'>
-                  <IonImg src='/assets/image/MultiLogo.png' />
+              <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+                <IonAvatar slot="start">
+                  <IonImg src="/assets/image/MultiLogo.png" />
                 </IonAvatar>
-                <IonChip color='primary' slot='end'>
-                  <IonLabel style={{ verticalAlign: 'middle' }}>
-                    <span style={{ fontSize: 'small' }}>Club</span>
+                <IonChip color="primary" slot="end">
+                  <IonLabel style={{ verticalAlign: "middle" }}>
+                    <span style={{ fontSize: "small" }}>Club</span>
                   </IonLabel>
                 </IonChip>
-                <IonLabel text-wrap color='dark'>
+                <IonLabel text-wrap color="dark">
                   <p>
                     <b>CLC Multimedia</b>
                   </p>
-                  <IonLabel color='medium'>
+                  <IonLabel color="medium">
                     {item.timestamp.toString()}
                   </IonLabel>
                 </IonLabel>
               </IonItem>
               <IonCardContent style={{ paddingTop: 0 }}>
-                <IonCardSubtitle color='primary'>{item.title}</IonCardSubtitle>
-                <IonLabel color='dark' text-wrap>
+                <IonCardSubtitle color="primary">{item.title}</IonCardSubtitle>
+                <IonLabel color="dark" text-wrap>
                   {item.body}
                 </IonLabel>
               </IonCardContent>
@@ -184,29 +186,29 @@ const HomePage: React.FC = () => {
           ))}
 
           <IonCard>
-            <IonImg src='https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156' />
+            <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156" />
 
-            <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar slot='start'>
-                <IonImg src='/assets/image/MultiLogo.png' />
+            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonAvatar slot="start">
+                <IonImg src="/assets/image/MultiLogo.png" />
               </IonAvatar>
-              <IonChip color='primary' slot='end'>
-                <IonLabel style={{ verticalAlign: 'middle' }}>
-                  <span style={{ fontSize: 'small' }}>Club</span>
+              <IonChip color="primary" slot="end">
+                <IonLabel style={{ verticalAlign: "middle" }}>
+                  <span style={{ fontSize: "small" }}>Club</span>
                 </IonLabel>
               </IonChip>
-              <IonLabel text-wrap color='dark'>
+              <IonLabel text-wrap color="dark">
                 <p>
                   <b>CLC Multimedia</b>
                 </p>
-                <IonLabel color='medium'>28/08/2021 • 11:20</IonLabel>
+                <IonLabel color="medium">28/08/2021 • 11:20</IonLabel>
               </IonLabel>
             </IonItem>
             <IonCardContent style={{ paddingTop: 0 }}>
-              <IonCardSubtitle color='primary'>
+              <IonCardSubtitle color="primary">
                 Mở đăng ký sớm MyCLC
               </IonCardSubtitle>
-              <IonLabel color='dark' text-wrap>
+              <IonLabel color="dark" text-wrap>
                 🌐 Trước sự thay đổi chóng mặt của thời đại công nghệ 4.0, CLC
                 Multimedia đã phối hợp với các anh chị cựu học sinh đang là sinh
                 viên ngành CNTT trong và ngoài nước để phát triển một ứng dụng
@@ -240,31 +242,31 @@ const HomePage: React.FC = () => {
       ) : (
         <IonContent>
           <IonCard>
-            <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar slot='start'>
+            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonAvatar slot="start">
                 <IonSkeletonText animated />
               </IonAvatar>
-              <IonChip color='primary' slot='end'>
-                <IonLabel style={{ verticalAlign: 'middle' }}>...</IonLabel>
+              <IonChip color="primary" slot="end">
+                <IonLabel style={{ verticalAlign: "middle" }}>...</IonLabel>
               </IonChip>
-              <IonLabel text-wrap color='dark'>
+              <IonLabel text-wrap color="dark">
                 <p>
-                  <IonSkeletonText animated style={{ width: '50%' }} />
+                  <IonSkeletonText animated style={{ width: "50%" }} />
                 </p>
-                <IonLabel color='medium'>
-                  <IonSkeletonText animated style={{ width: '30%' }} />
+                <IonLabel color="medium">
+                  <IonSkeletonText animated style={{ width: "30%" }} />
                 </IonLabel>
               </IonLabel>
             </IonItem>
             <IonCardContent style={{ paddingTop: 0 }}>
-              <IonCardSubtitle color='primary'>
-                <IonSkeletonText animated style={{ width: '100%' }} />
+              <IonCardSubtitle color="primary">
+                <IonSkeletonText animated style={{ width: "100%" }} />
               </IonCardSubtitle>
-              <IonLabel color='dark' text-wrap>
-                <IonSkeletonText animated style={{ width: '100%' }} />
-                <IonSkeletonText animated style={{ width: '100%' }} />
-                <IonSkeletonText animated style={{ width: '100%' }} />
-                <IonSkeletonText animated style={{ width: '100%' }} />
+              <IonLabel color="dark" text-wrap>
+                <IonSkeletonText animated style={{ width: "100%" }} />
+                <IonSkeletonText animated style={{ width: "100%" }} />
+                <IonSkeletonText animated style={{ width: "100%" }} />
+                <IonSkeletonText animated style={{ width: "100%" }} />
               </IonLabel>
             </IonCardContent>
           </IonCard>
@@ -273,10 +275,10 @@ const HomePage: React.FC = () => {
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
-        cssClass='my-custom-class'
+        cssClass="my-custom-class"
         header={alertHeader}
         message={alertMessage}
-        buttons={['OK']}
+        buttons={["OK"]}
       />
     </IonPage>
   );
