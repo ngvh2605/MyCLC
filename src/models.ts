@@ -33,6 +33,8 @@ export interface News {
   reaction?: string[];
   comment?: Comment[];
   isLiked?: boolean;
+  totalLikes?: number;
+  totalComments?: number;
 }
 
 export function toNews(doc: firebase.firestore.DocumentSnapshot): News {

@@ -61,8 +61,36 @@ export const getLikedUserByNewId = async (id: string) => {
 };
 
 export const likeNews = async (userId: string, newId: string) => {
-  const junctionRef = firestore.doc(`newsReaction/${newId}_${userId}`);
-  await junctionRef.set({ newId, userId });
+  const currentLikes = (
+    await firestore.collection("news").doc(newId).get()
+  ).data().totalLikes;
+  if (currentLikes)
+    firestore
+      .collection("news")
+      .doc(newId)
+      .update({ totalLikes: currentLikes + 1 });
+  else firestore.collection("news").doc(newId).update({ totalLikes: 1 });
+  await firestore.doc(`newsReaction/${newId}_${userId}`).set({ newId, userId });
+};
+
+export const unlikeNews = async (userId: string, newId: string) => {
+  const currentLikes = (
+    await firestore.collection("news").doc(newId).get()
+  ).data().totalLikes;
+  firestore
+    .collection("news")
+    .doc(newId)
+    .update({ totalLikes: currentLikes - 1 });
+  await firestore
+    .collection("newsReaction")
+    .where("newId", "==", newId)
+    .where("userId", "==", userId)
+    .get()
+    .then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        doc.ref.delete();
+      });
+    });
 };
 
 export const isNewLikedByUser = async (userId: string, newId: string) => {

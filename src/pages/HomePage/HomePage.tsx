@@ -48,7 +48,9 @@ import {
   mailUnreadOutline,
   notificationsOutline,
   pin,
+  rocket,
   sparkles,
+  star,
   walk,
   warning,
   wifi,
@@ -67,6 +69,7 @@ import {
   getLikedUserByNewId,
   likeNews,
   isNewLikedByUser,
+  unlikeNews,
 } from "./services";
 import "./HomePage.scss";
 import moment from "moment";
@@ -82,33 +85,40 @@ const HomePage: React.FC = () => {
 
   const [news, setNews] = useState<News[]>([]);
 
-  const test = async () => {
-    const a = await getLikedNewByUserId(userId); //lấy ra những bài đã like của user hiện tại
-    const b = await getLikedUserByNewId("HCtGShJ3gaSJ8n1x2VuW"); //lấy ra danh sách những người đã like bài viết này
-    console.log(a, b);
-    likeNews(userId, "HCtGShJ3gaSJ8n1x2VuW"); //like bài viết
-  };
-
   useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      const temp = await getNew();
-      let array: News[] = [];
-      for (const item of temp) {
-        array.push({
-          ...item,
-          comment: await getComment(item.id),
-          isLiked: await isNewLikedByUser(userId, item.id),
-        });
-      }
-      setLoading(false);
-      setNews(array);
-
-      // test here
-      //test();
-    };
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
+
+  const fetchNews = async () => {
+    setLoading(true);
+    const temp = await getNew();
+    let array: News[] = [];
+    for (const item of temp) {
+      array.push({
+        ...item,
+        comment: await getComment(item.id),
+        isLiked: await isNewLikedByUser(userId, item.id),
+      });
+    }
+    setLoading(false);
+    setNews(array);
+  };
+
+  const handleReaction = (index: number, isLiked: boolean) => {
+    let array: News[] = [...news];
+
+    array[index] = {
+      ...array[index],
+      isLiked: isLiked,
+      totalLikes: isLiked
+        ? array[index].totalLikes
+          ? array[index].totalLikes + 1
+          : 1
+        : array[index].totalLikes - 1,
+    };
+
+    setNews(array);
+  };
 
   return (
     <IonPage id="home-page">
@@ -166,16 +176,16 @@ const HomePage: React.FC = () => {
                 <IonAvatar slot="start">
                   <IonImg src="/assets/image/MultiLogo.png" />
                 </IonAvatar>
-                <IonChip color="primary" slot="end">
-                  <IonLabel style={{ verticalAlign: "middle" }}>
-                    <span style={{ fontSize: "small" }}>Club</span>
-                  </IonLabel>
-                </IonChip>
+
                 <IonLabel text-wrap color="dark">
                   <p>
                     <b>CLC Multimedia</b>
                   </p>
                   <IonLabel color="medium">
+                    <IonNote color="primary">
+                      <IonIcon icon={star} /> Club
+                    </IonNote>
+                    {" • "}
                     {moment(item.timestamp).locale("vi").fromNow()}
                   </IonLabel>
                 </IonLabel>
@@ -213,7 +223,8 @@ const HomePage: React.FC = () => {
                       />
 
                       <IonLabel color="primary" style={{ fontSize: "small" }}>
-                        123
+                        {item.totalComments > 0 ? item.totalComments : ""} Bình
+                        luận
                       </IonLabel>
                     </IonButton>
                   </IonCol>
@@ -226,6 +237,10 @@ const HomePage: React.FC = () => {
                         fill="clear"
                         expand="full"
                         style={{ height: "max-content" }}
+                        onClick={() => {
+                          unlikeNews(userId, item.id);
+                          handleReaction(index, false);
+                        }}
                       >
                         <IonIcon
                           icon={heart}
@@ -235,7 +250,7 @@ const HomePage: React.FC = () => {
                         />
 
                         <IonLabel color="danger" style={{ fontSize: "small" }}>
-                          123
+                          {item.totalLikes} Yêu thích
                         </IonLabel>
                       </IonButton>
                     ) : (
@@ -243,6 +258,10 @@ const HomePage: React.FC = () => {
                         fill="clear"
                         expand="full"
                         style={{ height: "max-content" }}
+                        onClick={() => {
+                          likeNews(userId, item.id);
+                          handleReaction(index, true);
+                        }}
                       >
                         <IonIcon
                           icon={heartOutline}
@@ -252,7 +271,7 @@ const HomePage: React.FC = () => {
                         />
 
                         <IonLabel color="dark" style={{ fontSize: "small" }}>
-                          123
+                          {item.totalLikes > 0 ? item.totalLikes : ""} Yêu thích
                         </IonLabel>
                       </IonButton>
                     )}
