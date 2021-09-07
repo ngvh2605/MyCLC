@@ -35,6 +35,7 @@ export interface News {
   isLiked?: boolean;
   totalLikes?: number;
   totalComments?: number;
+  authorInfo?: any;
 }
 
 export function toNews(doc: firebase.firestore.DocumentSnapshot): News {

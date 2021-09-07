@@ -70,6 +70,7 @@ import {
   likeNews,
   isNewLikedByUser,
   unlikeNews,
+  getInfoByUserId,
 } from "./services";
 import "./HomePage.scss";
 import moment from "moment";
@@ -98,6 +99,7 @@ const HomePage: React.FC = () => {
         ...item,
         comment: await getComment(item.id),
         isLiked: await isNewLikedByUser(userId, item.id),
+        authorInfo: await getInfoByUserId(item.author),
       });
     }
     setLoading(false);
@@ -169,24 +171,30 @@ const HomePage: React.FC = () => {
           ))}
           {news.map((item, index) => (
             <IonCard key={index}>
-              <IonButton onClick={() => {}}>Why</IonButton>
-              <IonImg src={item.pictureUrl} />
+              <IonImg hidden={!item.pictureUrl} src={item.pictureUrl} />
 
               <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
                 <IonAvatar slot="start">
-                  <IonImg src="/assets/image/MultiLogo.png" />
+                  <IonImg src={item.authorInfo.avatar} />
                 </IonAvatar>
 
                 <IonLabel text-wrap color="dark">
                   <p>
-                    <b>CLC Multimedia</b>
+                    <b>{item.authorInfo.fullName}</b>
                   </p>
                   <IonLabel color="medium">
                     <IonNote color="primary">
-                      <IonIcon icon={star} /> Club
+                      <IonIcon
+                        icon={star}
+                        style={{
+                          fontSize: "x-small",
+                          verticalAlign: "baseline",
+                        }}
+                      />{" "}
+                      Club
                     </IonNote>
-                    {" • "}
-                    {moment(item.timestamp).locale("vi").fromNow()}
+                    {" · "}
+                    {moment(item.timestamp).locale("vi").format("Do MMM, H:mm")}
                   </IonLabel>
                 </IonLabel>
               </IonItem>

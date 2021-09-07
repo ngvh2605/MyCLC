@@ -6,7 +6,7 @@ const useUploadFile = (userId?: string) => {
   const [progress, setProgress] = useState<number>(0);
   const [url, setUrl] = useState<string>("");
 
-  const handleUpload = async (blobUrl: any, type?: "avatar") => {
+  const handleUpload = async (blobUrl: any, type?: "avatar" | "news") => {
     const imgName = `${Date.now()}`;
     const rootFolder = `/${userId ? `users/${userId}` : "public"}`;
     const folderPath = `${rootFolder}/${type ? type + "/" : ""}`;

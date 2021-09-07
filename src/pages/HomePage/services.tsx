@@ -56,8 +56,17 @@ export const getLikedUserByNewId = async (id: string) => {
       return { id: userId, ...user };
     })
   );
-
   return users;
+};
+
+export const getInfoByUserId = async (id: string) => {
+  const info = await database
+    .ref()
+    .child("users")
+    .child(id)
+    .child("personal")
+    .get();
+  return info.val();
 };
 
 export const likeNews = async (userId: string, newId: string) => {

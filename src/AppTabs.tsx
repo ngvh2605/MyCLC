@@ -23,6 +23,7 @@ import EventPage from "./pages/EventPage";
 import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AvatarPage from "./pages/ProfilePage/AvatarPage";
+import AddNewsPage from "./pages/HomePage/AddNewsPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -33,6 +34,9 @@ const AppTabs: React.FC = () => {
     <IonRouterOutlet>
       <Route exact path="/my/home">
         <HomePage />
+      </Route>
+      <Route exact path="/my/home/add">
+        <AddNewsPage />
       </Route>
       <Route exact path="/my/home/view/:id">
         <EntryPage />
