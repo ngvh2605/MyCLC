@@ -17,6 +17,7 @@ export interface Comment {
   author: string;
   body: string;
   timestamp?: string;
+  authorInfo?: any;
 }
 
 export function toComment(doc: firebase.firestore.DocumentSnapshot): Comment {

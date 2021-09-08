@@ -6,6 +6,7 @@ export const getComment = async (id: string) => {
     .collection("news")
     .doc(id)
     .collection("comment")
+    .orderBy("timestamp", "desc")
     .get();
   return docs.map(toComment);
 };

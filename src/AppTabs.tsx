@@ -24,6 +24,7 @@ import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AvatarPage from "./pages/ProfilePage/AvatarPage";
 import AddNewsPage from "./pages/HomePage/AddNewsPage";
+import ViewNewsPage from "./pages/HomePage/ViewNewsPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -39,7 +40,7 @@ const AppTabs: React.FC = () => {
         <AddNewsPage />
       </Route>
       <Route exact path="/my/home/view/:id">
-        <EntryPage />
+        <ViewNewsPage />
       </Route>
       <Route exact path="/my/entries">
         <AllEntryPage />

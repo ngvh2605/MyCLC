@@ -98,13 +98,12 @@ const HomePage: React.FC = () => {
     for (const item of temp) {
       array.push({
         ...item,
-        comment: await getComment(item.id),
         isLiked: await isNewLikedByUser(userId, item.id),
         authorInfo: await getInfoByUserId(item.author),
       });
     }
-    setLoading(false);
     setNews(array);
+    setLoading(false);
   };
 
   const handleReaction = (index: number, isLiked: boolean) => {
@@ -174,7 +173,6 @@ const HomePage: React.FC = () => {
                 <IonAvatar slot="start">
                   <IonImg src={item.authorInfo.avatar} />
                 </IonAvatar>
-
                 <IonLabel text-wrap color="dark">
                   <p>
                     <b>{item.authorInfo.fullName}</b>
@@ -224,6 +222,7 @@ const HomePage: React.FC = () => {
                       fill="clear"
                       expand="full"
                       style={{ height: "max-content" }}
+                      routerLink={`/my/home/view/${item.id}`}
                     >
                       <IonIcon
                         icon={chatbubbleEllipses}
@@ -354,33 +353,32 @@ const HomePage: React.FC = () => {
           </IonFab>
         </IonContent>
       ) : (
-        <IonContent>
+        <IonContent className="ion-padding">
           <IonCard>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">
                 <IonSkeletonText animated />
               </IonAvatar>
-              <IonChip color="primary" slot="end">
-                <IonLabel style={{ verticalAlign: "middle" }}>...</IonLabel>
-              </IonChip>
-              <IonLabel text-wrap color="dark">
+              <IonLabel text-wrap>
                 <p>
                   <IonSkeletonText animated style={{ width: "50%" }} />
                 </p>
-                <IonLabel color="medium">
-                  <IonSkeletonText animated style={{ width: "30%" }} />
+                <IonLabel>
+                  <IonNote>
+                    <IonSkeletonText animated style={{ width: "30%" }} />
+                  </IonNote>
                 </IonLabel>
               </IonLabel>
             </IonItem>
             <IonCardContent style={{ paddingTop: 0 }}>
-              <IonCardSubtitle color="primary">
+              <IonCardSubtitle style={{ paddingBottom: 10 }}>
                 <IonSkeletonText animated style={{ width: "100%" }} />
               </IonCardSubtitle>
-              <IonLabel color="dark" text-wrap>
+              <IonLabel text-wrap>
                 <IonSkeletonText animated style={{ width: "100%" }} />
                 <IonSkeletonText animated style={{ width: "100%" }} />
                 <IonSkeletonText animated style={{ width: "100%" }} />
-                <IonSkeletonText animated style={{ width: "100%" }} />
+                <IonSkeletonText animated style={{ width: "30%" }} />
               </IonLabel>
             </IonCardContent>
           </IonCard>
