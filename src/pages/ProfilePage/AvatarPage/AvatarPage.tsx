@@ -1,4 +1,4 @@
-import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from "@capacitor/core";
 import {
   IonAlert,
   IonAvatar,
@@ -19,65 +19,52 @@ import {
   IonTitle,
   IonToolbar,
   isPlatform,
-} from '@ionic/react';
-import { chevronBack } from 'ionicons/icons';
-import React, { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router';
-import { useAuth } from '../../../auth';
-import { auth as firebaseAuth, database } from '../../../firebase';
-import useUploadFile from '../../../common/useUploadFile';
-import { resizeImage } from '../../../utils/helpers/helpers';
+} from "@ionic/react";
+import { chevronBack } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router";
+import { useAuth } from "../../../auth";
+import { auth as firebaseAuth, database } from "../../../firebase";
+import useUploadFile from "../../../common/useUploadFile";
+import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AvatarPage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [status, setStatus] = useState({ loading: false, error: false });
   const fileInputRef = useRef<HTMLInputElement>();
-  const { progress, url, handleUpload } = useUploadFile(userId);
 
   const [isDisabled, setIsDisabled] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const { handleUploadImage } = useUploadFile();
 
   useEffect(() => {
     readData();
   }, []);
 
-  useEffect(() => {
-    if (progress === 100) {
-    }
-  }, [progress]);
-
   useEffect(
     () => () => {
-      if (avatarUrl.startsWith('blob:')) {
+      if (avatarUrl.startsWith("blob:")) {
         URL.revokeObjectURL(avatarUrl);
       }
     },
     [avatarUrl]
   );
 
-  useEffect(() => {
-    if (progress === 100) {
-      setStatus({ loading: false, error: false });
-      setAlertHeader('Chúc mừng!');
-      setAlertMessage('Ảnh đại diện của bạn đã được cập nhật thành công');
-      setShowAlert(true);
-    }
-  }, [progress]);
-
   const readData = () => {
-    const userData = database.ref().child('users').child(userId);
+    const userData = database.ref().child("users").child(userId);
 
-    userData.child('personal').on('value', (snapshot) => {
+    userData.child("personal").on("value", (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         if (data.avatar) setAvatarUrl(data.avatar);
-        else setAvatarUrl('/assets/image/placeholder.png');
+        else setAvatarUrl("/assets/image/placeholder.png");
       } else {
-        console.log('No data available');
+        console.log("No data available");
       }
     });
   };
@@ -97,7 +84,7 @@ const AvatarPage: React.FC = () => {
   };
 
   const handlePictureClick = async () => {
-    if (isPlatform('capacitor')) {
+    if (isPlatform("capacitor")) {
       try {
         const photo = await Camera.getPhoto({
           resultType: CameraResultType.Uri,
@@ -110,7 +97,7 @@ const AvatarPage: React.FC = () => {
 
         setIsDisabled(false);
       } catch (error) {
-        console.log('Camera error:', error);
+        console.log("Camera error:", error);
       }
     } else {
       fileInputRef.current.click();
@@ -119,52 +106,66 @@ const AvatarPage: React.FC = () => {
 
   const handleUploadFile = async (url: string) => {
     setStatus({ loading: true, error: false });
-    await handleUpload(url, 'avatar');
+    const uploadedUrl = await handleUploadImage(url, "avatar");
+    const userData = database.ref();
+    userData
+      .child("users")
+      .child(userId)
+      .child("personal")
+      .update({
+        avatar: uploadedUrl,
+      })
+      .then(() => {
+        setStatus({ loading: false, error: false });
+        setAlertHeader("Chúc mừng!");
+        setAlertMessage("Ảnh đại diện của bạn đã được cập nhật thành công");
+        setShowAlert(true);
+      });
   };
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton text='Huỷ' defaultHref='/my/profile' />
+          <IonButtons slot="start">
+            <IonBackButton text="Huỷ" defaultHref="/my/profile" />
           </IonButtons>
           <IonTitle>Sửa ảnh đại diện</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className='ion-padding'>
+      <IonContent className="ion-padding">
         <IonAvatar
-          className='ion-margin'
+          className="ion-margin"
           style={{
             width: window.screen.height / 3,
             height: window.screen.height / 3,
-            marginLeft: 'auto',
-            marginRight: 'auto',
+            marginLeft: "auto",
+            marginRight: "auto",
           }}
         >
           <IonSkeletonText animated hidden={avatarUrl ? true : false} />
           <img
             hidden={avatarUrl ? false : true}
-            src={avatarUrl || '/assets/image/placeholder.png'}
-            alt=''
+            src={avatarUrl || "/assets/image/placeholder.png"}
+            alt=""
             onClick={handlePictureClick}
           />
         </IonAvatar>
         <input
-          type='file'
-          id='upload'
-          accept='image/*'
+          type="file"
+          id="upload"
+          accept="image/*"
           hidden
           multiple={false}
           ref={fileInputRef}
           onChange={handleFileChange}
         />
         <IonChip
-          color='primary'
-          style={{ height: 'max-content', marginBottom: 10 }}
-          className='ion-margin'
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
         >
-          <IonLabel text-wrap className='ion-padding'>
+          <IonLabel text-wrap className="ion-padding">
             Ấn vào khung ảnh để thay đổi. Nên chọn ảnh đại diện hình vuông hoặc
             đã được crop sẵn
           </IonLabel>
@@ -176,21 +177,21 @@ const AvatarPage: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => {
             setShowAlert(false);
-            history.replace('/my/profile');
+            history.replace("/my/profile");
           }}
-          cssClass='my-custom-class'
+          cssClass="my-custom-class"
           header={alertHeader}
           message={alertMessage}
-          buttons={['OK']}
+          buttons={["OK"]}
         />
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          <div className='ion-margin'>
+          <div className="ion-margin">
             <IonButton
-              className='ion-margin'
-              expand='block'
-              shape='round'
+              className="ion-margin"
+              expand="block"
+              shape="round"
               onClick={() => {
                 handleUploadFile(avatarUrl);
               }}

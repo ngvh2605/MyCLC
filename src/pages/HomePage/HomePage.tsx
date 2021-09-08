@@ -37,6 +37,7 @@ import {
   IonSkeletonText,
   IonNote,
   IonItemDivider,
+  IonVirtualScroll,
 } from "@ionic/react";
 import {
   add as addIcon,
@@ -165,10 +166,6 @@ const HomePage: React.FC = () => {
             </IonLabel>
           </IonChip>
 
-          <IonButton onClick={() => console.log(news)}>Why</IonButton>
-          {news.map((item, index) => (
-            <IonLabel key={index}>Here</IonLabel>
-          ))}
           {news.map((item, index) => (
             <IonCard key={index}>
               <IonImg hidden={!item.pictureUrl} src={item.pictureUrl} />
@@ -200,10 +197,15 @@ const HomePage: React.FC = () => {
               </IonItem>
               <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
                 <IonCardSubtitle color="primary">{item.title}</IonCardSubtitle>
-                <IonLabel color="dark" text-wrap>
-                  {item.body}
+                <IonLabel
+                  color="dark"
+                  text-wrap
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  {decodeURI(item.body)}
                 </IonLabel>
               </IonCardContent>
+
               <hr
                 className="ion-margin"
                 style={{
@@ -345,13 +347,11 @@ const HomePage: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          {/*  
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton routerLink="/my/entries/add">
-            <IonIcon icon={addIcon} />
-          </IonFabButton>
-        </IonFab>
-        */}
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton routerLink="/my/home/add">
+              <IonIcon icon={addIcon} />
+            </IonFabButton>
+          </IonFab>
         </IonContent>
       ) : (
         <IonContent>

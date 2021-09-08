@@ -28,6 +28,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
+
 import { auth as firebaseAuth, firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
@@ -44,16 +45,7 @@ const AddNewsPage: React.FC = () => {
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
-  const { progress, url, handleUpload } = useUploadFile();
-
-  useEffect(() => {
-    if (progress === 100) {
-      setStatus({ loading: false, error: false });
-      setAlertHeader("Chúc mừng!");
-      setAlertMessage("Ảnh đại diện của bạn đã được cập nhật thành công");
-      //setShowAlert(true);
-    }
-  }, [progress]);
+  const { handleUploadImage } = useUploadFile();
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -87,22 +79,23 @@ const AddNewsPage: React.FC = () => {
 
   const handlePost = async () => {
     setStatus({ loading: true, error: false });
-    if (pictureUrl) {
-      await handleUpload(pictureUrl, "news").then(() => {
-        firestore
-          .collection("news")
-          .add({
-            title: title,
-            body: body,
-            pictureUrl: pictureUrl ? url : "",
-            author: userId,
-            timestamp: moment(moment.now()).format(),
-          })
-          .then(() => {
-            setStatus({ loading: false, error: false });
-          });
+    let uploadedUrl = "";
+    if (pictureUrl) uploadedUrl = await handleUploadImage(pictureUrl, "news");
+    firestore
+      .collection("news")
+      .add({
+        title: title,
+        body: encodeURI(body),
+        pictureUrl: uploadedUrl,
+        author: userId,
+        timestamp: moment(moment.now()).format(),
+      })
+      .then(() => {
+        setStatus({ loading: false, error: false });
+        setAlertHeader("Chúc mừng!");
+        setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
+        setShowAlert(true);
       });
-    }
   };
 
   return (
@@ -121,13 +114,6 @@ const AddNewsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton
-          onClick={() => {
-            console.log(moment(moment.now()).format());
-          }}
-        >
-          Clcick
-        </IonButton>
         <IonList>
           <IonItem>
             <IonLabel position="floating">
@@ -177,7 +163,7 @@ const AddNewsPage: React.FC = () => {
           isOpen={showAlert}
           onDidDismiss={() => {
             setShowAlert(false);
-            history.replace("/my/profile");
+            history.replace("/my/home");
           }}
           cssClass="my-custom-class"
           header={alertHeader}
