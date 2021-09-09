@@ -82,6 +82,10 @@ http://ionicframework.com/docs/theming/ */
    * -------------------------------------------
    */
 
+  ion-card {
+    --background: #1e1e1e;
+  }
+
   body {
     --ion-color-primary: #428cff;
     --ion-color-primary-rgb: 66, 140, 255;
@@ -181,7 +185,7 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-toolbar-background: #0d0d0d;
 
-    --ion-item-background: #000000;
+    --ion-item-background: none;
   }
 
   /*
@@ -224,4 +228,8 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-tab-bar-background: #1f1f1f;
   }
+}
+
+ion-button {
+  text-transform: none;
 }

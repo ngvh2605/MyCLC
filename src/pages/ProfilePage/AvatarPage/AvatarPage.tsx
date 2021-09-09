@@ -40,7 +40,7 @@ const AvatarPage: React.FC = () => {
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
-  const { handleUploadImage } = useUploadFile();
+  const { handleUploadImage } = useUploadFile(userId);
 
   useEffect(() => {
     readData();

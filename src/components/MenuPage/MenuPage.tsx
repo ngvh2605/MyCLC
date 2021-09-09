@@ -37,14 +37,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database } from "../../firebase";
+import { VerifyStatus } from "../../models";
 import "./MenuPage.scss";
-
-interface VerifyStatus {
-  emailVerify: boolean;
-  phoneVerify: boolean;
-  personalInfo: boolean;
-  hasAvatar: boolean;
-}
 
 const MenuPage = () => {
   const { userId } = useAuth();

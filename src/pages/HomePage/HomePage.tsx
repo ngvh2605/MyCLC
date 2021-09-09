@@ -232,8 +232,7 @@ const HomePage: React.FC = () => {
                       />
 
                       <IonLabel color="primary" style={{ fontSize: "small" }}>
-                        {item.totalComments > 0 ? item.totalComments : ""} Bình
-                        luận
+                        {item.count > 0 ? item.count : ""} Bình luận
                       </IonLabel>
                     </IonButton>
                   </IonCol>

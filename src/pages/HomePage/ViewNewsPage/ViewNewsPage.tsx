@@ -1,4 +1,5 @@
 import {
+  IonActionSheet,
   IonAlert,
   IonAvatar,
   IonBackButton,
@@ -22,23 +23,32 @@ import {
   IonLoading,
   IonNote,
   IonPage,
+  IonPopover,
   IonRow,
+  IonSpinner,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import {
+  caretForwardCircle,
   chatbubbleEllipses,
+  ellipsisHorizontal,
   heart,
   heartOutline,
   image,
   send,
+  share,
   star,
+  trash,
+  close,
+  brush,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { useAuth } from "../../../auth";
-import { firestore } from "../../../firebase";
+import { database, firestore } from "../../../firebase";
 import {
   getComment,
   getInfoByUserId,
@@ -46,7 +56,13 @@ import {
   likeNews,
   unlikeNews,
 } from "../services";
-import { News, toNews, Comment } from "./../../../models";
+import {
+  News,
+  toNews,
+  Comment,
+  toComment,
+  VerifyStatus,
+} from "./../../../models";
 
 interface RouteParams {
   id: string;
@@ -57,6 +73,13 @@ const ViewNewsPage: React.FC = () => {
   const { id } = useParams<RouteParams>();
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
+  const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
+    emailVerify: false,
+    phoneVerify: false,
+    personalInfo: false,
+    hasAvatar: false,
+  });
+
   const [news, setNews] = useState<News>({
     id: "",
     author: "",
@@ -65,36 +88,93 @@ const ViewNewsPage: React.FC = () => {
     pictureUrl: "",
     authorInfo: {},
   });
+  const [comments, setComments] = useState<Comment[]>([]);
   const [text, setText] = useState("");
+  const [chosenComment, setChosenComment] = useState<Comment>();
+  const [limitComment, setLimitComment] = useState(3);
+
+  const [showPopover, setShowPopoever] = useState(false);
+  const [showActionSheet, setShowActionSheet] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [presentAlert] = useIonAlert();
+
   useEffect(() => {
+    readStatus();
+    setLoading(true);
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const temp = toNews(await firestore.collection("news").doc(id).get());
-    let tempComment: Comment[] = await getComment(id);
-    let array: Comment[] = [];
-    for (const item of tempComment) {
-      array.push({
-        ...item,
-        authorInfo: await getInfoByUserId(item.author),
+  useEffect(() => {
+    //listen to comment
+    firestore
+      .collection("news")
+      .doc(id)
+      .collection("comment")
+      .orderBy("timestamp", "desc")
+      .limit(limitComment)
+      .onSnapshot(({ docs }) => {
+        setComments(docs.map(toComment));
       });
-    }
-    console.log(temp);
+  }, [limitComment]);
+
+  useEffect(() => {
+    const getCommetAuthorInfo = async () => {
+      let array: Comment[] = [];
+      for (const item of comments) {
+        array.push({
+          ...item,
+          authorInfo: await getInfoByUserId(item.author),
+        });
+      }
+      setNews({ ...news, comment: array });
+    };
+    getCommetAuthorInfo();
+  }, [comments]);
+
+  const fetchData = async () => {
+    const temp = toNews(await firestore.collection("news").doc(id).get());
+
     setNews({
       ...temp,
-      comment: array,
       isLiked: await isNewLikedByUser(userId, id),
       authorInfo: await getInfoByUserId(temp.author),
     });
+
+    //listen to comment
+    firestore
+      .collection("news")
+      .doc(id)
+      .collection("comment")
+      .orderBy("timestamp", "desc")
+      .limit(limitComment)
+      .onSnapshot(({ docs }) => {
+        setComments(docs.map(toComment));
+      });
+
     setLoading(false);
+  };
+
+  const readStatus = () => {
+    const userData = database.ref().child("users").child(userId);
+    userData.child("verify").on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setVerifyStatus(data);
+      } else {
+        setVerifyStatus({
+          emailVerify: false,
+          phoneVerify: false,
+          personalInfo: false,
+          hasAvatar: false,
+        });
+        console.log("No data available");
+      }
+    });
   };
 
   const handleReaction = (isLiked: boolean) => {
@@ -109,8 +189,37 @@ const ViewNewsPage: React.FC = () => {
           : 1
         : temp.totalLikes - 1,
     };
-
     setNews(temp);
+  };
+
+  const commentNews = async () => {
+    setStatus({ loading: true, error: false });
+    await firestore
+      .collection("news")
+      .doc(id)
+      .update({
+        totalComments: news.totalComments ? news.totalComments + 1 : 1,
+        count: news.count ? news.count + 1 : 1,
+      });
+    await firestore
+      .collection("news")
+      .doc(id)
+      .collection("comment")
+      .add({
+        body: text,
+        author: userId,
+        timestamp: moment(moment.now()).format(),
+        order: news.count ? news.count + 1 : 1,
+      });
+
+    setText("");
+    setLimitComment(limitComment + 1);
+    setNews({
+      ...news,
+      totalComments: news.totalComments ? news.totalComments + 1 : 1,
+      count: news.count ? news.count + 1 : 1,
+    });
+    setStatus({ loading: false, error: false });
   };
 
   return (
@@ -131,9 +240,7 @@ const ViewNewsPage: React.FC = () => {
           ) : (
             <></>
           )}
-
-          <IonButton onClick={() => console.log(news)}>Click</IonButton>
-          <div className="ion-padding">
+          <div>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">
                 <IonImg src={news.authorInfo.avatar} />
@@ -175,6 +282,8 @@ const ViewNewsPage: React.FC = () => {
                 borderBottom: "1px solid",
                 opacity: 0.2,
                 marginBottom: 10,
+                marginLeft: 0,
+                marginRight: 0,
               }}
             />
             <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
@@ -196,8 +305,7 @@ const ViewNewsPage: React.FC = () => {
                     />
 
                     <IonLabel color="primary" style={{ fontSize: "small" }}>
-                      {news.totalComments > 0 ? news.totalComments : ""} Bình
-                      luận
+                      {news.count > 0 ? news.count : ""} Bình luận
                     </IonLabel>
                   </IonButton>
                 </IonCol>
@@ -260,37 +368,69 @@ const ViewNewsPage: React.FC = () => {
                     lines="none"
                     style={{ marginTop: 10, marginBottom: 10 }}
                   >
-                    {comment.authorInfo.avatar && (
+                    {comment.authorInfo && comment.authorInfo.avatar ? (
                       <IonAvatar slot="start">
                         <IonImg src={comment.authorInfo.avatar} />
                       </IonAvatar>
+                    ) : (
+                      <IonAvatar slot="start">
+                        <IonImg src={"assets/image/placeholder.png"} />
+                      </IonAvatar>
                     )}
-                    <IonChip
-                      color="medium"
-                      style={{ width: "100%", height: "max-content" }}
-                    >
+                    <div style={{ width: "100%" }}>
+                      <IonChip
+                        color="medium"
+                        style={{ width: "100%", height: "max-content" }}
+                      >
+                        <IonLabel
+                          text-wrap
+                          color="dark"
+                          style={{ whiteSpace: "pre-wrap", width: "100%" }}
+                        >
+                          <IonIcon
+                            icon={ellipsisHorizontal}
+                            className="ion-float-right"
+                            color="medium"
+                            onClick={() => {
+                              setChosenComment(comment);
+                              setShowActionSheet(true);
+                            }}
+                            hidden={comment.author != userId}
+                          />
+                          {comment.authorInfo && comment.authorInfo.fullName && (
+                            <p style={{ paddingBottom: 5 }}>
+                              <b>{comment.authorInfo.fullName}</b>
+                            </p>
+                          )}
+                          {decodeURI(comment.body)}
+                        </IonLabel>
+                      </IonChip>
                       <IonLabel
                         text-wrap
-                        color="dark"
-                        style={{ whiteSpace: "pre-wrap" }}
+                        color="medium"
+                        className="ion-float-right"
                       >
-                        {comment.authorInfo.fullName && (
-                          <p style={{ paddingBottom: 5 }}>
-                            <b>{comment.authorInfo.fullName}</b>
-                            {" · "}
-                            <i>
-                              {moment(comment.timestamp).locale("vi").fromNow()}
-                            </i>
-                          </p>
-                        )}
-                        {decodeURI(comment.body)}
+                        <b>#{comment.order}</b>
+                        {" · "}
+                        <i>
+                          {moment(comment.timestamp).locale("vi").fromNow()}
+                        </i>
                       </IonLabel>
-                    </IonChip>
+                    </div>
                   </IonItem>
                 ))}
             </IonList>
+
+            <IonButton
+              fill="clear"
+              color="primary"
+              hidden={limitComment >= news.totalComments}
+              onClick={() => setLimitComment(limitComment + 2)}
+            >
+              Đọc thêm bình luận
+            </IonButton>
           </div>
-          <IonLoading isOpen={status.loading} />
+          <IonLoading isOpen={false} />
 
           <IonAlert
             isOpen={showAlert}
@@ -303,6 +443,96 @@ const ViewNewsPage: React.FC = () => {
             message={alertMessage}
             buttons={["OK"]}
           />
+
+          <IonActionSheet
+            isOpen={showActionSheet}
+            onDidDismiss={() => setShowActionSheet(false)}
+            cssClass="my-custom-class"
+            buttons={[
+              {
+                text: "Chỉnh sửa",
+                icon: brush,
+                handler: () => {
+                  presentAlert({
+                    header: "Sửa bình luận",
+                    inputs: [
+                      {
+                        placeholder: "Nhập bình luận mới",
+                        name: "text",
+                        type: "text",
+                      },
+                    ],
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Xong",
+                        handler: async (d) => {
+                          await firestore
+                            .collection("news")
+                            .doc(id)
+                            .collection("comment")
+                            .doc(chosenComment.id)
+                            .update({
+                              body: d.text,
+                              order: parseFloat(
+                                (chosenComment.order + 0.01).toFixed(2)
+                              ),
+                              lastEdited: moment(moment.now()).format(),
+                            });
+                        },
+                      },
+                    ],
+                    onDidDismiss: (e) => console.log("did dismiss"),
+                  });
+                },
+              },
+              {
+                text: "Xoá",
+                role: "destructive",
+                icon: trash,
+                handler: () => {
+                  presentAlert({
+                    header: "Xoá bình luận",
+                    message:
+                      "Bạn có chắc chắn xoá vĩnh viễn bình luận này khỏi MyCLC không?",
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Xoá",
+                        handler: (d) => {
+                          firestore
+                            .collection("news")
+                            .doc(id)
+                            .collection("comment")
+                            .doc(chosenComment.id)
+                            .delete();
+                          firestore
+                            .collection("news")
+                            .doc(id)
+                            .update({
+                              totalComments: news.totalComments - 1,
+                            });
+                          setNews({
+                            ...news,
+                            totalComments: news.totalComments - 1,
+                          });
+                        },
+                      },
+                    ],
+                    onDidDismiss: (e) => console.log("did dismiss"),
+                  });
+                },
+              },
+              {
+                text: "Cancel",
+                icon: close,
+                role: "cancel",
+                handler: () => {
+                  console.log("Cancel clicked");
+                },
+              },
+            ]}
+          ></IonActionSheet>
         </IonContent>
       ) : (
         <IonContent className="ion-padding">
@@ -311,7 +541,17 @@ const ViewNewsPage: React.FC = () => {
       )}
       <IonFooter>
         <IonToolbar>
-          <IonItem lines="none" style={{ paddingTop: 10, paddingBottom: 10 }}>
+          <IonItem
+            lines="none"
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+            hidden={
+              !(
+                verifyStatus.emailVerify &&
+                verifyStatus.phoneVerify &&
+                verifyStatus.personalInfo
+              )
+            }
+          >
             <IonChip
               color="medium"
               style={{
@@ -321,20 +561,45 @@ const ViewNewsPage: React.FC = () => {
             >
               <IonInput
                 type="text"
+                color="dark"
                 placeholder="Nhập bình luận"
                 autocapitalize="sentences"
                 value={text}
                 onIonChange={(e) => setText(e.detail.value)}
+                disabled={status.loading}
               ></IonInput>
             </IonChip>
             <IonButton
+              hidden={status.loading}
               fill="clear"
               style={{ width: "wrap-content", float: "right" }}
               disabled={!text}
+              onClick={commentNews}
             >
               <IonIcon icon={send} style={{ textAlign: "right" }} />
             </IonButton>
+            <IonSpinner
+              hidden={!status.loading}
+              style={{ marginLeft: 5, marginRight: 5 }}
+              name="lines-small"
+              color="primary"
+            />
           </IonItem>
+
+          <IonChip
+            color="primary"
+            style={{ height: "max-content", marginBottom: 10 }}
+            className="ion-margin"
+            hidden={
+              verifyStatus.emailVerify &&
+              verifyStatus.phoneVerify &&
+              verifyStatus.personalInfo
+            }
+          >
+            <IonLabel text-wrap className="ion-padding">
+              Bạn cần thực hiện đủ 3 bước xác minh để có thể bình luận!
+            </IonLabel>
+          </IonChip>
         </IonToolbar>
       </IonFooter>
     </IonPage>

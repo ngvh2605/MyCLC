@@ -1,5 +1,11 @@
 import firebase from "firebase/app";
 
+export interface VerifyStatus {
+  emailVerify: boolean;
+  phoneVerify: boolean;
+  personalInfo: boolean;
+  hasAvatar: boolean;
+}
 export interface Entry {
   id: string;
   date: string;
@@ -16,6 +22,7 @@ export interface Comment {
   id: string;
   author: string;
   body: string;
+  order?: number;
   timestamp?: string;
   authorInfo?: any;
 }
@@ -36,6 +43,7 @@ export interface News {
   isLiked?: boolean;
   totalLikes?: number;
   totalComments?: number;
+  count?: number;
   authorInfo?: any;
 }
 
