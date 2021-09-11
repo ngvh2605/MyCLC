@@ -34,7 +34,7 @@ export function toComment(doc: firebase.firestore.DocumentSnapshot): Comment {
 export interface News {
   id: string;
   author: string;
-  timestamp: string;
+  timestamp: string | number;
   title?: string;
   body: string;
   pictureUrl?: string;

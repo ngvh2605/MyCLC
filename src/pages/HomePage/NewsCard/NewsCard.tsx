@@ -250,7 +250,6 @@ const NewsCard: React.FC<any> = (props) => {
                         style={{ fontSize: "large" }}
                         slot="start"
                       />
-
                       <IonLabel color="dark" style={{ fontSize: "small" }}>
                         {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
                       </IonLabel>

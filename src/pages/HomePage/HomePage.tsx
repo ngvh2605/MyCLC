@@ -147,7 +147,7 @@ const HomePage: React.FC = () => {
   };
 
   const refreshNews = (event: CustomEvent<RefresherEventDetail>) => {
-    setNewsList([]);
+    //setNewsList([]);
     fetchNews();
     setTimeout(() => {
       event.detail.complete();
@@ -197,7 +197,7 @@ const HomePage: React.FC = () => {
           <IonButton
             shape="round"
             onClick={() => {
-              setNewsList([]);
+              //setNewsList([]);
               fetchNews();
             }}
           >

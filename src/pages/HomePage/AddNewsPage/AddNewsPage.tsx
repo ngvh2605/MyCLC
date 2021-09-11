@@ -103,14 +103,14 @@ const AddNewsPage: React.FC = () => {
         body: encodeURI(body),
         pictureUrl: uploadedUrl,
         author: userId,
-        timestamp: moment(moment.now()).format(),
+        timestamp: moment().valueOf(),
       })
       .then(() => {
         setStatus({ loading: false, error: false });
         //setAlertHeader("Chúc mừng!");
         //setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
         //setShowAlert(true);
-        history.goBack();
+        history.replace("/my/home");
       });
   };
 
@@ -136,7 +136,8 @@ const AddNewsPage: React.FC = () => {
       })
       .then(() => {
         setStatus({ loading: false, error: false });
-        history.goBack();
+        //history.goBack();
+        history.replace("/my/home");
       });
   };
 

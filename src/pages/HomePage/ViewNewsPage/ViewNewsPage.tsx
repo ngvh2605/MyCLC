@@ -24,6 +24,7 @@ import {
   IonPage,
   IonRow,
   IonSpinner,
+  IonText,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -46,6 +47,7 @@ import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import {
+  deleteNews,
   getInfoByUserId,
   isNewLikedByUser,
   likeNews,
@@ -88,6 +90,7 @@ const ViewNewsPage: React.FC = () => {
   const [limitComment, setLimitComment] = useState(3);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showNewsActionSheet, setShowNewsActionSheet] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
@@ -98,22 +101,26 @@ const ViewNewsPage: React.FC = () => {
   useEffect(() => {
     readStatus();
     if (location.state) {
-      const temp = location.state["news"];
-      setNews({
-        ...temp,
-        authorInfo: location.state["authorInfo"],
-        isLiked: location.state["isLiked"],
-      });
-
-      console.log("temp", temp);
-      firestore
-        .collection("news")
-        .doc(temp.id)
-        .collection("comment")
-        .orderBy("timestamp", "desc")
-        .onSnapshot(({ docs }) => {
-          setComments(docs.map(toComment));
+      try {
+        const temp = location.state["news"];
+        setNews({
+          ...temp,
+          authorInfo: location.state["authorInfo"],
+          isLiked: location.state["isLiked"],
         });
+
+        console.log("temp", temp);
+        firestore
+          .collection("news")
+          .doc(temp.id)
+          .collection("comment")
+          .orderBy("timestamp", "desc")
+          .onSnapshot(({ docs }) => {
+            setComments(docs.map(toComment));
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }, [location]);
 
@@ -164,7 +171,7 @@ const ViewNewsPage: React.FC = () => {
       .add({
         body: text,
         author: userId,
-        timestamp: moment(moment.now()).format(),
+        timestamp: moment().valueOf(),
         order: news.count ? news.count + 1 : 1,
       });
 
@@ -213,9 +220,6 @@ const ViewNewsPage: React.FC = () => {
           )}
           <div>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonButton onClick={() => console.log(commentAuthors)}>
-                Click
-              </IonButton>
               <IonAvatar slot="start">
                 <IonImg
                   src={
@@ -226,6 +230,14 @@ const ViewNewsPage: React.FC = () => {
                 />
               </IonAvatar>
               <IonLabel text-wrap color="dark">
+                <IonIcon
+                  icon={ellipsisHorizontal}
+                  className="ion-float-right"
+                  color="medium"
+                  onClick={() => {
+                    setShowNewsActionSheet(true);
+                  }}
+                />
                 <p>
                   <b>
                     {news.authorInfo && news.authorInfo.fullName
@@ -243,9 +255,15 @@ const ViewNewsPage: React.FC = () => {
                       }}
                     />{" "}
                     Club
+                    <IonText color="medium">
+                      {" · "}
+                      <i>
+                        {moment(news.timestamp)
+                          .locale("vi")
+                          .format("Do MMM, H:mm")}
+                      </i>
+                    </IonText>
                   </IonNote>
-                  {" · "}
-                  {moment(news.timestamp).locale("vi").format("Do MMM, H:mm")}
                 </IonLabel>
               </IonLabel>
             </IonItem>
@@ -391,17 +409,19 @@ const ViewNewsPage: React.FC = () => {
                           {decodeURI(comment.body)}
                         </IonLabel>
                       </IonChip>
-                      <IonLabel
-                        text-wrap
-                        color="medium"
-                        className="ion-float-right"
-                      >
-                        <b>#{comment.order}</b>
-                        {" · "}
-                        <i>
-                          {moment(comment.timestamp).locale("vi").fromNow()}
-                        </i>
-                      </IonLabel>
+                      <IonNote>
+                        <IonLabel
+                          text-wrap
+                          color="medium"
+                          className="ion-float-right"
+                        >
+                          <b>#{comment.order}</b>
+                          {" · "}
+                          <i>
+                            {moment(comment.timestamp).locale("vi").fromNow()}
+                          </i>
+                        </IonLabel>
+                      </IonNote>
                     </div>
                   </IonItem>
                 ))}
@@ -517,6 +537,56 @@ const ViewNewsPage: React.FC = () => {
                             ...news,
                             totalComments: news.totalComments - 1,
                           });
+                        },
+                      },
+                    ],
+                    onDidDismiss: (e) => console.log("did dismiss"),
+                  });
+                },
+              },
+              {
+                text: "Cancel",
+                icon: close,
+                role: "cancel",
+                handler: () => {
+                  console.log("Cancel clicked");
+                },
+              },
+            ]}
+          ></IonActionSheet>
+
+          <IonActionSheet
+            isOpen={showNewsActionSheet}
+            onDidDismiss={() => setShowNewsActionSheet(false)}
+            cssClass="my-custom-class"
+            buttons={[
+              {
+                text: "Chỉnh sửa",
+                icon: brush,
+                handler: () => {
+                  history.push({
+                    pathname: `/my/home/add/${news.id}`,
+                    state: news,
+                  });
+                },
+              },
+              {
+                text: "Xoá",
+                role: "destructive",
+                icon: trash,
+                handler: () => {
+                  presentAlert({
+                    header: "Xoá bài viết",
+                    message:
+                      "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Xoá",
+                        handler: (d) => {
+                          setNews({ ...news, body: "" });
+                          deleteNews(news);
+                          history.goBack();
                         },
                       },
                     ],
