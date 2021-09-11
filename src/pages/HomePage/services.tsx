@@ -139,12 +139,7 @@ export const deleteNews = async (news: News) => {
   task.push(
     ...reaction
       .filter((doc) => doc.exists)
-      .map((doc) =>
-        firestore
-          .collection('newsReaction')
-          .doc(doc.data().newId + '_' + doc.data().userId)
-          .delete()
-      )
+      .map((doc) => firestore.collection('newsReaction').doc(doc.id).delete())
   );
 
   //delete comment

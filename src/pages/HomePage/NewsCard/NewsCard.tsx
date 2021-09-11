@@ -32,7 +32,7 @@ import 'moment/locale/vi';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../../auth';
-import { database, firestore, storage } from '../../../firebase';
+import { database, firestore } from '../../../firebase';
 import { News, toNews } from '../../../models';
 import { deleteNews, likeNews, unlikeNews } from './../services';
 import './NewsCard.scss';
@@ -41,7 +41,7 @@ const NewsCard: React.FC<any> = (props) => {
   const history = useHistory();
   const { userId } = useAuth();
 
-  const { newId } = props;
+  const { newId, author } = props;
 
   const [news, setNews] = useState<News>();
   const [isLiked, setIsLiked] = useState(false);
@@ -51,40 +51,41 @@ const NewsCard: React.FC<any> = (props) => {
   const [presentAlert] = useIonAlert();
 
   useEffect(() => {
-    firestore
+    const onNews = firestore
       .collection('news')
       .doc(newId)
       .onSnapshot((doc) => {
         setNews(toNews(doc));
       });
+
+    return () => onNews();
   }, [newId]);
 
   useEffect(() => {
-    if (news) {
-      try {
-        database
-          .ref()
-          .child('users')
-          .child(news.author)
-          .child('personal')
-          .on('value', (snapshot) => {
-            if (snapshot.exists) {
-              setAuthorInfo(snapshot.val());
-            }
-          });
-        firestore
-          .collection('newsReaction')
-          .where('newId', '==', newId)
-          .where('userId', '==', userId)
-          .onSnapshot((doc) => {
-            if (doc.empty) setIsLiked(false);
-            else setIsLiked(true);
-          });
-      } catch (error) {
-        console.log(error);
+    const authorRef = database
+      .ref()
+      .child('users')
+      .child(author)
+      .child('personal');
+    authorRef.on('value', (snapshot) => {
+      if (snapshot.exists) {
+        setAuthorInfo(snapshot.val());
       }
-    }
-  }, [news]);
+    });
+    const onLike = firestore
+      .collection('newsReaction')
+      .where('newId', '==', newId)
+      .where('userId', '==', userId)
+      .onSnapshot((doc) => {
+        if (doc.empty) setIsLiked(false);
+        else setIsLiked(true);
+      });
+
+    return () => {
+      onLike();
+      authorRef.off();
+    };
+  }, [author, newId, userId]);
 
   return (
     <>
@@ -168,7 +169,6 @@ const NewsCard: React.FC<any> = (props) => {
                 {decodeURI(news.body)}
               </IonLabel>
             </IonCardContent>
-
             <hr
               className='ion-margin'
               style={{
@@ -268,7 +268,6 @@ const NewsCard: React.FC<any> = (props) => {
                   ))}
               </IonList>
               */}
-
             <IonActionSheet
               isOpen={showActionSheet}
               onDidDismiss={() => setShowActionSheet(false)}

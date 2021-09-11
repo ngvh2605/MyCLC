@@ -34,6 +34,7 @@ import {
   mailUnreadOutline,
 } from 'ionicons/icons';
 import 'moment/locale/vi';
+import { stringify } from 'querystring';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../auth';
 import { auth as firebaseAuth, firestore } from '../../firebase';
@@ -119,7 +120,9 @@ const LoadingNews = () => (
 
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
-  const [newsList, setNewsList] = useState<String[]>([]);
+  const [newsList, setNewsList] = useState<{ id: string; author: string }[]>(
+    []
+  );
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState('');
@@ -139,7 +142,9 @@ const HomePage: React.FC = () => {
 
   const fetchNews = async () => {
     const news = await getNew(100);
-    const newIds = news.map((p) => p.id);
+    const newIds = news.map((p) => {
+      return { id: p.id, author: p.author };
+    });
     setNewsList(newIds);
   };
 
@@ -223,7 +228,9 @@ const HomePage: React.FC = () => {
         {totalNews ? (
           newsList
             .slice(0, newsCount)
-            .map((item, index) => <NewsCard newId={item} key={index} />)
+            .map((item, index) => (
+              <NewsCard newId={item.id} author={item.author} key={index} />
+            ))
         ) : (
           <>
             <LoadingNews />
