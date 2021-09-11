@@ -1,36 +1,36 @@
-import { firestore, database } from '../../firebase';
-import { News, toNews, Comment, toComment } from '../../models';
+import { firestore, database } from "../../firebase";
+import { News, toNews, Comment, toComment } from "../../models";
 
 export const getComment = async (id: string) => {
   const { docs } = await firestore
-    .collection('news')
+    .collection("news")
     .doc(id)
-    .collection('comment')
-    .orderBy('timestamp', 'desc')
+    .collection("comment")
+    .orderBy("timestamp", "desc")
     .get();
   return docs.map(toComment);
 };
 
 export const getNew = async () => {
-  const newsRef = firestore.collection('news');
-  const { docs } = await newsRef.orderBy('timestamp', 'desc').limit(2).get();
+  const newsRef = firestore.collection("news");
+  const { docs } = await newsRef.orderBy("timestamp", "desc").limit(2).get();
   return docs.map(toNews);
 };
 
 export const getNextNew = async (key: any) => {
-  const newsRef = firestore.collection('news');
+  const newsRef = firestore.collection("news");
   const { docs } = await newsRef
-    .orderBy('timestamp', 'desc')
+    .orderBy("timestamp", "desc")
     .startAfter(key)
-    .limit(2)
+    .limit(3)
     .get();
   return docs.map(toNews);
 };
 
 export const getLikedNewByUserId = async (id: string) => {
   const junctions = await firestore
-    .collection('newsReaction')
-    .where('userId', '==', id)
+    .collection("newsReaction")
+    .where("userId", "==", id)
     .get();
 
   const news = await Promise.all(
@@ -46,8 +46,8 @@ export const getLikedNewByUserId = async (id: string) => {
 
 export const getLikedUserByNewId = async (id: string) => {
   const junctions = await firestore
-    .collection('newsReaction')
-    .where('newId', '==', id)
+    .collection("newsReaction")
+    .where("newId", "==", id)
     .get();
 
   const userIds = await Promise.all(
@@ -59,9 +59,9 @@ export const getLikedUserByNewId = async (id: string) => {
       const user = (
         await database
           .ref()
-          .child('users')
+          .child("users")
           .child(userId)
-          .child('personal')
+          .child("personal")
           .get()
       ).val();
       return { id: userId, ...user };
@@ -73,38 +73,38 @@ export const getLikedUserByNewId = async (id: string) => {
 export const getInfoByUserId = async (id: string) => {
   const info = await database
     .ref()
-    .child('users')
+    .child("users")
     .child(id)
-    .child('personal')
+    .child("personal")
     .get();
   return info.val();
 };
 
 export const likeNews = async (userId: string, newId: string) => {
   const currentLikes = (
-    await firestore.collection('news').doc(newId).get()
+    await firestore.collection("news").doc(newId).get()
   ).data().totalLikes;
   if (currentLikes)
     firestore
-      .collection('news')
+      .collection("news")
       .doc(newId)
       .update({ totalLikes: currentLikes + 1 });
-  else firestore.collection('news').doc(newId).update({ totalLikes: 1 });
+  else firestore.collection("news").doc(newId).update({ totalLikes: 1 });
   await firestore.doc(`newsReaction/${newId}_${userId}`).set({ newId, userId });
 };
 
 export const unlikeNews = async (userId: string, newId: string) => {
   const currentLikes = (
-    await firestore.collection('news').doc(newId).get()
+    await firestore.collection("news").doc(newId).get()
   ).data().totalLikes;
   firestore
-    .collection('news')
+    .collection("news")
     .doc(newId)
     .update({ totalLikes: currentLikes - 1 });
   await firestore
-    .collection('newsReaction')
-    .where('newId', '==', newId)
-    .where('userId', '==', userId)
+    .collection("newsReaction")
+    .where("newId", "==", newId)
+    .where("userId", "==", userId)
     .get()
     .then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
@@ -115,9 +115,9 @@ export const unlikeNews = async (userId: string, newId: string) => {
 
 export const isNewLikedByUser = async (userId: string, newId: string) => {
   const junctions = await firestore
-    .collection('newsReaction')
-    .where('newId', '==', newId)
-    .where('userId', '==', userId)
+    .collection("newsReaction")
+    .where("newId", "==", newId)
+    .where("userId", "==", userId)
     .get();
   return !junctions.empty;
 };

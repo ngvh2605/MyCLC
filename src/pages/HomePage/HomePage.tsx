@@ -38,6 +38,7 @@ import {
   IonNote,
   IonItemDivider,
   IonVirtualScroll,
+  IonText,
 } from "@ionic/react";
 import {
   add as addIcon,
@@ -77,6 +78,7 @@ import {
 import "./HomePage.scss";
 import moment from "moment";
 import "moment/locale/vi";
+import NewsCard from "./NewsCard";
 
 const SampleNews = () => (
   <IonCard>
@@ -183,12 +185,17 @@ const HomePage: React.FC = () => {
     setLastKey(() => temp.slice(-1).pop()?.timestamp);
     setNews(array);
     setLoading(false);
+
+    //read size
+    const size = (await firestore.collection("news").get()).size;
+    console.log(size);
   };
 
   const fetchNextNews = async () => {
     setLoadingNext((p) => !p);
     const temp = await getNextNew(lastKey);
-    if (temp.length) {
+    console.log(temp);
+    if (temp.length > 0) {
       let array: News[] = [];
       for (const item of temp) {
         array.push({
@@ -203,22 +210,6 @@ const HomePage: React.FC = () => {
       setIsEnd(true);
     }
     setLoadingNext((p) => !p);
-  };
-
-  const handleReaction = (index: number, isLiked: boolean) => {
-    let array: News[] = [...news];
-
-    array[index] = {
-      ...array[index],
-      isLiked: isLiked,
-      totalLikes: isLiked
-        ? array[index].totalLikes
-          ? array[index].totalLikes + 1
-          : 1
-        : array[index].totalLikes - 1,
-    };
-
-    setNews(array);
   };
 
   return (
@@ -265,137 +256,7 @@ const HomePage: React.FC = () => {
           </IonChip>
 
           {news.map((item, index) => (
-            <IonCard key={index}>
-              <IonImg hidden={!item.pictureUrl} src={item.pictureUrl} />
-
-              <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-                <IonAvatar slot="start">
-                  <IonImg src={item.authorInfo.avatar} />
-                </IonAvatar>
-                <IonLabel text-wrap color="dark">
-                  <p>
-                    <b>{item.authorInfo.fullName}</b>
-                  </p>
-                  <IonLabel color="medium">
-                    <IonNote color="primary">
-                      <IonIcon
-                        icon={star}
-                        style={{
-                          fontSize: "x-small",
-                          verticalAlign: "baseline",
-                        }}
-                      />{" "}
-                      Club
-                    </IonNote>
-                    {" · "}
-                    {moment(item.timestamp).locale("vi").format("Do MMM, H:mm")}
-                  </IonLabel>
-                </IonLabel>
-              </IonItem>
-              <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-                <IonCardSubtitle color="primary">{item.title}</IonCardSubtitle>
-                <IonLabel
-                  color="dark"
-                  text-wrap
-                  style={{ whiteSpace: "pre-wrap" }}
-                >
-                  {decodeURI(item.body)}
-                </IonLabel>
-              </IonCardContent>
-
-              <hr
-                className="ion-margin"
-                style={{
-                  borderBottom: "1px solid",
-                  opacity: 0.2,
-                  marginBottom: 10,
-                }}
-              />
-              <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
-                <IonRow className="ion-align-items-center">
-                  <IonCol
-                    className="ion-align-self-center"
-                    style={{ textAlign: "center" }}
-                  >
-                    <IonButton
-                      fill="clear"
-                      expand="full"
-                      style={{ height: "max-content" }}
-                      routerLink={`/my/home/view/${item.id}`}
-                    >
-                      <IonIcon
-                        icon={chatbubbleEllipses}
-                        color="primary"
-                        style={{ fontSize: "large" }}
-                        slot="start"
-                      />
-
-                      <IonLabel color="primary" style={{ fontSize: "small" }}>
-                        {item.count > 0 ? item.count : ""} Bình luận
-                      </IonLabel>
-                    </IonButton>
-                  </IonCol>
-                  <IonCol
-                    className="ion-align-self-center"
-                    style={{ textAlign: "center" }}
-                  >
-                    {item.isLiked ? (
-                      <IonButton
-                        fill="clear"
-                        expand="full"
-                        style={{ height: "max-content" }}
-                        onClick={() => {
-                          unlikeNews(userId, item.id);
-                          handleReaction(index, false);
-                        }}
-                      >
-                        <IonIcon
-                          icon={heart}
-                          color="danger"
-                          style={{ fontSize: "large" }}
-                          slot="start"
-                        />
-
-                        <IonLabel color="danger" style={{ fontSize: "small" }}>
-                          {item.totalLikes} Yêu thích
-                        </IonLabel>
-                      </IonButton>
-                    ) : (
-                      <IonButton
-                        fill="clear"
-                        expand="full"
-                        style={{ height: "max-content" }}
-                        onClick={() => {
-                          likeNews(userId, item.id);
-                          handleReaction(index, true);
-                        }}
-                      >
-                        <IonIcon
-                          icon={heartOutline}
-                          color="dark"
-                          style={{ fontSize: "large" }}
-                          slot="start"
-                        />
-
-                        <IonLabel color="dark" style={{ fontSize: "small" }}>
-                          {item.totalLikes > 0 ? item.totalLikes : ""} Yêu thích
-                        </IonLabel>
-                      </IonButton>
-                    )}
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-              {/* 
-              <IonList>
-                {item.comment &&
-                  item.comment.map((comment, index) => (
-                    <IonItem key={index}>
-                      <IonLabel>{comment.body}</IonLabel>
-                    </IonItem>
-                  ))}
-              </IonList>
-              */}
-            </IonCard>
+            <NewsCard newId={item.id} key={index} />
           ))}
 
           {loadingNext && <LoadingNews />}

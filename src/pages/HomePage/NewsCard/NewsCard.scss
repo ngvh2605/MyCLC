@@ -1,0 +1,15 @@
+#home-page {
+  .container {
+    position: relative;
+  }
+
+  .child {
+    width: 50px;
+    height: 50px;
+    /* Center vertically and horizontally */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+  }
+}
