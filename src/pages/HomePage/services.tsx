@@ -1,5 +1,5 @@
-import { firestore, database } from "../../firebase";
-import { News, toNews, Comment, toComment } from "../../models";
+import { database, firestore } from "../../firebase";
+import { toComment, toNews } from "../../models";
 
 export const getComment = async (id: string) => {
   const { docs } = await firestore

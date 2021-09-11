@@ -7,15 +7,13 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonLabel,
   IonLoading,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronBack } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { auth as firebaseAuth } from "../../../firebase";

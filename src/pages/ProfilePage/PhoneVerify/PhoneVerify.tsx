@@ -1,3 +1,4 @@
+import { alertController } from "@ionic/core";
 import {
   IonAlert,
   IonBackButton,
@@ -6,12 +7,10 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
-  IonLoading,
   IonPage,
   IonSelect,
   IonSelectOption,
@@ -20,15 +19,12 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import firebase from "firebase";
-import { chevronBack, closeCircle } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { auth as firebaseAuth, database } from "../../../firebase";
-import "./PhoneVerify.scss";
-
 import country from "./country.json";
-import { alertController } from "@ionic/core";
+import "./PhoneVerify.scss";
 
 const PhoneVerify: React.FC = () => {
   const { userId } = useAuth();

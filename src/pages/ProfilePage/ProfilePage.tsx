@@ -1,7 +1,6 @@
 import {
   IonAlert,
   IonAvatar,
-  IonBadge,
   IonButton,
   IonButtons,
   IonCheckbox,
@@ -17,20 +16,16 @@ import {
   IonLabel,
   IonList,
   IonMenuButton,
-  IonModal,
   IonPage,
   IonSkeletonText,
-  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { camera, mailOutline, pencil } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
-import { database } from "../../firebase";
-import { useAuth } from "../../auth";
+import { camera, pencil } from "ionicons/icons";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import useUploadFile from "../../common/useUploadFile";
-import { deleteAllSubItemFirebase } from "../../utils/helpers/helpers";
+import { useAuth } from "../../auth";
+import { database } from "../../firebase";
 import { VerifyStatus } from "../../models";
 
 const ProfilePage: React.FC = () => {

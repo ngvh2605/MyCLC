@@ -5,7 +5,6 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonCard,
   IonCardContent,
   IonCardSubtitle,
   IonChip,
@@ -23,7 +22,6 @@ import {
   IonLoading,
   IonNote,
   IonPage,
-  IonPopover,
   IonRow,
   IonSpinner,
   IonTitle,
@@ -31,18 +29,16 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import {
-  caretForwardCircle,
+  brush,
   chatbubbleEllipses,
+  chevronDown,
+  close,
   ellipsisHorizontal,
   heart,
   heartOutline,
-  image,
   send,
-  share,
   star,
   trash,
-  close,
-  brush,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -50,17 +46,16 @@ import { useHistory, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import {
-  getComment,
   getInfoByUserId,
   isNewLikedByUser,
   likeNews,
   unlikeNews,
 } from "../services";
 import {
-  News,
-  toNews,
   Comment,
+  News,
   toComment,
+  toNews,
   VerifyStatus,
 } from "./../../../models";
 
@@ -305,7 +300,8 @@ const ViewNewsPage: React.FC = () => {
                     />
 
                     <IonLabel color="primary" style={{ fontSize: "small" }}>
-                      {news.count > 0 ? news.count : ""} Bình luận
+                      {news.totalComments > 0 ? news.totalComments : ""} Bình
+                      luận
                     </IonLabel>
                   </IonButton>
                 </IonCol>
@@ -424,10 +420,25 @@ const ViewNewsPage: React.FC = () => {
             <IonButton
               fill="clear"
               color="primary"
-              hidden={limitComment >= news.totalComments}
+              hidden={
+                news.totalComments
+                  ? limitComment >= news.totalComments
+                    ? true
+                    : false
+                  : true
+              }
               onClick={() => setLimitComment(limitComment + 2)}
+              style={{
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
             >
-              Đọc thêm bình luận
+              <IonLabel>
+                Đọc thêm
+                <br />
+                <IonIcon icon={chevronDown} />
+              </IonLabel>
             </IonButton>
           </div>
           <IonLoading isOpen={false} />

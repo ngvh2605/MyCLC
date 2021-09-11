@@ -1,83 +1,34 @@
 import {
+  IonAlert,
+  IonAvatar,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardSubtitle,
+  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
-  IonList,
+  IonMenuButton,
+  IonNote,
   IonPage,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
-  IonThumbnail,
-  IonImg,
-  IonButtons,
-  IonMenuButton,
-  IonMenu,
-  IonButton,
-  IonInfiniteScroll,
-  IonCard,
-  IonCardHeader,
-  IonInfiniteScrollContent,
-  useIonViewWillEnter,
-  IonAlert,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
-  IonAvatar,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonBadge,
-  IonChip,
-  IonLoading,
-  IonProgressBar,
-  IonSpinner,
-  IonSkeletonText,
-  IonNote,
-  IonItemDivider,
-  IonVirtualScroll,
-  IonText,
 } from "@ionic/react";
-import {
-  add as addIcon,
-  chatbubbleEllipses,
-  heart,
-  heartCircle,
-  heartOutline,
-  mailOutline,
-  mailUnreadOutline,
-  notificationsOutline,
-  pin,
-  rocket,
-  sparkles,
-  star,
-  walk,
-  warning,
-  wifi,
-  wine,
-} from "ionicons/icons";
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../auth";
-import { formatDate } from "../../date";
-import { firestore } from "../../firebase";
-import { News, toNews, Comment, toComment } from "../../models";
-import { auth as firebaseAuth } from "../../firebase";
-import {
-  getNew,
-  getComment,
-  getLikedNewByUserId,
-  getLikedUserByNewId,
-  likeNews,
-  isNewLikedByUser,
-  unlikeNews,
-  getInfoByUserId,
-  getNextNew,
-} from "./services";
-import "./HomePage.scss";
-import moment from "moment";
+import { add as addIcon, chevronDown, mailUnreadOutline } from "ionicons/icons";
 import "moment/locale/vi";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../auth";
+import { auth as firebaseAuth, firestore } from "../../firebase";
+import { toNewsId } from "../../models";
+import "./HomePage.scss";
 import NewsCard from "./NewsCard";
 
 const SampleNews = () => (
@@ -157,59 +108,30 @@ const LoadingNews = () => (
 
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
+  const [newsList, setNewsList] = useState<String[]>([]);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [lastKey, setLastKey] = useState(null);
-  const [news, setNews] = useState<News[]>([]);
-  const [isEnd, setIsEnd] = useState<boolean>(false);
-  const [loadingNext, setLoadingNext] = useState(false);
+
+  const [newsCount, setNewsCount] = useState(3);
 
   useEffect(() => {
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
 
   const fetchNews = async () => {
-    setLoading(true);
-    const temp = await getNew();
-    let array: News[] = [];
-    for (const item of temp) {
-      array.push({
-        ...item,
-        isLiked: await isNewLikedByUser(userId, item.id),
-        authorInfo: await getInfoByUserId(item.author),
-      });
-    }
-    setLastKey(() => temp.slice(-1).pop()?.timestamp);
-    setNews(array);
-    setLoading(false);
-
     //read size
     const size = (await firestore.collection("news").get()).size;
     console.log(size);
-  };
 
-  const fetchNextNews = async () => {
-    setLoadingNext((p) => !p);
-    const temp = await getNextNew(lastKey);
-    console.log(temp);
-    if (temp.length > 0) {
-      let array: News[] = [];
-      for (const item of temp) {
-        array.push({
-          ...item,
-          isLiked: await isNewLikedByUser(userId, item.id),
-          authorInfo: await getInfoByUserId(item.author),
-        });
-      }
-      setLastKey(() => temp.slice(-1).pop()?.timestamp);
-      setNews((old) => [...old, ...array]);
-    } else {
-      setIsEnd(true);
-    }
-    setLoadingNext((p) => !p);
+    const { docs } = await firestore
+      .collection("news")
+      .orderBy("timestamp", "desc")
+      .limit(100)
+      .get();
+    setNewsList(docs.map(toNewsId));
+    console.log(docs.map(toNewsId));
   };
 
   return (
@@ -235,65 +157,59 @@ const HomePage: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      {!loading ? (
-        <IonContent className="ion-padding">
-          <IonChip
-            color="primary"
-            style={{ height: "max-content", marginBottom: 10 }}
-            className="ion-margin"
-            hidden={
-              !(
-                firebaseAuth.currentUser.metadata.creationTime ===
-                firebaseAuth.currentUser.metadata.lastSignInTime
-              )
-            }
-          >
-            <IonLabel text-wrap className="ion-padding">
-              Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và
-              thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác
-              của MyCLC nhé!
-            </IonLabel>
-          </IonChip>
 
-          {news.map((item, index) => (
-            <NewsCard newId={item.id} key={index} />
-          ))}
+      <IonContent className="ion-padding">
+        <IonChip
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
+          hidden={
+            !(
+              firebaseAuth.currentUser.metadata.creationTime ===
+              firebaseAuth.currentUser.metadata.lastSignInTime
+            )
+          }
+        >
+          <IonLabel text-wrap className="ion-padding">
+            Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực
+            hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của
+            MyCLC nhé!
+          </IonLabel>
+        </IonChip>
 
-          {loadingNext && <LoadingNews />}
+        {newsList.slice(0, newsCount).map((item, index) => (
+          <NewsCard newId={item} key={index} />
+        ))}
 
-          {!isEnd && (
-            <IonCard>
-              <IonButton
-                color="primary"
-                onClick={fetchNextNews}
-                style={{ width: "100%" }}
-              >
-                Load
-              </IonButton>
-            </IonCard>
-          )}
+        {/* <SampleNews /> */}
+        <IonButton
+          style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
+          fill="clear"
+          hidden={newsCount >= newsList.length}
+          onClick={() => setNewsCount(newsCount + 1)}
+        >
+          <IonLabel>
+            Đọc thêm
+            <br />
+            <IonIcon icon={chevronDown} />
+          </IonLabel>
+        </IonButton>
 
-          {/* <SampleNews /> */}
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton routerLink="/my/home/add">
+            <IonIcon icon={addIcon} />
+          </IonFabButton>
+        </IonFab>
 
-          <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton routerLink="/my/home/add">
-              <IonIcon icon={addIcon} />
-            </IonFabButton>
-          </IonFab>
-        </IonContent>
-      ) : (
-        <IonContent className="ion-padding">
-          <LoadingNews />
-        </IonContent>
-      )}
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        cssClass="my-custom-class"
-        header={alertHeader}
-        message={alertMessage}
-        buttons={["OK"]}
-      />
+        <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          cssClass="my-custom-class"
+          header={alertHeader}
+          message={alertMessage}
+          buttons={["OK"]}
+        />
+      </IonContent>
     </IonPage>
   );
 };

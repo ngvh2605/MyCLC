@@ -14,11 +14,9 @@ import {
   IonList,
   IonLoading,
   IonPage,
-  IonText,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronBack, closeCircle, eye, eyeOff } from "ionicons/icons";
+import { closeCircle, eye, eyeOff } from "ionicons/icons";
 import React, { useState } from "react";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";

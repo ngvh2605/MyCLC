@@ -78,8 +78,10 @@ import {
 import "./NewsCard.scss";
 import moment from "moment";
 import "moment/locale/vi";
+import { useHistory } from "react-router-dom";
 
 const NewsCard: React.FC<any> = (props) => {
+  const history = useHistory();
   const { userId } = useAuth();
 
   const { newId } = props;
@@ -168,7 +170,10 @@ const NewsCard: React.FC<any> = (props) => {
               </IonLabel>
             </IonLabel>
           </IonItem>
-          <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <IonCardContent
+            style={{ paddingTop: 0, paddingBottom: 0 }}
+            onClick={() => history.push(`/my/home/view/${news.id}`)}
+          >
             <IonCardSubtitle color="primary">{news.title}</IonCardSubtitle>
             <IonLabel color="dark" text-wrap style={{ whiteSpace: "pre-wrap" }}>
               {decodeURI(news.body)}
@@ -267,7 +272,34 @@ const NewsCard: React.FC<any> = (props) => {
               */}
         </IonCard>
       ) : (
-        <></>
+        <IonCard>
+          <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+            <IonAvatar slot="start">
+              <IonSkeletonText animated />
+            </IonAvatar>
+            <IonLabel text-wrap>
+              <p>
+                <IonSkeletonText animated style={{ width: "50%" }} />
+              </p>
+              <IonLabel>
+                <IonNote>
+                  <IonSkeletonText animated style={{ width: "30%" }} />
+                </IonNote>
+              </IonLabel>
+            </IonLabel>
+          </IonItem>
+          <IonCardContent style={{ paddingTop: 0 }}>
+            <IonCardSubtitle style={{ paddingBottom: 10 }}>
+              <IonSkeletonText animated style={{ width: "100%" }} />
+            </IonCardSubtitle>
+            <IonLabel text-wrap>
+              <IonSkeletonText animated style={{ width: "100%" }} />
+              <IonSkeletonText animated style={{ width: "100%" }} />
+              <IonSkeletonText animated style={{ width: "100%" }} />
+              <IonSkeletonText animated style={{ width: "30%" }} />
+            </IonLabel>
+          </IonCardContent>
+        </IonCard>
       )}
     </>
   );

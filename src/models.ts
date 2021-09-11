@@ -50,3 +50,7 @@ export interface News {
 export function toNews(doc: firebase.firestore.DocumentSnapshot): News {
   return { id: doc.id, ...doc.data() } as News;
 }
+
+export function toNewsId(doc: firebase.firestore.DocumentSnapshot): String {
+  return doc.id;
+}

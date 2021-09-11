@@ -8,26 +8,21 @@ import {
   IonDatetime,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonInput,
   IonItem,
-  IonItemDivider,
   IonLabel,
   IonList,
   IonLoading,
-  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
-  IonTextarea,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronBack } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth, database } from "../../../firebase";
+import { database } from "../../../firebase";
 
 const PersonalInfo: React.FC = () => {
   const { userId, userEmail } = useAuth();

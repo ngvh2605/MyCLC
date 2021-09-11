@@ -9,23 +9,19 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
-  IonImg,
   IonLabel,
   IonLoading,
   IonPage,
-  IonProgressBar,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { chevronBack } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth, database } from "../../../firebase";
 import useUploadFile from "../../../common/useUploadFile";
+import { database } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AvatarPage: React.FC = () => {
