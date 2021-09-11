@@ -39,6 +39,9 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/home/add">
         <AddNewsPage />
       </Route>
+      <Route exact path="/my/home/add/:id">
+        <AddNewsPage />
+      </Route>
       <Route exact path="/my/home/view/:id">
         <ViewNewsPage />
       </Route>

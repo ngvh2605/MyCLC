@@ -9,6 +9,7 @@ import {
   IonContent,
   IonFooter,
   IonHeader,
+  IonIcon,
   IonLabel,
   IonLoading,
   IonPage,
@@ -17,6 +18,7 @@ import {
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
+import { image } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
@@ -104,6 +106,9 @@ const AvatarPage: React.FC = () => {
     setStatus({ loading: true, error: false });
     const uploadedUrl = await handleUploadImage(url, "avatar");
     const userData = database.ref();
+    userData.child("users").child(userId).child("verify").update({
+      hasAvatar: true,
+    });
     userData
       .child("users")
       .child(userId)
@@ -156,14 +161,26 @@ const AvatarPage: React.FC = () => {
           ref={fileInputRef}
           onChange={handleFileChange}
         />
+        <IonButton
+          className="ion-margin"
+          expand="block"
+          fill="clear"
+          onClick={() => {
+            handlePictureClick();
+          }}
+        >
+          <IonIcon icon={image} slot="start" />
+          {avatarUrl && avatarUrl != "/assets/image/placeholder.png"
+            ? "Đổi ảnh khác"
+            : "Thêm hình ảnh"}
+        </IonButton>
         <IonChip
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Ấn vào khung ảnh để thay đổi. Nên chọn ảnh đại diện hình vuông hoặc
-            đã được crop sẵn
+            Nên chọn ảnh đại diện hình vuông hoặc đã được crop sẵn
           </IonLabel>
         </IonChip>
         <br />

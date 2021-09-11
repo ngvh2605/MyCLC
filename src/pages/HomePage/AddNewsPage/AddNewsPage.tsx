@@ -25,14 +25,16 @@ import {
 import { chevronBack, image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
 
-import { auth as firebaseAuth, firestore } from "../../../firebase";
+import { auth as firebaseAuth, firestore, storage } from "../../../firebase";
+import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AddNewsPage: React.FC = () => {
+  const location = useLocation<News>();
   const { userId } = useAuth();
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -41,11 +43,24 @@ const AddNewsPage: React.FC = () => {
   const [body, setBody] = useState("");
   const [pictureUrl, setPictureUrl] = useState("");
 
+  const [news, setNews] = useState<News>();
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   const { handleUploadImage } = useUploadFile();
+
+  useEffect(() => {
+    if (location.state) {
+      const temp: News = { ...location.state };
+      setNews(temp);
+      if (temp.title) setTitle(temp.title);
+      setBody(decodeURI(temp.body));
+      if (temp.pictureUrl) setPictureUrl(temp.pictureUrl);
+    }
+    console.log(location.state);
+  }, [location]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -53,7 +68,7 @@ const AddNewsPage: React.FC = () => {
     if (event.target.files.length > 0) {
       const file = event.target.files.item(0);
       const pictureUrl = URL.createObjectURL(file);
-      const resizeUrl = await resizeImage(pictureUrl, 1080);
+      const resizeUrl = await resizeImage(pictureUrl, 800);
       setPictureUrl(resizeUrl);
     }
   };
@@ -64,10 +79,10 @@ const AddNewsPage: React.FC = () => {
         const photo = await Camera.getPhoto({
           resultType: CameraResultType.Uri,
           source: CameraSource.Prompt,
-          width: 600,
+          width: 800,
         });
 
-        const resizeUrl = await resizeImage(photo.webPath, 1080);
+        const resizeUrl = await resizeImage(photo.webPath, 800);
         setPictureUrl(resizeUrl);
       } catch (error) {
         console.log("Camera error:", error);
@@ -92,9 +107,36 @@ const AddNewsPage: React.FC = () => {
       })
       .then(() => {
         setStatus({ loading: false, error: false });
-        setAlertHeader("Chúc mừng!");
-        setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
-        setShowAlert(true);
+        //setAlertHeader("Chúc mừng!");
+        //setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
+        //setShowAlert(true);
+        history.goBack();
+      });
+  };
+
+  const handleEdit = async () => {
+    setStatus({ loading: true, error: false });
+    let uploadedUrl = "";
+    if (pictureUrl && pictureUrl != news.pictureUrl) {
+      uploadedUrl = await handleUploadImage(pictureUrl, "news");
+      if (news.pictureUrl) storage.refFromURL(news.pictureUrl).delete();
+    }
+    firestore
+      .collection("news")
+      .doc(news.id)
+      .update({
+        title: title,
+        body: encodeURI(body),
+        pictureUrl:
+          pictureUrl && pictureUrl != news.pictureUrl
+            ? uploadedUrl
+            : news.pictureUrl
+            ? news.pictureUrl
+            : "",
+      })
+      .then(() => {
+        setStatus({ loading: false, error: false });
+        history.goBack();
       });
   };
 
@@ -106,27 +148,29 @@ const AddNewsPage: React.FC = () => {
             <IonBackButton text="Huỷ" defaultHref="/my/home" />
           </IonButtons>
           <IonButtons slot="end">
-            <IonButton disabled={!body} onClick={() => handlePost()}>
+            <IonButton
+              disabled={body.length < 50}
+              onClick={() => {
+                if (news) handleEdit();
+                else handlePost();
+              }}
+            >
               <b>Đăng</b>
             </IonButton>
           </IonButtons>
-          <IonTitle>Tạo News</IonTitle>
+          <IonTitle>{news ? "Sửa News" : "Tạo News"}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <IonList>
           <IonItem>
-            <IonLabel position="floating">
-              Tiêu đề{" "}
-              <i style={{ float: "right" }}>
-                (Không bắt buộc, tối đa 50 chữ cái)
-              </i>
-            </IonLabel>
+            <IonLabel position="floating">Tiêu đề </IonLabel>
             <IonInput
               type="text"
               maxlength={50}
               value={title}
               onIonChange={(e) => setTitle(e.detail.value)}
+              placeholder="Không bắt buộc, tối đa 50 chữ cái"
             />
           </IonItem>
 
@@ -135,6 +179,7 @@ const AddNewsPage: React.FC = () => {
               Nội dung <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonTextarea
+              placeholder={"Tối thiểu 50 chữ cái"}
               autoGrow
               cols={5}
               value={body}
@@ -183,7 +228,7 @@ const AddNewsPage: React.FC = () => {
               }}
             >
               <IonIcon icon={image} slot="start" />
-              Thêm hình ảnh
+              {pictureUrl ? "Đổi ảnh khác" : "Thêm hình ảnh"}
             </IonButton>
           </div>
         </IonToolbar>

@@ -42,7 +42,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import {
@@ -59,13 +59,16 @@ import {
   VerifyStatus,
 } from "./../../../models";
 
-interface RouteParams {
-  id: string;
+interface stateType {
+  news: News;
+  authorInfo: any;
+  isLiked: boolean;
 }
 
 const ViewNewsPage: React.FC = () => {
   const { userId } = useAuth();
-  const { id } = useParams<RouteParams>();
+  const location = useLocation<stateType>();
+
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
   const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
@@ -75,84 +78,57 @@ const ViewNewsPage: React.FC = () => {
     hasAvatar: false,
   });
 
-  const [news, setNews] = useState<News>({
-    id: "",
-    author: "",
-    timestamp: moment().format(),
-    body: "",
-    pictureUrl: "",
-    authorInfo: {},
-  });
+  const [news, setNews] = useState<News>();
+
   const [comments, setComments] = useState<Comment[]>([]);
+  const [commentAuthors, setCommentAuthors] = useState<any[]>([]);
+
   const [text, setText] = useState("");
   const [chosenComment, setChosenComment] = useState<Comment>();
   const [limitComment, setLimitComment] = useState(3);
 
-  const [showPopover, setShowPopoever] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const [presentAlert] = useIonAlert();
 
   useEffect(() => {
     readStatus();
-    setLoading(true);
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    //listen to comment
-    firestore
-      .collection("news")
-      .doc(id)
-      .collection("comment")
-      .orderBy("timestamp", "desc")
-      .limit(limitComment)
-      .onSnapshot(({ docs }) => {
-        setComments(docs.map(toComment));
+    if (location.state) {
+      const temp = location.state["news"];
+      setNews({
+        ...temp,
+        authorInfo: location.state["authorInfo"],
+        isLiked: location.state["isLiked"],
       });
-  }, [limitComment]);
 
-  useEffect(() => {
-    const getCommetAuthorInfo = async () => {
-      let array: Comment[] = [];
-      for (const item of comments) {
-        array.push({
-          ...item,
-          authorInfo: await getInfoByUserId(item.author),
+      console.log("temp", temp);
+      firestore
+        .collection("news")
+        .doc(temp.id)
+        .collection("comment")
+        .orderBy("timestamp", "desc")
+        .onSnapshot(({ docs }) => {
+          setComments(docs.map(toComment));
         });
+    }
+  }, [location]);
+
+  useEffect(() => {
+    const fetchAuthorInfo = async () => {
+      let tempInfo = [];
+      for (let item of comments) {
+        tempInfo.push(await getInfoByUserId(item.author));
       }
-      setNews({ ...news, comment: array });
+      setCommentAuthors(tempInfo);
     };
-    getCommetAuthorInfo();
+    if (comments.length > 0) {
+      fetchAuthorInfo();
+    }
   }, [comments]);
-
-  const fetchData = async () => {
-    const temp = toNews(await firestore.collection("news").doc(id).get());
-
-    setNews({
-      ...temp,
-      isLiked: await isNewLikedByUser(userId, id),
-      authorInfo: await getInfoByUserId(temp.author),
-    });
-
-    //listen to comment
-    firestore
-      .collection("news")
-      .doc(id)
-      .collection("comment")
-      .orderBy("timestamp", "desc")
-      .limit(limitComment)
-      .onSnapshot(({ docs }) => {
-        setComments(docs.map(toComment));
-      });
-
-    setLoading(false);
-  };
 
   const readStatus = () => {
     const userData = database.ref().child("users").child(userId);
@@ -172,33 +148,18 @@ const ViewNewsPage: React.FC = () => {
     });
   };
 
-  const handleReaction = (isLiked: boolean) => {
-    let temp: News = { ...news };
-
-    temp = {
-      ...temp,
-      isLiked: isLiked,
-      totalLikes: isLiked
-        ? temp.totalLikes
-          ? temp.totalLikes + 1
-          : 1
-        : temp.totalLikes - 1,
-    };
-    setNews(temp);
-  };
-
   const commentNews = async () => {
     setStatus({ loading: true, error: false });
     await firestore
       .collection("news")
-      .doc(id)
+      .doc(news.id)
       .update({
         totalComments: news.totalComments ? news.totalComments + 1 : 1,
         count: news.count ? news.count + 1 : 1,
       });
     await firestore
       .collection("news")
-      .doc(id)
+      .doc(news.id)
       .collection("comment")
       .add({
         body: text,
@@ -217,6 +178,20 @@ const ViewNewsPage: React.FC = () => {
     setStatus({ loading: false, error: false });
   };
 
+  const handleReaction = (isLiked: boolean) => {
+    let temp: News = { ...news };
+    temp = {
+      ...temp,
+      isLiked: isLiked,
+      totalLikes: isLiked
+        ? temp.totalLikes
+          ? temp.totalLikes + 1
+          : 1
+        : temp.totalLikes - 1,
+    };
+    setNews(temp);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -228,7 +203,8 @@ const ViewNewsPage: React.FC = () => {
           <IonTitle>CLC News</IonTitle>
         </IonToolbar>
       </IonHeader>
-      {!loading ? (
+
+      {news ? (
         <IonContent>
           {news.pictureUrl ? (
             <IonImg src={news.pictureUrl ? news.pictureUrl : ""} />
@@ -237,12 +213,25 @@ const ViewNewsPage: React.FC = () => {
           )}
           <div>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonButton onClick={() => console.log(commentAuthors)}>
+                Click
+              </IonButton>
               <IonAvatar slot="start">
-                <IonImg src={news.authorInfo.avatar} />
+                <IonImg
+                  src={
+                    news.authorInfo && news.authorInfo.avatar
+                      ? news.authorInfo.avatar
+                      : "/assets/image/placeholder.png"
+                  }
+                />
               </IonAvatar>
               <IonLabel text-wrap color="dark">
                 <p>
-                  <b>{news.authorInfo.fullName}</b>
+                  <b>
+                    {news.authorInfo && news.authorInfo.fullName
+                      ? news.authorInfo.fullName
+                      : ""}
+                  </b>
                 </p>
                 <IonLabel color="medium">
                   <IonNote color="primary">
@@ -357,16 +346,16 @@ const ViewNewsPage: React.FC = () => {
             </IonGrid>
 
             <IonList>
-              {news.comment &&
-                news.comment.map((comment, index) => (
+              {comments &&
+                comments.slice(0, limitComment).map((comment, index) => (
                   <IonItem
                     key={index}
                     lines="none"
                     style={{ marginTop: 10, marginBottom: 10 }}
                   >
-                    {comment.authorInfo && comment.authorInfo.avatar ? (
+                    {commentAuthors[index] && commentAuthors[index].avatar ? (
                       <IonAvatar slot="start">
-                        <IonImg src={comment.authorInfo.avatar} />
+                        <IonImg src={commentAuthors[index].avatar} />
                       </IonAvatar>
                     ) : (
                       <IonAvatar slot="start">
@@ -393,11 +382,12 @@ const ViewNewsPage: React.FC = () => {
                             }}
                             hidden={comment.author != userId}
                           />
-                          {comment.authorInfo && comment.authorInfo.fullName && (
-                            <p style={{ paddingBottom: 5 }}>
-                              <b>{comment.authorInfo.fullName}</b>
-                            </p>
-                          )}
+                          {commentAuthors[index] &&
+                            commentAuthors[index].fullName && (
+                              <p style={{ paddingBottom: 5 }}>
+                                <b>{commentAuthors[index].fullName}</b>
+                              </p>
+                            )}
                           {decodeURI(comment.body)}
                         </IonLabel>
                       </IonChip>
@@ -480,7 +470,7 @@ const ViewNewsPage: React.FC = () => {
                         handler: async (d) => {
                           await firestore
                             .collection("news")
-                            .doc(id)
+                            .doc(news.id)
                             .collection("comment")
                             .doc(chosenComment.id)
                             .update({
@@ -513,13 +503,13 @@ const ViewNewsPage: React.FC = () => {
                         handler: (d) => {
                           firestore
                             .collection("news")
-                            .doc(id)
+                            .doc(news.id)
                             .collection("comment")
                             .doc(chosenComment.id)
                             .delete();
                           firestore
                             .collection("news")
-                            .doc(id)
+                            .doc(news.id)
                             .update({
                               totalComments: news.totalComments - 1,
                             });
@@ -546,9 +536,7 @@ const ViewNewsPage: React.FC = () => {
           ></IonActionSheet>
         </IonContent>
       ) : (
-        <IonContent className="ion-padding">
-          <IonLabel>Loading</IonLabel>
-        </IonContent>
+        <></>
       )}
       <IonFooter>
         <IonToolbar>
@@ -573,10 +561,14 @@ const ViewNewsPage: React.FC = () => {
               <IonInput
                 type="text"
                 color="dark"
-                placeholder="Nhập bình luận"
+                placeholder="Nhập bình luận (tối thiểu 15 chữ cái)"
                 autocapitalize="sentences"
+                minlength={15}
                 value={text}
                 onIonChange={(e) => setText(e.detail.value)}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter" && text.length >= 15) commentNews();
+                }}
                 disabled={status.loading}
               ></IonInput>
             </IonChip>
@@ -584,7 +576,7 @@ const ViewNewsPage: React.FC = () => {
               hidden={status.loading}
               fill="clear"
               style={{ width: "wrap-content", float: "right" }}
-              disabled={!text}
+              disabled={text.length < 15}
               onClick={commentNews}
             >
               <IonIcon icon={send} style={{ textAlign: "right" }} />

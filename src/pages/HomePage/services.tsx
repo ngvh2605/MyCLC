@@ -1,5 +1,5 @@
-import { database, firestore } from "../../firebase";
-import { toComment, toNews } from "../../models";
+import { database, firestore, storage } from "../../firebase";
+import { News, toComment, toNews } from "../../models";
 
 export const getComment = async (id: string) => {
   const { docs } = await firestore
@@ -120,4 +120,41 @@ export const isNewLikedByUser = async (userId: string, newId: string) => {
     .where("userId", "==", userId)
     .get();
   return !junctions.empty;
+};
+
+export const deleteNews = async (news: News) => {
+  //delete picture from storage
+  if (news.pictureUrl) await storage.refFromURL(news.pictureUrl).delete();
+  //delete reaction
+  const { docs: reaction } = await firestore
+    .collection("newsReaction")
+    .where("newId", "==", news.id)
+    .get();
+  if (reaction.length > 0) {
+    let array: string[] = [];
+    reaction.forEach((doc) => array.push(doc.id));
+    for (let item of array) {
+      await firestore.collection("newsReaction").doc(item).delete();
+    }
+  }
+  //delete comment
+  const { docs } = await firestore
+    .collection("news")
+    .doc(news.id)
+    .collection("comment")
+    .get();
+  if (docs.length > 0) {
+    let array: string[] = [];
+    docs.forEach((doc) => array.push(doc.id));
+    for (let item of array) {
+      await firestore
+        .collection("news")
+        .doc(news.id)
+        .collection("comment")
+        .doc(item)
+        .delete();
+    }
+  }
+  //delete news
+  await firestore.collection("news").doc(news.id).delete();
 };

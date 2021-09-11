@@ -1,3 +1,4 @@
+import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAlert,
   IonAvatar,
@@ -18,11 +19,20 @@ import {
   IonMenuButton,
   IonNote,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { add as addIcon, chevronDown, mailUnreadOutline } from "ionicons/icons";
+import {
+  add as addIcon,
+  arrowUp,
+  chevronDown,
+  chevronDownCircleOutline,
+  chevronUp,
+  mailUnreadOutline,
+} from "ionicons/icons";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
@@ -115,6 +125,7 @@ const HomePage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
 
   const [newsCount, setNewsCount] = useState(3);
+  const [totalNews, setTotalNews] = useState(0);
 
   useEffect(() => {
     fetchNews();
@@ -122,8 +133,9 @@ const HomePage: React.FC = () => {
 
   const fetchNews = async () => {
     //read size
-    const size = (await firestore.collection("news").get()).size;
-    console.log(size);
+    firestore.collection("news").onSnapshot(({ docs }) => {
+      setTotalNews(docs.length);
+    });
 
     const { docs } = await firestore
       .collection("news")
@@ -132,6 +144,14 @@ const HomePage: React.FC = () => {
       .get();
     setNewsList(docs.map(toNewsId));
     console.log(docs.map(toNewsId));
+  };
+
+  const refreshNews = (event: CustomEvent<RefresherEventDetail>) => {
+    setNewsList([]);
+    fetchNews();
+    setTimeout(() => {
+      event.detail.complete();
+    }, 2000);
   };
 
   return (
@@ -159,6 +179,33 @@ const HomePage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={refreshNews}>
+          <IonRefresherContent
+            style={{ marginTop: 10 }}
+            pullingIcon={chevronDown}
+            pullingText="Kéo xuống để làm mới"
+          ></IonRefresherContent>
+        </IonRefresher>
+
+        <IonFab
+          hidden={newsList.length > 0 ? newsList.length >= totalNews : true}
+          vertical="top"
+          horizontal="center"
+          slot="fixed"
+          className="fab-center"
+        >
+          <IonButton
+            shape="round"
+            onClick={() => {
+              setNewsList([]);
+              fetchNews();
+            }}
+          >
+            <IonIcon icon={arrowUp} slot="start" />
+            <IonLabel>Có tin mới</IonLabel>
+          </IonButton>
+        </IonFab>
+
         <IonChip
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}
