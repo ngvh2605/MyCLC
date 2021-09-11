@@ -1,26 +1,29 @@
-import { database, firestore, storage } from "../../firebase";
-import { News, toComment, toNews } from "../../models";
+import { database, firestore, storage } from '../../firebase';
+import { News, toComment, toNews } from '../../models';
 
 export const getComment = async (id: string) => {
   const { docs } = await firestore
-    .collection("news")
+    .collection('news')
     .doc(id)
-    .collection("comment")
-    .orderBy("timestamp", "desc")
+    .collection('comment')
+    .orderBy('timestamp', 'desc')
     .get();
   return docs.map(toComment);
 };
 
-export const getNew = async () => {
-  const newsRef = firestore.collection("news");
-  const { docs } = await newsRef.orderBy("timestamp", "desc").limit(2).get();
+export const getNew = async (limit: number) => {
+  const newsRef = firestore.collection('news');
+  const { docs } = await newsRef
+    .orderBy('timestamp', 'desc')
+    .limit(limit)
+    .get();
   return docs.map(toNews);
 };
 
 export const getNextNew = async (key: any) => {
-  const newsRef = firestore.collection("news");
+  const newsRef = firestore.collection('news');
   const { docs } = await newsRef
-    .orderBy("timestamp", "desc")
+    .orderBy('timestamp', 'desc')
     .startAfter(key)
     .limit(3)
     .get();
@@ -29,8 +32,8 @@ export const getNextNew = async (key: any) => {
 
 export const getLikedNewByUserId = async (id: string) => {
   const junctions = await firestore
-    .collection("newsReaction")
-    .where("userId", "==", id)
+    .collection('newsReaction')
+    .where('userId', '==', id)
     .get();
 
   const news = await Promise.all(
@@ -46,8 +49,8 @@ export const getLikedNewByUserId = async (id: string) => {
 
 export const getLikedUserByNewId = async (id: string) => {
   const junctions = await firestore
-    .collection("newsReaction")
-    .where("newId", "==", id)
+    .collection('newsReaction')
+    .where('newId', '==', id)
     .get();
 
   const userIds = await Promise.all(
@@ -59,9 +62,9 @@ export const getLikedUserByNewId = async (id: string) => {
       const user = (
         await database
           .ref()
-          .child("users")
+          .child('users')
           .child(userId)
-          .child("personal")
+          .child('personal')
           .get()
       ).val();
       return { id: userId, ...user };
@@ -73,38 +76,38 @@ export const getLikedUserByNewId = async (id: string) => {
 export const getInfoByUserId = async (id: string) => {
   const info = await database
     .ref()
-    .child("users")
+    .child('users')
     .child(id)
-    .child("personal")
+    .child('personal')
     .get();
   return info.val();
 };
 
 export const likeNews = async (userId: string, newId: string) => {
   const currentLikes = (
-    await firestore.collection("news").doc(newId).get()
+    await firestore.collection('news').doc(newId).get()
   ).data().totalLikes;
   if (currentLikes)
     firestore
-      .collection("news")
+      .collection('news')
       .doc(newId)
       .update({ totalLikes: currentLikes + 1 });
-  else firestore.collection("news").doc(newId).update({ totalLikes: 1 });
+  else firestore.collection('news').doc(newId).update({ totalLikes: 1 });
   await firestore.doc(`newsReaction/${newId}_${userId}`).set({ newId, userId });
 };
 
 export const unlikeNews = async (userId: string, newId: string) => {
   const currentLikes = (
-    await firestore.collection("news").doc(newId).get()
+    await firestore.collection('news').doc(newId).get()
   ).data().totalLikes;
   firestore
-    .collection("news")
+    .collection('news')
     .doc(newId)
     .update({ totalLikes: currentLikes - 1 });
   await firestore
-    .collection("newsReaction")
-    .where("newId", "==", newId)
-    .where("userId", "==", userId)
+    .collection('newsReaction')
+    .where('newId', '==', newId)
+    .where('userId', '==', userId)
     .get()
     .then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
@@ -115,46 +118,57 @@ export const unlikeNews = async (userId: string, newId: string) => {
 
 export const isNewLikedByUser = async (userId: string, newId: string) => {
   const junctions = await firestore
-    .collection("newsReaction")
-    .where("newId", "==", newId)
-    .where("userId", "==", userId)
+    .collection('newsReaction')
+    .where('newId', '==', newId)
+    .where('userId', '==', userId)
     .get();
   return !junctions.empty;
 };
 
 export const deleteNews = async (news: News) => {
+  const task: Promise<void>[] = [];
+
   //delete picture from storage
-  if (news.pictureUrl) await storage.refFromURL(news.pictureUrl).delete();
+  if (news.pictureUrl) task.push(storage.refFromURL(news.pictureUrl).delete());
   //delete reaction
   const { docs: reaction } = await firestore
-    .collection("newsReaction")
-    .where("newId", "==", news.id)
+    .collection('newsReaction')
+    .where('newId', '==', news.id)
     .get();
-  if (reaction.length > 0) {
-    let array: string[] = [];
-    reaction.forEach((doc) => array.push(doc.id));
-    for (let item of array) {
-      await firestore.collection("newsReaction").doc(item).delete();
-    }
-  }
+
+  task.push(
+    ...reaction
+      .filter((doc) => doc.exists)
+      .map((doc) =>
+        firestore
+          .collection('newsReaction')
+          .doc(doc.data().newId + '_' + doc.data().userId)
+          .delete()
+      )
+  );
+
   //delete comment
   const { docs } = await firestore
-    .collection("news")
+    .collection('news')
     .doc(news.id)
-    .collection("comment")
+    .collection('comment')
     .get();
-  if (docs.length > 0) {
-    let array: string[] = [];
-    docs.forEach((doc) => array.push(doc.id));
-    for (let item of array) {
-      await firestore
-        .collection("news")
-        .doc(news.id)
-        .collection("comment")
-        .doc(item)
-        .delete();
-    }
-  }
+
+  task.push(
+    ...docs
+      .filter((doc) => doc.exists)
+      .map((doc) =>
+        firestore
+          .collection('news')
+          .doc(news.id)
+          .collection('comment')
+          .doc(doc.id)
+          .delete()
+      )
+  );
+
   //delete news
-  await firestore.collection("news").doc(news.id).delete();
+  task.push(firestore.collection('news').doc(news.id).delete());
+
+  return Promise.all(task);
 };

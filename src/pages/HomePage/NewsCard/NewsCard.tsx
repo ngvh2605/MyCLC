@@ -16,7 +16,7 @@ import {
   IonSkeletonText,
   IonText,
   useIonAlert,
-} from "@ionic/react";
+} from '@ionic/react';
 import {
   brush,
   chatbubbleEllipses,
@@ -26,16 +26,16 @@ import {
   heartOutline,
   star,
   trash,
-} from "ionicons/icons";
-import moment from "moment";
-import "moment/locale/vi";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useAuth } from "../../../auth";
-import { database, firestore, storage } from "../../../firebase";
-import { News, toNews } from "../../../models";
-import { deleteNews, likeNews, unlikeNews } from "./../services";
-import "./NewsCard.scss";
+} from 'ionicons/icons';
+import moment from 'moment';
+import 'moment/locale/vi';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useAuth } from '../../../auth';
+import { database, firestore, storage } from '../../../firebase';
+import { News, toNews } from '../../../models';
+import { deleteNews, likeNews, unlikeNews } from './../services';
+import './NewsCard.scss';
 
 const NewsCard: React.FC<any> = (props) => {
   const history = useHistory();
@@ -52,30 +52,30 @@ const NewsCard: React.FC<any> = (props) => {
 
   useEffect(() => {
     firestore
-      .collection("news")
+      .collection('news')
       .doc(newId)
       .onSnapshot((doc) => {
         setNews(toNews(doc));
       });
-  }, []);
+  }, [newId]);
 
   useEffect(() => {
     if (news) {
       try {
         database
           .ref()
-          .child("users")
+          .child('users')
           .child(news.author)
-          .child("personal")
-          .on("value", (snapshot) => {
+          .child('personal')
+          .on('value', (snapshot) => {
             if (snapshot.exists) {
               setAuthorInfo(snapshot.val());
             }
           });
         firestore
-          .collection("newsReaction")
-          .where("newId", "==", newId)
-          .where("userId", "==", userId)
+          .collection('newsReaction')
+          .where('newId', '==', newId)
+          .where('userId', '==', userId)
           .onSnapshot((doc) => {
             if (doc.empty) setIsLiked(false);
             else setIsLiked(true);
@@ -94,24 +94,24 @@ const NewsCard: React.FC<any> = (props) => {
             {news.pictureUrl && (
               <IonImg
                 hidden={!news.pictureUrl}
-                src={news.pictureUrl || "/assets/image/placeholder.png"}
+                src={news.pictureUrl || '/assets/image/placeholder.png'}
               />
             )}
-            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar slot="start">
+            <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonAvatar slot='start'>
                 <IonImg
                   src={
                     authorInfo && authorInfo.avatar
                       ? authorInfo.avatar
-                      : "/assets/image/placeholder.png"
+                      : '/assets/image/placeholder.png'
                   }
                 />
               </IonAvatar>
-              <IonLabel text-wrap color="dark">
+              <IonLabel text-wrap color='dark'>
                 <IonIcon
                   icon={ellipsisHorizontal}
-                  className="ion-float-right"
-                  color="medium"
+                  className='ion-float-right'
+                  color='medium'
                   onClick={() => {
                     setShowActionSheet(true);
                   }}
@@ -121,25 +121,25 @@ const NewsCard: React.FC<any> = (props) => {
                   <b>
                     {authorInfo && authorInfo.fullName
                       ? authorInfo.fullName
-                      : ""}
+                      : ''}
                   </b>
                 </p>
-                <IonLabel color="medium">
-                  <IonNote color="primary">
+                <IonLabel color='medium'>
+                  <IonNote color='primary'>
                     <IonIcon
                       icon={star}
                       style={{
-                        fontSize: "x-small",
-                        verticalAlign: "baseline",
+                        fontSize: 'x-small',
+                        verticalAlign: 'baseline',
                       }}
-                    />{" "}
+                    />{' '}
                     Club
-                    <IonText color="medium">
-                      {" · "}
+                    <IonText color='medium'>
+                      {' · '}
                       <i>
                         {moment(news.timestamp)
-                          .locale("vi")
-                          .format("Do MMM, H:mm")}
+                          .locale('vi')
+                          .format('Do MMM, H:mm')}
                       </i>
                     </IonText>
                   </IonNote>
@@ -159,34 +159,34 @@ const NewsCard: React.FC<any> = (props) => {
                 });
               }}
             >
-              <IonCardSubtitle color="primary">{news.title}</IonCardSubtitle>
+              <IonCardSubtitle color='primary'>{news.title}</IonCardSubtitle>
               <IonLabel
-                color="dark"
+                color='dark'
                 text-wrap
-                style={{ whiteSpace: "pre-wrap" }}
+                style={{ whiteSpace: 'pre-wrap' }}
               >
                 {decodeURI(news.body)}
               </IonLabel>
             </IonCardContent>
 
             <hr
-              className="ion-margin"
+              className='ion-margin'
               style={{
-                borderBottom: "1px solid",
+                borderBottom: '1px solid',
                 opacity: 0.2,
                 marginBottom: 10,
               }}
             />
-            <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
-              <IonRow className="ion-align-items-center">
+            <IonGrid className='ion-no-padding' style={{ paddingBottom: 10 }}>
+              <IonRow className='ion-align-items-center'>
                 <IonCol
-                  className="ion-align-self-center"
-                  style={{ textAlign: "center" }}
+                  className='ion-align-self-center'
+                  style={{ textAlign: 'center' }}
                 >
                   <IonButton
-                    fill="clear"
-                    expand="full"
-                    style={{ height: "max-content" }}
+                    fill='clear'
+                    expand='full'
+                    style={{ height: 'max-content' }}
                     onClick={() => {
                       history.push({
                         pathname: `/my/home/view/${news.id}`,
@@ -200,58 +200,58 @@ const NewsCard: React.FC<any> = (props) => {
                   >
                     <IonIcon
                       icon={chatbubbleEllipses}
-                      color="primary"
-                      style={{ fontSize: "large" }}
-                      slot="start"
+                      color='primary'
+                      style={{ fontSize: 'large' }}
+                      slot='start'
                     />
 
-                    <IonLabel color="primary" style={{ fontSize: "small" }}>
-                      {news.totalComments > 0 ? news.totalComments : ""} Bình
+                    <IonLabel color='primary' style={{ fontSize: 'small' }}>
+                      {news.totalComments > 0 ? news.totalComments : ''} Bình
                       luận
                     </IonLabel>
                   </IonButton>
                 </IonCol>
                 <IonCol
-                  className="ion-align-self-center"
-                  style={{ textAlign: "center" }}
+                  className='ion-align-self-center'
+                  style={{ textAlign: 'center' }}
                 >
                   {isLiked ? (
                     <IonButton
-                      fill="clear"
-                      expand="full"
-                      style={{ height: "max-content" }}
+                      fill='clear'
+                      expand='full'
+                      style={{ height: 'max-content' }}
                       onClick={() => {
                         unlikeNews(userId, news.id);
                       }}
                     >
                       <IonIcon
                         icon={heart}
-                        color="danger"
-                        style={{ fontSize: "large" }}
-                        slot="start"
+                        color='danger'
+                        style={{ fontSize: 'large' }}
+                        slot='start'
                       />
 
-                      <IonLabel color="danger" style={{ fontSize: "small" }}>
+                      <IonLabel color='danger' style={{ fontSize: 'small' }}>
                         {news.totalLikes} Yêu thích
                       </IonLabel>
                     </IonButton>
                   ) : (
                     <IonButton
-                      fill="clear"
-                      expand="full"
-                      style={{ height: "max-content" }}
+                      fill='clear'
+                      expand='full'
+                      style={{ height: 'max-content' }}
                       onClick={() => {
                         likeNews(userId, news.id);
                       }}
                     >
                       <IonIcon
                         icon={heartOutline}
-                        color="dark"
-                        style={{ fontSize: "large" }}
-                        slot="start"
+                        color='dark'
+                        style={{ fontSize: 'large' }}
+                        slot='start'
                       />
-                      <IonLabel color="dark" style={{ fontSize: "small" }}>
-                        {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
+                      <IonLabel color='dark' style={{ fontSize: 'small' }}>
+                        {news.totalLikes > 0 ? news.totalLikes : ''} Yêu thích
                       </IonLabel>
                     </IonButton>
                   )}
@@ -272,10 +272,10 @@ const NewsCard: React.FC<any> = (props) => {
             <IonActionSheet
               isOpen={showActionSheet}
               onDidDismiss={() => setShowActionSheet(false)}
-              cssClass="my-custom-class"
+              cssClass='my-custom-class'
               buttons={[
                 {
-                  text: "Chỉnh sửa",
+                  text: 'Chỉnh sửa',
                   icon: brush,
                   handler: () => {
                     history.push({
@@ -285,34 +285,34 @@ const NewsCard: React.FC<any> = (props) => {
                   },
                 },
                 {
-                  text: "Xoá",
-                  role: "destructive",
+                  text: 'Xoá',
+                  role: 'destructive',
                   icon: trash,
                   handler: () => {
                     presentAlert({
-                      header: "Xoá bài viết",
+                      header: 'Xoá bài viết',
                       message:
-                        "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
+                        'Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?',
                       buttons: [
-                        "Huỷ",
+                        'Huỷ',
                         {
-                          text: "Xoá",
+                          text: 'Xoá',
                           handler: (d) => {
-                            setNews({ ...news, body: "" });
+                            setNews({ ...news, body: '' });
                             deleteNews(news);
                           },
                         },
                       ],
-                      onDidDismiss: (e) => console.log("did dismiss"),
+                      onDidDismiss: (e) => console.log('did dismiss'),
                     });
                   },
                 },
                 {
-                  text: "Cancel",
+                  text: 'Cancel',
                   icon: close,
-                  role: "cancel",
+                  role: 'cancel',
                   handler: () => {
-                    console.log("Cancel clicked");
+                    console.log('Cancel clicked');
                   },
                 },
               ]}
@@ -321,30 +321,30 @@ const NewsCard: React.FC<any> = (props) => {
         )
       ) : (
         <IonCard>
-          <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-            <IonAvatar slot="start">
+          <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
+            <IonAvatar slot='start'>
               <IonSkeletonText animated />
             </IonAvatar>
             <IonLabel text-wrap>
               <p>
-                <IonSkeletonText animated style={{ width: "50%" }} />
+                <IonSkeletonText animated style={{ width: '50%' }} />
               </p>
               <IonLabel>
                 <IonNote>
-                  <IonSkeletonText animated style={{ width: "30%" }} />
+                  <IonSkeletonText animated style={{ width: '30%' }} />
                 </IonNote>
               </IonLabel>
             </IonLabel>
           </IonItem>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle style={{ paddingBottom: 10 }}>
-              <IonSkeletonText animated style={{ width: "100%" }} />
+              <IonSkeletonText animated style={{ width: '100%' }} />
             </IonCardSubtitle>
             <IonLabel text-wrap>
-              <IonSkeletonText animated style={{ width: "100%" }} />
-              <IonSkeletonText animated style={{ width: "100%" }} />
-              <IonSkeletonText animated style={{ width: "100%" }} />
-              <IonSkeletonText animated style={{ width: "30%" }} />
+              <IonSkeletonText animated style={{ width: '100%' }} />
+              <IonSkeletonText animated style={{ width: '100%' }} />
+              <IonSkeletonText animated style={{ width: '100%' }} />
+              <IonSkeletonText animated style={{ width: '30%' }} />
             </IonLabel>
           </IonCardContent>
         </IonCard>
