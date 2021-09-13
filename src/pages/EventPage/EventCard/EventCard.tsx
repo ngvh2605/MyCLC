@@ -43,6 +43,7 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import { Events } from "../../../models";
+import { getInfoByUserId } from "../../HomePage/services";
 import "./EventCard.scss";
 
 const Skeleton = () => (
@@ -66,19 +67,31 @@ interface Props {
   event: Events;
 }
 
+function calImgScale() {
+  const width = window.screen.width - 32;
+  const height = (width * 9) / 16;
+  return { width: width, height: height };
+}
+
 const EventCard: React.FC<Props> = (props) => {
   const history = useHistory();
   const { userId } = useAuth();
 
   const { event } = props;
 
-  const [isLiked, setIsLiked] = useState(false);
   const [authorInfo, setAuthorInfo] = useState<any>({});
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
 
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getAuthor = async () => {
+      setAuthorInfo(await getInfoByUserId(event.author));
+    };
+    getAuthor();
+  }, [event]);
 
   return (
     <>
@@ -90,7 +103,11 @@ const EventCard: React.FC<Props> = (props) => {
                 {imgLoaded ? null : (
                   <IonSkeletonText
                     animated
-                    style={{ height: 200, width: "100%", margin: 0 }}
+                    style={{
+                      height: calImgScale().height,
+                      width: calImgScale().width,
+                      margin: 0,
+                    }}
                   />
                 )}
                 <img
@@ -99,7 +116,11 @@ const EventCard: React.FC<Props> = (props) => {
                   style={
                     !imgLoaded
                       ? { display: "none" }
-                      : { objectFit: "cover", height: 200, width: "100%" }
+                      : {
+                          objectFit: "cover",
+                          height: calImgScale().height,
+                          width: calImgScale().width,
+                        }
                   }
                   onLoad={() => setImgLoaded(true)}
                 />
@@ -107,11 +128,21 @@ const EventCard: React.FC<Props> = (props) => {
             )}
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">
-                <IonImg src="/assets/image/placeholder.png" />
+                <IonImg
+                  src={
+                    authorInfo && authorInfo.avatar
+                      ? authorInfo.avatar
+                      : "/assets/image/placeholder.png"
+                  }
+                />
               </IonAvatar>
               <IonLabel color="dark" text-wrap>
                 <p>
-                  <b>{event.author}</b>
+                  <b>
+                    {authorInfo && authorInfo.fullName
+                      ? authorInfo.fullName
+                      : ""}
+                  </b>
                 </p>
               </IonLabel>
             </IonItem>

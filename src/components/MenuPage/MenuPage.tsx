@@ -32,6 +32,7 @@ import {
   sendOutline,
   logoFacebook,
   sparklesOutline,
+  buildOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
@@ -207,7 +208,16 @@ const MenuPage = () => {
         <IonToolbar>
           <IonList lines="none" className="ion-margin">
             <IonItem>
-              <IonLabel>Phiên bản: 1.4</IonLabel>
+              <IonLabel>Phiên bản: 1.5</IonLabel>
+            </IonItem>
+            <IonItem
+              onClick={() => {
+                history.push("/my/manage");
+                menuClose();
+              }}
+            >
+              <IonIcon icon={buildOutline} color="primary" slot="start" />
+              <IonLabel>Quản lý</IonLabel>
             </IonItem>
             <IonItem
               onClick={() => {

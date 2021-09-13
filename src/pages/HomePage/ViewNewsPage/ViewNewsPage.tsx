@@ -204,7 +204,7 @@ const ViewNewsPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/my/home" />
+            <IonBackButton text="" defaultHref="/my/home" />
           </IonButtons>
           <IonButtons slot="end"></IonButtons>
           <IonTitle>CLC News</IonTitle>

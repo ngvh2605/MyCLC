@@ -1,4 +1,4 @@
-import { RefresherEventDetail } from '@ionic/core';
+import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAlert,
   IonAvatar,
@@ -24,7 +24,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
-} from '@ionic/react';
+} from "@ionic/react";
 import {
   add as addIcon,
   arrowUp,
@@ -32,40 +32,40 @@ import {
   chevronDownCircleOutline,
   chevronUp,
   mailUnreadOutline,
-} from 'ionicons/icons';
-import 'moment/locale/vi';
-import { stringify } from 'querystring';
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../auth';
-import { auth as firebaseAuth, firestore } from '../../firebase';
-import { toNewsId } from '../../models';
-import './HomePage.scss';
-import NewsCard from './NewsCard';
-import { getNew } from './services';
+} from "ionicons/icons";
+import "moment/locale/vi";
+import { stringify } from "querystring";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../auth";
+import { auth as firebaseAuth, firestore } from "../../firebase";
+import { toNewsId } from "../../models";
+import "./HomePage.scss";
+import NewsCard from "./NewsCard";
+import { getNew } from "./services";
 
 const SampleNews = () => (
   <IonCard>
-    <IonImg src='https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156' />
+    <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156" />
 
-    <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-      <IonAvatar slot='start'>
-        <IonImg src='/assets/image/MultiLogo.png' />
+    <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+      <IonAvatar slot="start">
+        <IonImg src="/assets/image/MultiLogo.png" />
       </IonAvatar>
-      <IonChip color='primary' slot='end'>
-        <IonLabel style={{ verticalAlign: 'middle' }}>
-          <span style={{ fontSize: 'small' }}>Club</span>
+      <IonChip color="primary" slot="end">
+        <IonLabel style={{ verticalAlign: "middle" }}>
+          <span style={{ fontSize: "small" }}>Club</span>
         </IonLabel>
       </IonChip>
-      <IonLabel text-wrap color='dark'>
+      <IonLabel text-wrap color="dark">
         <p>
           <b>CLC Multimedia</b>
         </p>
-        <IonLabel color='medium'>28/08/2021 • 11:20</IonLabel>
+        <IonLabel color="medium">28/08/2021 • 11:20</IonLabel>
       </IonLabel>
     </IonItem>
     <IonCardContent style={{ paddingTop: 0 }}>
-      <IonCardSubtitle color='primary'>Mở đăng ký sớm MyCLC</IonCardSubtitle>
-      <IonLabel color='dark' text-wrap>
+      <IonCardSubtitle color="primary">Mở đăng ký sớm MyCLC</IonCardSubtitle>
+      <IonLabel color="dark" text-wrap>
         🌐 Trước sự thay đổi chóng mặt của thời đại công nghệ 4.0, CLC
         Multimedia đã phối hợp với các anh chị cựu học sinh đang là sinh viên
         ngành CNTT trong và ngoài nước để phát triển một ứng dụng dành riêng cho
@@ -89,30 +89,30 @@ const SampleNews = () => (
 
 const LoadingNews = () => (
   <IonCard>
-    <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-      <IonAvatar slot='start'>
+    <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+      <IonAvatar slot="start">
         <IonSkeletonText animated />
       </IonAvatar>
       <IonLabel text-wrap>
         <p>
-          <IonSkeletonText animated style={{ width: '50%' }} />
+          <IonSkeletonText animated style={{ width: "50%" }} />
         </p>
         <IonLabel>
           <IonNote>
-            <IonSkeletonText animated style={{ width: '30%' }} />
+            <IonSkeletonText animated style={{ width: "30%" }} />
           </IonNote>
         </IonLabel>
       </IonLabel>
     </IonItem>
     <IonCardContent style={{ paddingTop: 0 }}>
       <IonCardSubtitle style={{ paddingBottom: 10 }}>
-        <IonSkeletonText animated style={{ width: '100%' }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
       </IonCardSubtitle>
       <IonLabel text-wrap>
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '30%' }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "30%" }} />
       </IonLabel>
     </IonCardContent>
   </IonCard>
@@ -120,20 +120,18 @@ const LoadingNews = () => (
 
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
-  const [newsList, setNewsList] = useState<{ id: string; author: string }[]>(
-    []
-  );
+  const [newsList, setNewsList] = useState<string[]>([]);
 
   const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const [newsCount, setNewsCount] = useState(3);
   const [totalNews, setTotalNews] = useState(0);
 
   useEffect(() => {
     //read size
-    firestore.collection('news').onSnapshot(({ docs }) => {
+    firestore.collection("news").onSnapshot(({ docs }) => {
       setTotalNews(docs.length);
     });
 
@@ -143,7 +141,7 @@ const HomePage: React.FC = () => {
   const fetchNews = async () => {
     const news = await getNew(100);
     const newIds = news.map((p) => {
-      return { id: p.id, author: p.author };
+      return p.id;
     });
     setNewsList(newIds);
   };
@@ -156,61 +154,61 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <IonPage id='home-page'>
+    <IonPage id="home-page">
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
+          <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
           <IonTitle>CLC News</IonTitle>
-          <IonButtons slot='end'>
+          <IonButtons slot="end">
             <IonButton
               onClick={() => {
-                setAlertHeader('Hòm thư');
+                setAlertHeader("Hòm thư");
                 setAlertMessage(
-                  'Cảm ơn bạn đã thử ấn vào đây! Chức năng này sẽ được ra mắt trong thời gian tới. Hãy cùng đón chờ nhé!'
+                  "Cảm ơn bạn đã thử ấn vào đây! Chức năng này sẽ được ra mắt trong thời gian tới. Hãy cùng đón chờ nhé!"
                 );
                 setShowAlert(true);
               }}
             >
-              <IonIcon icon={mailUnreadOutline} color='primary' />
+              <IonIcon icon={mailUnreadOutline} color="primary" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className='ion-padding'>
-        <IonRefresher slot='fixed' onIonRefresh={refreshNews}>
+      <IonContent className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={refreshNews}>
           <IonRefresherContent
             style={{ marginTop: 10 }}
             pullingIcon={chevronDown}
-            pullingText='Kéo xuống để làm mới'
+            pullingText="Kéo xuống để làm mới"
           ></IonRefresherContent>
         </IonRefresher>
 
         <IonFab
           hidden={newsList.length > 0 ? newsList.length >= totalNews : true}
-          vertical='top'
-          horizontal='center'
-          slot='fixed'
-          className='fab-center'
+          vertical="top"
+          horizontal="center"
+          slot="fixed"
+          className="fab-center"
         >
           <IonButton
-            shape='round'
+            shape="round"
             onClick={() => {
               //setNewsList([]);
               fetchNews();
             }}
           >
-            <IonIcon icon={arrowUp} slot='start' />
+            <IonIcon icon={arrowUp} slot="start" />
             <IonLabel>Có tin mới</IonLabel>
           </IonButton>
         </IonFab>
 
         <IonChip
-          color='primary'
-          style={{ height: 'max-content', marginBottom: 10 }}
-          className='ion-margin'
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
           hidden={
             !(
               firebaseAuth.currentUser.metadata.creationTime ===
@@ -218,7 +216,7 @@ const HomePage: React.FC = () => {
             )
           }
         >
-          <IonLabel text-wrap className='ion-padding'>
+          <IonLabel text-wrap className="ion-padding">
             Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực
             hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của
             MyCLC nhé!
@@ -228,9 +226,7 @@ const HomePage: React.FC = () => {
         {totalNews ? (
           newsList
             .slice(0, newsCount)
-            .map((item, index) => (
-              <NewsCard newId={item.id} author={item.author} key={index} />
-            ))
+            .map((item, index) => <NewsCard newId={item} key={index} />)
         ) : (
           <>
             <LoadingNews />
@@ -241,8 +237,8 @@ const HomePage: React.FC = () => {
 
         {/* <SampleNews /> */}
         <IonButton
-          style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-          fill='clear'
+          style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
+          fill="clear"
           hidden={newsCount >= newsList.length}
           onClick={() => setNewsCount(newsCount + 1)}
         >
@@ -253,8 +249,8 @@ const HomePage: React.FC = () => {
           </IonLabel>
         </IonButton>
 
-        <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-          <IonFabButton routerLink='/my/home/add'>
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton routerLink="/my/home/add">
             <IonIcon icon={addIcon} />
           </IonFabButton>
         </IonFab>
@@ -262,10 +258,10 @@ const HomePage: React.FC = () => {
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
-          cssClass='my-custom-class'
+          cssClass="my-custom-class"
           header={alertHeader}
           message={alertMessage}
-          buttons={['OK']}
+          buttons={["OK"]}
         />
       </IonContent>
     </IonPage>

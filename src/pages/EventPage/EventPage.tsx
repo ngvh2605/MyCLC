@@ -22,39 +22,46 @@ import {
   IonNote,
   IonCardSubtitle,
   IonCardContent,
-} from '@ionic/react';
-import { arrowUp, chevronDown, add as addIcon } from 'ionicons/icons';
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../auth';
-import { auth as firebaseAuth, firestore } from '../../firebase';
-import EventCard from './EventCard';
-import { getEvent, getNextEvent } from './services';
-import { RefresherEventDetail } from '@ionic/core';
-import { Events } from '../../models';
+} from "@ionic/react";
+import {
+  arrowUp,
+  chevronDown,
+  add as addIcon,
+  ticketOutline,
+} from "ionicons/icons";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../auth";
+import { auth as firebaseAuth, firestore } from "../../firebase";
+import EventCard from "./EventCard";
+import { getEvent, getNextEvent } from "./services";
+import { RefresherEventDetail } from "@ionic/core";
+import { Events } from "../../models";
+import { useHistory } from "react-router-dom";
 
 const Skeleton = () => (
   <IonCard>
     <div>
       <IonSkeletonText
         animated
-        style={{ height: 200, width: '100%', margin: 0 }}
+        style={{ height: 200, width: "100%", margin: 0 }}
       />
     </div>
     <IonCardContent>
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '30%', height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "30%", height: 16 }} />
     </IonCardContent>
   </IonCard>
 );
 
 const EventPage: React.FC = () => {
   const { userId } = useAuth();
+  const history = useHistory();
 
   const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const [totalEvents, setTotalEvents] = useState(0);
 
@@ -75,7 +82,7 @@ const EventPage: React.FC = () => {
 
   const fetchEvents = async () => {
     setLoading((p) => !p);
-    const events = await getEvent(1);
+    const events = await getEvent(2);
     setLastKey(events.slice(-1).pop().createDate || 0);
     setEventsList(events);
     console.log(events);
@@ -92,18 +99,26 @@ const EventPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
+          <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Sự kiện</IonTitle>
+          <IonButtons
+            slot="end"
+            onClick={() => history.push("/my/event/ticket")}
+          >
+            <IonButton>
+              <IonIcon icon={ticketOutline} color="primary" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className='ion-padding'>
-        <IonRefresher slot='fixed' onIonRefresh={refreshEvents}>
+      <IonContent className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={refreshEvents}>
           <IonRefresherContent
             style={{ marginTop: 10 }}
             pullingIcon={chevronDown}
-            pullingText='Kéo xuống để làm mới'
+            pullingText="Kéo xuống để làm mới"
           ></IonRefresherContent>
         </IonRefresher>
 
@@ -111,27 +126,27 @@ const EventPage: React.FC = () => {
           hidden={
             eventsList.length > 0 ? eventsList.length >= totalEvents : true
           }
-          vertical='top'
-          horizontal='center'
-          slot='fixed'
-          className='fab-center'
+          vertical="top"
+          horizontal="center"
+          slot="fixed"
+          className="fab-center"
         >
           <IonButton
-            shape='round'
+            shape="round"
             onClick={() => {
               //setEventsList([]);
               fetchEvents();
             }}
           >
-            <IonIcon icon={arrowUp} slot='start' />
+            <IonIcon icon={arrowUp} slot="start" />
             <IonLabel>Có tin mới</IonLabel>
           </IonButton>
         </IonFab>
 
         <IonChip
-          color='primary'
-          style={{ height: 'max-content', marginBottom: 10 }}
-          className='ion-margin'
+          color="primary"
+          style={{ height: "max-content", marginBottom: 10 }}
+          className="ion-margin"
           hidden={
             !(
               firebaseAuth.currentUser.metadata.creationTime ===
@@ -139,7 +154,7 @@ const EventPage: React.FC = () => {
             )
           }
         >
-          <IonLabel text-wrap className='ion-padding'>
+          <IonLabel text-wrap className="ion-padding">
             Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực
             hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của
             MyCLC nhé!
@@ -158,8 +173,8 @@ const EventPage: React.FC = () => {
 
         {/* <SampleEvents /> */}
         <IonButton
-          style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-          fill='clear'
+          style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
+          fill="clear"
           hidden={false}
           onClick={() => fetchMore()}
         >
@@ -170,29 +185,23 @@ const EventPage: React.FC = () => {
           </IonLabel>
         </IonButton>
 
-        <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-          <IonFabButton routerLink='/my/home/add'>
-            <IonIcon icon={addIcon} />
-          </IonFabButton>
-        </IonFab>
-
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
-          cssClass='my-custom-class'
+          cssClass="my-custom-class"
           header={alertHeader}
           message={alertMessage}
-          buttons={['OK']}
+          buttons={["OK"]}
         />
       </IonContent>
 
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
-        cssClass='my-custom-class'
+        cssClass="my-custom-class"
         header={alertHeader}
         message={alertMessage}
-        buttons={['OK']}
+        buttons={["OK"]}
       />
     </IonPage>
   );
