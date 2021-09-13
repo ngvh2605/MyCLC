@@ -54,3 +54,22 @@ export function toNews(doc: firebase.firestore.DocumentSnapshot): News {
 export function toNewsId(doc: firebase.firestore.DocumentSnapshot): String {
   return doc.id;
 }
+
+export interface Events {
+  id: string;
+  author: string;
+  club: string;
+  createDate: string | number;
+  eventDate: string | number;
+  title?: string;
+  body: string;
+  pictureUrl?: string;
+  isLiked?: boolean;
+  totalLikes?: number;
+  authorInfo?: any;
+  location: string;
+}
+
+export function toEvents(doc: firebase.firestore.DocumentSnapshot): Events {
+  return { id: doc.id, ...doc.data() } as Events;
+}

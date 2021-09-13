@@ -109,7 +109,7 @@ const ViewNewsPage: React.FC = () => {
           isLiked: location.state["isLiked"],
         });
 
-        console.log("temp", temp);
+        //console.log("temp", temp);
         firestore
           .collection("news")
           .doc(temp.id)
