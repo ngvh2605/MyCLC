@@ -237,6 +237,7 @@ const ViewNewsPage: React.FC = () => {
                   onClick={() => {
                     setShowNewsActionSheet(true);
                   }}
+                  hidden={news && news.author != userId}
                 />
                 <p>
                   <b>
