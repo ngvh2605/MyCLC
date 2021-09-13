@@ -22,7 +22,7 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
-} from '@ionic/react';
+} from "@ionic/react";
 import {
   brush,
   chatbubbleEllipses,
@@ -30,31 +30,34 @@ import {
   ellipsisHorizontal,
   heart,
   heartOutline,
+  location,
   star,
+  ticket,
+  time,
   trash,
-} from 'ionicons/icons';
-import moment from 'moment';
-import 'moment/locale/vi';
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useAuth } from '../../../auth';
-import { database, firestore } from '../../../firebase';
-import { Events } from '../../../models';
-import './EventCard.scss';
+} from "ionicons/icons";
+import moment from "moment";
+import "moment/locale/vi";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useAuth } from "../../../auth";
+import { database, firestore } from "../../../firebase";
+import { Events } from "../../../models";
+import "./EventCard.scss";
 
 const Skeleton = () => (
   <IonCard>
     <div>
       <IonSkeletonText
         animated
-        style={{ height: 200, width: '100%', margin: 0 }}
+        style={{ height: 200, width: "100%", margin: 0 }}
       />
     </div>
     <IonCardContent>
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '100%', height: 16 }} />
-      <IonSkeletonText animated style={{ width: '30%', height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
+      <IonSkeletonText animated style={{ width: "30%", height: 16 }} />
     </IonCardContent>
   </IonCard>
 );
@@ -87,67 +90,75 @@ const EventCard: React.FC<Props> = (props) => {
                 {imgLoaded ? null : (
                   <IonSkeletonText
                     animated
-                    style={{ height: 200, width: '100%', margin: 0 }}
+                    style={{ height: 200, width: "100%", margin: 0 }}
                   />
                 )}
                 <img
                   src={event.pictureUrl}
-                  alt={''}
+                  alt=""
                   style={
                     !imgLoaded
-                      ? { display: 'none' }
-                      : { objectFit: 'cover', height: 200, width: '100%' }
+                      ? { display: "none" }
+                      : { objectFit: "cover", height: 200, width: "100%" }
                   }
                   onLoad={() => setImgLoaded(true)}
                 />
               </div>
             )}
-
+            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+              <IonAvatar slot="start">
+                <IonImg src="/assets/image/placeholder.png" />
+              </IonAvatar>
+              <IonLabel color="dark" text-wrap>
+                <p>
+                  <b>{event.author}</b>
+                </p>
+              </IonLabel>
+            </IonItem>
             <IonCardContent
-              style={{
-                paddingTop: 0,
-                paddingBottom: 0,
-                marginTop: 8,
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
+              style={{ paddingTop: 0, paddingBottom: 0 }}
               onClick={() => {}}
             >
-              <div>
-                <IonCardTitle style={{ color: '#FF6991', fontSize: 16 }}>
-                  {moment(event.eventDate).locale('vi').format('Do MMM, H:mm')}
-                </IonCardTitle>
-                <IonCardTitle style={{ marginTop: 4 }}>
-                  {event.title}
-                </IonCardTitle>
-                <IonCardSubtitle style={{ color: '#BCC4D2', marginTop: 4 }}>
-                  {event.location}
-                </IonCardSubtitle>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginBottom: 8,
-                  }}
-                >
-                  <img
-                    src='/assets/image/placeholder.png'
-                    alt=''
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      objectFit: 'cover',
-                    }}
-                  />
-                  <IonCardSubtitle style={{ color: '#BCC4D2', marginLeft: 8 }}>
-                    {event.club}
-                  </IonCardSubtitle>
-                </div>
-              </div>
-              <IonButton color='light'>
-                <IonIcon icon={heartOutline} />
-              </IonButton>
+              <IonCardSubtitle color="primary">
+                {moment(event.startDate)
+                  .locale("vi")
+                  .format("dddd, Do MMMM, H:mm")}
+                {moment(event.startDate).isSame(moment(event.endDate), "day")
+                  ? moment(event.endDate).locale("vi").format(" - H:mm")
+                  : moment(event.endDate)
+                      .locale("vi")
+                      .format(" - dddd, Do MMMM, H:mm")}
+              </IonCardSubtitle>
+              <IonText color="dark" text-wrap>
+                <b style={{ fontSize: "large" }}>{event.title}</b>
+              </IonText>
+              <IonCardSubtitle
+                style={{
+                  textTransform: "none",
+                  fontWeight: "normal",
+                }}
+              >
+                <IonLabel color="medium" text-wrap>
+                  <p>
+                    <IonIcon icon={location} slot="start" />
+                    {"  "}
+                    {event.location}
+                  </p>
+                </IonLabel>
+              </IonCardSubtitle>
+              <IonLabel text-wrap color="dark">
+                {event.description}
+              </IonLabel>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>
+                    <IonButton color="primary" expand="block" shape="round">
+                      <IonIcon icon={ticket} slot="start" />
+                      <IonLabel>Tham gia</IonLabel>
+                    </IonButton>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
             </IonCardContent>
           </IonCard>
         )

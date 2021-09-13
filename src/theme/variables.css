@@ -234,6 +234,10 @@ ion-button {
   text-transform: none;
 }
 
+ion-card-subtitle {
+  text-transform: uppercase;
+}
+
 * {
   /* selectable text */
   -webkit-user-select: text;
