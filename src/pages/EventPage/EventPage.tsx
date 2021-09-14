@@ -76,15 +76,17 @@ const EventPage: React.FC = () => {
 
   const fetchMore = async () => {
     const events = await getNextEvent(lastKey, 1);
-    setLastKey(events?.slice(-1)?.pop()?.createDate || lastKey);
+    setLastKey(events?.slice(-1)?.pop()?.endDate || lastKey);
     setEventsList([...eventsList, ...events]);
   };
 
   const fetchEvents = async () => {
     setLoading((p) => !p);
     const events = await getEvent(2);
-    setLastKey(events.slice(-1).pop().createDate || 0);
-    setEventsList(events);
+    if (events.length > 0) {
+      setLastKey(events.slice(-1).pop().endDate || 0);
+      setEventsList(events);
+    }
     console.log(events);
     setLoading((p) => !p);
   };

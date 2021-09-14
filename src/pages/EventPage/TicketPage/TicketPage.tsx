@@ -38,7 +38,7 @@ import EventCard from "../EventCard";
 import TicketCard from "./TicketCard";
 
 const EmptyCard = () => (
-  <div style={{ marginTop: 10, marginBottom: 20 }}>
+  <div style={{ marginTop: 10, marginBottom: 10 }}>
     <IonIcon
       icon={fileTray}
       style={{
@@ -99,11 +99,11 @@ const TicketPage: React.FC = () => {
         </IonItemDivider>
         <IonList>
           {events.filter(function (event) {
-            return moment(event.endDate).isSameOrAfter(moment(new Date()));
+            return moment(event.endDate).isSameOrAfter(moment().valueOf());
           }).length > 0 ? (
             events
               .filter(function (event) {
-                return moment(event.endDate).isSameOrAfter(moment(new Date()));
+                return moment(event.endDate).isSameOrAfter(moment().valueOf());
               })
               .map((event, index) => (
                 <TicketCard
@@ -115,6 +115,7 @@ const TicketPage: React.FC = () => {
           ) : (
             <EmptyCard />
           )}
+          <br />
         </IonList>
 
         <IonItemDivider color="primary">
@@ -122,11 +123,11 @@ const TicketPage: React.FC = () => {
         </IonItemDivider>
         <IonList>
           {events.filter(function (event) {
-            return moment(event.endDate).isBefore(moment(new Date()));
+            return moment(event.endDate).isBefore(moment().valueOf());
           }).length > 0 ? (
             events
               .filter(function (event) {
-                return moment(event.endDate).isBefore(moment(new Date()));
+                return moment(event.endDate).isBefore(moment().valueOf());
               })
               .map((event, index) => (
                 <TicketCard
