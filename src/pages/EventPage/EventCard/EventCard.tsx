@@ -30,9 +30,12 @@ import {
   ellipsisHorizontal,
   heart,
   heartOutline,
+  link,
+  linkOutline,
   location,
   star,
   ticket,
+  ticketOutline,
   time,
   trash,
 } from "ionicons/icons";
@@ -43,8 +46,9 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import { Events } from "../../../models";
-import { getInfoByUserId } from "../../HomePage/services";
+import { cancelTicket, getInfoByUserId } from "../../HomePage/services";
 import "./EventCard.scss";
+import { buyTicket } from "./../../HomePage/services";
 
 const Skeleton = () => (
   <IonCard>
@@ -80,6 +84,7 @@ const EventCard: React.FC<Props> = (props) => {
   const { event } = props;
 
   const [authorInfo, setAuthorInfo] = useState<any>({});
+  const [isBuy, setIsBuy] = useState(false);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
@@ -91,6 +96,20 @@ const EventCard: React.FC<Props> = (props) => {
       setAuthorInfo(await getInfoByUserId(event.author));
     };
     getAuthor();
+
+    //is user buy ticket?
+    const checkIsBuy = firestore
+      .collection("eventsTicket")
+      .where("eventId", "==", event.id)
+      .where("userId", "==", userId)
+      .onSnapshot((doc) => {
+        if (doc.empty) setIsBuy(false);
+        else setIsBuy(true);
+      });
+
+    return () => {
+      checkIsBuy();
+    };
   }, [event]);
 
   return (
@@ -182,12 +201,51 @@ const EventCard: React.FC<Props> = (props) => {
               </IonLabel>
               <IonGrid>
                 <IonRow>
-                  <IonCol>
-                    <IonButton color="primary" expand="block" shape="round">
-                      <IonIcon icon={ticket} slot="start" />
-                      <IonLabel>Tham gia</IonLabel>
-                    </IonButton>
-                  </IonCol>
+                  {event && event.sellTicket && (
+                    <IonCol>
+                      <IonButton
+                        color="primary"
+                        expand="block"
+                        shape="round"
+                        onClick={() => {
+                          buyTicket(userId, event.id);
+                        }}
+                        hidden={isBuy}
+                      >
+                        <IonIcon icon={ticket} slot="start" />
+                        <IonLabel>Đăng ký</IonLabel>
+                      </IonButton>
+                      <IonButton
+                        color="primary"
+                        fill="solid"
+                        expand="block"
+                        shape="round"
+                        onClick={() => {
+                          cancelTicket(userId, event.id);
+                        }}
+                        hidden={!isBuy}
+                        disabled
+                      >
+                        <IonIcon icon={ticket} slot="start" />
+                        <IonLabel>Đã đăng ký</IonLabel>
+                      </IonButton>
+                    </IonCol>
+                  )}
+                  {event && !event.sellTicket && event.externalLink && (
+                    <IonCol>
+                      <IonButton
+                        color="primary"
+                        fill="outline"
+                        expand="block"
+                        shape="round"
+                        href={event.externalLink}
+                        target="_blank"
+                      >
+                        <IonIcon icon={linkOutline} slot="start" />
+                        <IonLabel>Truy cập liên kết</IonLabel>
+                      </IonButton>
+                    </IonCol>
+                  )}
                 </IonRow>
               </IonGrid>
             </IonCardContent>

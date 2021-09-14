@@ -70,6 +70,7 @@ export interface Events {
   sellTicket?: boolean;
   totalTicket?: number;
   totalBuy?: number;
+  externalLink?: string;
 }
 
 export function toEvents(doc: firebase.firestore.DocumentSnapshot): Events {

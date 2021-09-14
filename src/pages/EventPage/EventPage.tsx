@@ -143,24 +143,6 @@ const EventPage: React.FC = () => {
           </IonButton>
         </IonFab>
 
-        <IonChip
-          color="primary"
-          style={{ height: "max-content", marginBottom: 10 }}
-          className="ion-margin"
-          hidden={
-            !(
-              firebaseAuth.currentUser.metadata.creationTime ===
-              firebaseAuth.currentUser.metadata.lastSignInTime
-            )
-          }
-        >
-          <IonLabel text-wrap className="ion-padding">
-            Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực
-            hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của
-            MyCLC nhé!
-          </IonLabel>
-        </IonChip>
-
         {!loading ? (
           eventsList.map((item, index) => (
             <EventCard event={item} key={index} />
