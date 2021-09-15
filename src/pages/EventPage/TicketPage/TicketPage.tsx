@@ -105,6 +105,10 @@ const TicketPage: React.FC = () => {
               .filter(function (event) {
                 return moment(event.endDate).isSameOrAfter(moment().valueOf());
               })
+              .sort(
+                (a, b) =>
+                  moment(a.startDate).valueOf() - moment(b.startDate).valueOf()
+              )
               .map((event, index) => (
                 <TicketCard
                   event={event}
@@ -129,6 +133,10 @@ const TicketPage: React.FC = () => {
               .filter(function (event) {
                 return moment(event.endDate).isBefore(moment().valueOf());
               })
+              .sort(
+                (a, b) =>
+                  moment(b.startDate).valueOf() - moment(a.startDate).valueOf()
+              )
               .map((event, index) => (
                 <TicketCard
                   event={event}

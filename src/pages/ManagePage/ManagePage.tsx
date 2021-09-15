@@ -12,11 +12,13 @@ import {
 import { mailUnreadOutline } from "ionicons/icons";
 import "moment/locale/vi";
 import React from "react";
+import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import "./ManagePage.scss";
 
 const ManagePage: React.FC = () => {
   const { userId } = useAuth();
+  const history = useHistory();
 
   return (
     <IonPage id="manage-page">
@@ -34,7 +36,15 @@ const ManagePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding"></IonContent>
+      <IonContent className="ion-padding">
+        <IonButton
+          expand="block"
+          shape="round"
+          onClick={() => history.push("/my/manage/add")}
+        >
+          Tạo sự kiện
+        </IonButton>
+      </IonContent>
     </IonPage>
   );
 };

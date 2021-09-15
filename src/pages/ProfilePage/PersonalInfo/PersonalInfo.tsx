@@ -314,9 +314,11 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Ngày sinh</IonLabel>
             <IonDatetime
-              displayFormat="DD MM YYYY"
+              displayFormat="DD/MM/YYYY"
               value={birth}
               onIonChange={(e) => setBirth(e.detail.value)}
+              cancelText="Huỷ"
+              doneText="Xác nhận"
             ></IonDatetime>
           </IonItem>
           <IonItem>
@@ -440,6 +442,8 @@ const PersonalInfo: React.FC = () => {
               displayFormat="YYYY"
               value={gradeStart}
               onIonChange={(e) => setGradeStart(e.detail.value)}
+              cancelText="Huỷ"
+              doneText="Xác nhận"
             ></IonDatetime>
           </IonItem>
           <IonItem>
@@ -450,6 +454,8 @@ const PersonalInfo: React.FC = () => {
               max={gradeStart ? (parseInt(gradeStart) + 3).toString() : "2050"}
               value={gradeEnd}
               onIonChange={(e) => setGradeEnd(e.detail.value)}
+              cancelText="Huỷ"
+              doneText="Xác nhận"
             ></IonDatetime>
           </IonItem>
         </IonList>

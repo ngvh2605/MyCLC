@@ -68,6 +68,7 @@ export interface Events {
   authorInfo?: any;
   location?: string;
   sellTicket?: boolean;
+  sellInApp?: boolean;
   totalTicket?: number;
   totalBuy?: number;
   externalLink?: string;

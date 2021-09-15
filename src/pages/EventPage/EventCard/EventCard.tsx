@@ -1,54 +1,31 @@
 import {
-  IonActionSheet,
   IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
-  IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   IonCol,
-  IonContent,
   IonGrid,
-  IonHeader,
   IonIcon,
   IonImg,
   IonItem,
   IonLabel,
-  IonNote,
   IonRow,
   IonSkeletonText,
   IonText,
-  IonTitle,
-  IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import {
-  brush,
-  chatbubbleEllipses,
-  close,
-  ellipsisHorizontal,
-  heart,
-  heartOutline,
-  link,
-  linkOutline,
-  location,
-  star,
-  ticket,
-  ticketOutline,
-  time,
-  trash,
-} from "ionicons/icons";
+import { linkOutline, location, ticket } from "ionicons/icons";
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
-import { database, firestore } from "../../../firebase";
+import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
 import { cancelTicket, getInfoByUserId } from "../../HomePage/services";
-import "./EventCard.scss";
 import { buyTicket } from "./../../HomePage/services";
+import "./EventCard.scss";
 
 const Skeleton = () => (
   <IonCard>
@@ -72,7 +49,7 @@ interface Props {
 }
 
 function calImgScale() {
-  const width = window.screen.width - 32;
+  const width = window.screen.width - 64;
   const height = (width * 9) / 16;
   return { width: width, height: height };
 }
