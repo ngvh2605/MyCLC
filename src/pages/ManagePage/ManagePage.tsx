@@ -64,11 +64,6 @@ const ManagePage: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Quản lý sự kiện</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => {}}>
-              <IonIcon icon={mailUnreadOutline} color="primary" />
-            </IonButton>
-          </IonButtons>
         </IonToolbar>
       </IonHeader>
 

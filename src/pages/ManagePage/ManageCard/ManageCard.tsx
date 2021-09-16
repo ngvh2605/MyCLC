@@ -160,7 +160,12 @@ const ManageCard: React.FC<Props> = (props) => {
                   shape="round"
                   fill="solid"
                   hidden={!(event.sellTicket && event.sellInApp)}
-                  routerLink={`/my/manage/list/${event.id}`}
+                  onClick={() => {
+                    history.push({
+                      pathname: `/my/manage/list/${event.id}`,
+                      state: event,
+                    });
+                  }}
                 >
                   <IonIcon icon={list} slot="start" />
                   <IonLabel>Danh sách đăng ký</IonLabel>
