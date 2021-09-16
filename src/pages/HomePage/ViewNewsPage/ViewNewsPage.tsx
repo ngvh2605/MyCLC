@@ -238,6 +238,7 @@ const ViewNewsPage: React.FC = () => {
                     setShowNewsActionSheet(true);
                   }}
                   hidden={news && news.author != userId}
+                  style={{ fontSize: "large" }}
                 />
                 <p>
                   <b>
@@ -400,6 +401,7 @@ const ViewNewsPage: React.FC = () => {
                               setShowActionSheet(true);
                             }}
                             hidden={comment.author != userId}
+                            style={{ fontSize: "large" }}
                           />
                           {commentAuthors[index] &&
                             commentAuthors[index].fullName && (

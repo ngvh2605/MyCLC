@@ -36,11 +36,11 @@ import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
 
 import { auth as firebaseAuth, firestore, storage } from "../../../firebase";
-import { News } from "../../../models";
+import { Events, News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AddEventPage: React.FC = () => {
-  const locationRef = useLocation<News>();
+  const locationRef = useLocation<Events>();
   const { userId } = useAuth();
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -58,13 +58,33 @@ const AddEventPage: React.FC = () => {
   const [externalLink, setExternalLink] = useState("");
   const [pictureUrl, setPictureUrl] = useState("");
 
-  const [events, setEvents] = useState<News>();
+  const [events, setEvents] = useState<Events>();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   const { handleUploadImage } = useUploadFile();
+
+  useEffect(() => {
+    if (locationRef.state) {
+      const temp: Events = { ...locationRef.state };
+      setEvents(temp);
+      if (temp.title) setTitle(temp.title);
+      if (temp.startDate) setStartDate(temp.startDate);
+      if (temp.endDate) setEndDate(temp.endDate);
+      if (temp.location) setLocation(temp.location);
+      if (temp.description) setDescription(temp.description);
+      if (temp.sellTicket) setSellTicket(temp.sellTicket);
+      if (temp.sellInApp) setSellInApp(temp.sellInApp);
+      if (temp.totalTicket) setTotalTicket(temp.totalTicket);
+      if (temp.externalLink) setExternalLink(temp.externalLink);
+      if (temp.pictureUrl) setPictureUrl(temp.pictureUrl);
+      setBody(decodeURI(temp.body));
+      if (temp.pictureUrl) setPictureUrl(temp.pictureUrl);
+    }
+    console.log(locationRef.state);
+  }, [locationRef]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -122,7 +142,7 @@ const AddEventPage: React.FC = () => {
         //setAlertHeader("Chúc mừng!");
         //setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
         //setShowAlert(true);
-        history.replace("/my/home");
+        history.replace("/my/manage");
       });
   };
 
@@ -137,8 +157,16 @@ const AddEventPage: React.FC = () => {
       .collection("events")
       .doc(events.id)
       .update({
-        title: title,
+        title,
+        startDate,
+        endDate,
+        location,
+        description,
         body: encodeURI(body),
+        sellTicket,
+        sellInApp,
+        totalTicket,
+        externalLink,
         pictureUrl:
           pictureUrl && pictureUrl != events.pictureUrl
             ? uploadedUrl
@@ -171,7 +199,7 @@ const AddEventPage: React.FC = () => {
               <b>Đăng</b>
             </IonButton>
           </IonButtons>
-          <IonTitle>{events ? "Sửa News" : "Tạo News"}</IonTitle>
+          <IonTitle>{events ? "Sửa sự kiện" : "Tạo sự kiện"}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

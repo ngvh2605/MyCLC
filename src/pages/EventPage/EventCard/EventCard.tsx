@@ -156,75 +156,87 @@ const EventCard: React.FC<Props> = (props) => {
                       .locale("vi")
                       .format(" - dddd, Do MMMM, H:mm")}
               </IonCardSubtitle>
-              <IonText color="dark" text-wrap>
+
+              <IonLabel color="dark" text-wrap>
                 <b style={{ fontSize: "large" }}>{event.title}</b>
-              </IonText>
-              <IonCardSubtitle
-                style={{
-                  textTransform: "none",
-                  fontWeight: "normal",
-                }}
-              >
-                <IonLabel color="medium" text-wrap>
-                  <p>
-                    <IonIcon icon={location} slot="start" />
-                    {"  "}
-                    {event.location}
-                  </p>
-                </IonLabel>
-              </IonCardSubtitle>
+              </IonLabel>
+              <IonLabel color="medium" text-wrap>
+                <p>
+                  <IonIcon icon={location} slot="start" />
+                  {"  "}
+                  {event.location}
+                </p>
+              </IonLabel>
               <IonLabel text-wrap color="dark">
                 {event.description}
               </IonLabel>
-              <IonGrid>
-                <IonRow>
-                  {event && event.sellTicket && (
-                    <IonCol>
+
+              <div style={{ marginTop: 16, marginBottom: 16 }}>
+                {event && event.sellTicket && event.sellInApp && (
+                  <>
+                    {(!event.totalBuy ||
+                      (event.totalBuy &&
+                        event.totalBuy < event.totalTicket)) && (
                       <IonButton
                         color="primary"
                         expand="block"
                         shape="round"
                         onClick={() => {
-                          buyTicket(userId, event.id);
+                          presentAlert({
+                            header: event.title,
+                            message:
+                              "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                            buttons: [
+                              "Huỷ",
+                              {
+                                text: "Đồng ý",
+                                handler: (d) => {
+                                  buyTicket(userId, event.id);
+                                },
+                              },
+                            ],
+                            onDidDismiss: (e) => console.log("did dismiss"),
+                          });
                         }}
                         hidden={isBuy}
                       >
                         <IonIcon icon={ticket} slot="start" />
                         <IonLabel>Đăng ký</IonLabel>
                       </IonButton>
-                      <IonButton
-                        color="primary"
-                        fill="solid"
-                        expand="block"
-                        shape="round"
-                        onClick={() => {
-                          cancelTicket(userId, event.id);
-                        }}
-                        hidden={!isBuy}
-                        disabled
-                      >
-                        <IonIcon icon={ticket} slot="start" />
-                        <IonLabel>Đã đăng ký</IonLabel>
-                      </IonButton>
-                    </IonCol>
+                    )}
+                    <IonButton
+                      color="primary"
+                      fill="solid"
+                      expand="block"
+                      shape="round"
+                      onClick={() => {
+                        //cancelTicket(userId, event.id);
+                      }}
+                      hidden={!isBuy}
+                      disabled
+                    >
+                      <IonIcon icon={ticket} slot="start" />
+                      <IonLabel>Đã đăng ký</IonLabel>
+                    </IonButton>
+                  </>
+                )}
+                {event &&
+                  event.sellTicket &&
+                  !event.sellInApp &&
+                  event.externalLink && (
+                    <IonButton
+                      color="primary"
+                      fill="outline"
+                      expand="block"
+                      shape="round"
+                      href={event.externalLink}
+                      target="_blank"
+                    >
+                      <IonIcon icon={linkOutline} slot="start" />
+                      <IonLabel>Truy cập liên kết</IonLabel>
+                    </IonButton>
                   )}
-                  {event && !event.sellTicket && event.externalLink && (
-                    <IonCol>
-                      <IonButton
-                        color="primary"
-                        fill="outline"
-                        expand="block"
-                        shape="round"
-                        href={event.externalLink}
-                        target="_blank"
-                      >
-                        <IonIcon icon={linkOutline} slot="start" />
-                        <IonLabel>Truy cập liên kết</IonLabel>
-                      </IonButton>
-                    </IonCol>
-                  )}
-                </IonRow>
-              </IonGrid>
+              </div>
             </IonCardContent>
           </IonCard>
         )

@@ -155,18 +155,31 @@ export const deleteNews = async (news: News) => {
 };
 
 export const buyTicket = async (userId: string, eventId: string) => {
-  const currentBuy = (
-    await firestore.collection("events").doc(eventId).get()
-  ).data().totalBuy;
-  if (currentBuy)
-    firestore
-      .collection("events")
-      .doc(eventId)
-      .update({ totalBuy: currentBuy + 1 });
-  else firestore.collection("events").doc(eventId).update({ totalBuy: 1 });
-  await firestore
-    .doc(`eventsTicket/${eventId}_${userId}`)
-    .set({ eventId, userId });
+  const data = (await firestore.collection("events").doc(eventId).get()).data();
+  if (data.totalBuy) {
+    if (data.totalBuy < data.totalTicket) {
+      firestore
+        .collection("events")
+        .doc(eventId)
+        .update({ totalBuy: data.totalBuy + 1 });
+      await firestore
+        .doc(`eventsTicket/${eventId}_${userId}`)
+        .set({ eventId, userId, status: "register" });
+    } else {
+      firestore
+        .collection("events")
+        .doc(eventId)
+        .update({ totalBuy: data.totalBuy + 1 });
+      await firestore
+        .doc(`eventsTicket/${eventId}_${userId}`)
+        .set({ eventId, userId, status: "wishlist" });
+    }
+  } else {
+    firestore.collection("events").doc(eventId).update({ totalBuy: 1 });
+    await firestore
+      .doc(`eventsTicket/${eventId}_${userId}`)
+      .set({ eventId, userId, status: "register" });
+  }
 };
 
 export const cancelTicket = async (userId: string, eventId: string) => {

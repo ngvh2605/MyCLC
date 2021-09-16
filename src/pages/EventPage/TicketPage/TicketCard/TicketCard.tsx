@@ -92,7 +92,9 @@ const TicketCard: React.FC<Props> = (props) => {
           <IonItem lines="full">
             {event.pictureUrl && (
               <IonThumbnail slot="start">
-                {imgLoaded ? null : <IonSkeletonText animated style={{}} />}
+                {imgLoaded ? null : (
+                  <IonSkeletonText animated style={{ borderRadius: 10 }} />
+                )}
                 <img
                   src={event.pictureUrl}
                   alt=""
@@ -101,6 +103,7 @@ const TicketCard: React.FC<Props> = (props) => {
                       ? { display: "none" }
                       : {
                           objectFit: "cover",
+                          borderRadius: 10,
                         }
                   }
                   onLoad={() => setImgLoaded(true)}

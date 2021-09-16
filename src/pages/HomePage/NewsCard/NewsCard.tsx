@@ -113,6 +113,7 @@ const NewsCard: React.FC<any> = (props) => {
                     setShowActionSheet(true);
                   }}
                   hidden={news.author != userId}
+                  style={{ fontSize: "large" }}
                 />
                 <p>
                   <b>
@@ -254,16 +255,7 @@ const NewsCard: React.FC<any> = (props) => {
                 </IonCol>
               </IonRow>
             </IonGrid>
-            {/* 
-              <IonList>
-                {item.comment &&
-                  item.comment.map((comment, index) => (
-                    <IonItem key={index}>
-                      <IonLabel>{comment.body}</IonLabel>
-                    </IonItem>
-                  ))}
-              </IonList>
-              */}
+
             <IonActionSheet
               isOpen={showActionSheet}
               onDidDismiss={() => setShowActionSheet(false)}

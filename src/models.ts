@@ -58,9 +58,9 @@ export function toNewsId(doc: firebase.firestore.DocumentSnapshot): String {
 export interface Events {
   id: string;
   author: string;
-  createDate: string | number;
-  startDate: string | number;
-  endDate: string | number;
+  createDate: number;
+  startDate: number;
+  endDate: number;
   title?: string;
   description?: string;
   body: string;

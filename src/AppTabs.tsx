@@ -28,6 +28,7 @@ import ViewNewsPage from "./pages/HomePage/ViewNewsPage";
 import TicketPage from "./pages/EventPage/TicketPage";
 import ManagePage from "./pages/ManagePage";
 import AddEventPage from "./pages/ManagePage/AddEventPage";
+import EventRegisterList from "./pages/ManagePage/EventRegisterList";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -75,24 +76,28 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/profile/avatar">
         <AvatarPage />
       </Route>
-
       <Route exact path="/my/event">
         <EventPage />
       </Route>
       <Route exact path="/my/event/ticket">
         <TicketPage />
       </Route>
-
       <Route exact path="/my/about">
         <AboutPage />
       </Route>
-
       <Route exact path="/my/manage">
         <ManagePage />
       </Route>
       <Route exact path="/my/manage/add">
         <AddEventPage />
       </Route>
+      <Route exact path="/my/manage/add/:id">
+        <AddEventPage />
+      </Route>
+      <Route exact path="/my/manage/list/:id">
+        <EventRegisterList />
+      </Route>
+
       <Switch>
         <Route path="*">
           <NotFoundPage />
