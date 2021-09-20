@@ -20,7 +20,7 @@ import {
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { chevronBack } from "ionicons/icons";
+import { chevronBack, image } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
@@ -134,6 +134,10 @@ const AvatarPage: React.FC = () => {
 
   const handleUploadFile = async (url: string) => {
     setStatus({ loading: true, error: false });
+    const userData = database.ref();
+    userData.child("users").child(userId).child("verify").update({
+      hasAvatar: true,
+    });
     await handleUpload(url, "avatar");
   };
 
@@ -174,6 +178,19 @@ const AvatarPage: React.FC = () => {
           ref={fileInputRef}
           onChange={handleFileChange}
         />
+        <IonButton
+          className="ion-margin"
+          expand="block"
+          fill="clear"
+          onClick={() => {
+            handlePictureClick();
+          }}
+        >
+          <IonIcon icon={image} slot="start" />
+          {avatarUrl && avatarUrl !== "/assets/image/placeholder.png"
+            ? "Đổi ảnh khác"
+            : "Thêm hình ảnh"}
+        </IonButton>
         <IonChip
           color="primary"
           style={{ height: "max-content", marginBottom: 10 }}

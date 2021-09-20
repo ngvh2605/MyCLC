@@ -3,6 +3,7 @@ import {
   IonLoading,
   IonRouterOutlet,
   IonSplitPane,
+  setupConfig,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import React from "react";
@@ -17,7 +18,10 @@ import RegisterPage from "./pages/RegisterPage";
 import SplashPage from "./pages/SplashPage";
 
 const App: React.FC = () => {
+  setupConfig({ mode: "ios" });
+
   const { loading, auth } = useAuthInit();
+
   if (loading) {
     return <IonLoading isOpen />;
   }

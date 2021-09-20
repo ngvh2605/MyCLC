@@ -98,7 +98,7 @@ const HomePage: React.FC = () => {
           </IonLabel>
         </IonChip>
         <IonCard>
-          <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post1%20(1).png?alt=media&token=8c5a4ac1-81a9-4990-b632-30456a8e0156" />
+          <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BMyCLC%5D-Post.jpg?alt=media&token=5beb8cd7-895e-44d3-9ff3-70a63e230ed6" />
 
           <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
             <IonAvatar slot="start">
