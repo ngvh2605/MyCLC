@@ -13,13 +13,13 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth } from "../../../firebase";
+import { auth as firebaseAuth, database } from "../../../firebase";
 
 const EmailVerify: React.FC = () => {
-  const { userEmail, emailVerified } = useAuth();
+  const { userEmail, emailVerified, userId } = useAuth();
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
 
@@ -27,8 +27,47 @@ const EmailVerify: React.FC = () => {
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
+  useEffect(() => {
+    checkEmailVerify();
+  }, [emailVerified]);
+
+  const checkEmailVerify = async () => {
+    const verifyStatus = database
+      .ref()
+      .child("users")
+      .child(userId)
+      .child("verify")
+      .get();
+    try {
+      if ((await verifyStatus).val().emailVerify) {
+        setAlertHeader("Đã xác minh email!");
+        setAlertMessage("Bạn đã xác minh email thành công");
+        setShowAlert(true);
+      } else if (emailVerified && !(await verifyStatus).val().emailVerify) {
+        const userData = database.ref();
+        await userData
+          .child("users")
+          .child(userId)
+          .child("verify")
+          .update({
+            emailVerify: true,
+          })
+          .then(() => {
+            setAlertHeader("Đã xác minh email!");
+            setAlertMessage("Bạn đã xác minh email thành công");
+            setShowAlert(true);
+          });
+      }
+    } catch {}
+  };
+
   function sendVerifyEmail() {
     setStatus({ loading: true, error: false });
+
+    const userData = database.ref();
+    userData.child("users").child(userId).child("personal").update({
+      email: userEmail,
+    });
 
     firebaseAuth.onAuthStateChanged((firebaseUser) => {
       firebaseUser

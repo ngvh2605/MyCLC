@@ -1,2 +1,17 @@
 #menu-page {
+  * {
+    /* selectable text */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  ion-list {
+    ion-item {
+      ion-icon {
+        margin-left: 16px;
+      }
+    }
+  }
 }

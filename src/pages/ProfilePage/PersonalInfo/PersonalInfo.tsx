@@ -8,21 +8,27 @@ import {
   IonDatetime,
   IonFooter,
   IonHeader,
+  IonIcon,
   IonInput,
   IonItem,
+  IonItemDivider,
   IonLabel,
   IonList,
   IonLoading,
+  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
+  IonTextarea,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { chevronBack } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import { database } from "../../../firebase";
+import { auth as firebaseAuth, database } from "../../../firebase";
+import moment from "moment";
 
 const PersonalInfo: React.FC = () => {
   const { userId, userEmail } = useAuth();
@@ -314,11 +320,11 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Ngày sinh</IonLabel>
             <IonDatetime
-              displayFormat="DD/MM/YYYY"
+              displayFormat="DD MM YYYY"
               value={birth}
-              onIonChange={(e) => setBirth(e.detail.value)}
-              cancelText="Huỷ"
-              doneText="Xác nhận"
+              onIonChange={(e) =>
+                setBirth(moment(e.detail.value).format("YYYY-MM-DD"))
+              }
             ></IonDatetime>
           </IonItem>
           <IonItem>
@@ -441,21 +447,25 @@ const PersonalInfo: React.FC = () => {
               min="2003"
               displayFormat="YYYY"
               value={gradeStart}
-              onIonChange={(e) => setGradeStart(e.detail.value)}
-              cancelText="Huỷ"
-              doneText="Xác nhận"
+              onIonChange={(e) =>
+                setGradeStart(moment(e.detail.value).format("YYYY"))
+              }
             ></IonDatetime>
           </IonItem>
           <IonItem>
             <IonLabel position="floating">Năm ra trường</IonLabel>
             <IonDatetime
               displayFormat="YYYY"
-              min={gradeStart ? gradeStart : "2004"}
-              max={gradeStart ? (parseInt(gradeStart) + 3).toString() : "2050"}
+              min={gradeStart ? (parseInt(gradeStart) + 1).toString() : "2004"}
+              max={
+                gradeStart
+                  ? (parseInt(gradeStart) + 5).toString()
+                  : moment().add(5, "years").format("YYYY")
+              }
               value={gradeEnd}
-              onIonChange={(e) => setGradeEnd(e.detail.value)}
-              cancelText="Huỷ"
-              doneText="Xác nhận"
+              onIonChange={(e) =>
+                setGradeEnd(moment(e.detail.value).format("YYYY"))
+              }
             ></IonDatetime>
           </IonItem>
         </IonList>

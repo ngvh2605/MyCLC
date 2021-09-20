@@ -32,6 +32,7 @@ const ManagePage: React.FC = () => {
   const history = useHistory();
 
   const [events, setEvents] = useState<Events[]>();
+  const [oldEvents, setOldEvents] = useState<Events[]>();
   const [segment, setSegment] = useState("new");
 
   useEffect(() => {
@@ -43,11 +44,20 @@ const ManagePage: React.FC = () => {
       .collection("events")
       .where("author", "==", userId)
       .orderBy("startDate", "desc")
+      .where("startDate", ">=", moment().valueOf())
+      .get();
+
+    setEvents(docs.map(toEvents));
+
+    const { docs: oldDocs } = await firestore
+      .collection("events")
+      .where("author", "==", userId)
+      .orderBy("startDate", "desc")
+      .where("startDate", "<", moment().valueOf())
       .limit(10)
       .get();
 
-    console.log(docs.map(toEvents));
-    setEvents(docs.map(toEvents));
+    setOldEvents(oldDocs.map(toEvents));
 
     if (event) {
       setTimeout(() => {
@@ -85,32 +95,19 @@ const ManagePage: React.FC = () => {
             <IonSegmentButton value="old">Sự kiện đã qua</IonSegmentButton>
           </IonSegment>
         </div>
-        {events &&
-          (segment === "new"
-            ? events
-                .filter(function (e) {
-                  return e.endDate >= moment().valueOf();
-                })
-                .sort(
-                  (a, b) =>
-                    moment(a.startDate).valueOf() -
-                    moment(b.startDate).valueOf()
-                )
-                .map((item, index) => (
-                  <ManageCard event={item} key={index} allowEdit={true} />
-                ))
-            : events
-                .filter(function (e) {
-                  return e.endDate < moment().valueOf();
-                })
-                .sort(
-                  (a, b) =>
-                    moment(b.startDate).valueOf() -
-                    moment(a.startDate).valueOf()
-                )
-                .map((item, index) => (
-                  <ManageCard event={item} key={index} allowEdit={false} />
-                )))}
+        {segment === "new"
+          ? events &&
+            events
+              .sort((a, b) => a.startDate - b.startDate)
+              .map((item, index) => (
+                <ManageCard event={item} key={index} allowEdit={true} />
+              ))
+          : oldEvents &&
+            oldEvents
+              .sort((a, b) => b.startDate - a.startDate)
+              .map((item, index) => (
+                <ManageCard event={item} key={index} allowEdit={false} />
+              ))}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton routerLink="/my/manage/add">

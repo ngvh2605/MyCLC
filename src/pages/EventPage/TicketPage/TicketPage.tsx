@@ -1,4 +1,4 @@
-import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from "@capacitor/core";
 import {
   IonAlert,
   IonAvatar,
@@ -23,41 +23,41 @@ import {
   IonTitle,
   IonToolbar,
   isPlatform,
-} from '@ionic/react';
-import { fileTray, image, ticket } from 'ionicons/icons';
-import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router';
-import { useAuth } from '../../../auth';
-import useUploadFile from '../../../common/useUploadFile';
-import { database, firestore } from '../../../firebase';
-import { Events } from '../../../models';
-import { resizeImage } from '../../../utils/helpers/helpers';
-import { getEventTicketByUserId } from '../../HomePage/services';
-import EventCard from '../EventCard';
-import TicketCard from './TicketCard';
+} from "@ionic/react";
+import { fileTray, image, ticket } from "ionicons/icons";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router";
+import { useAuth } from "../../../auth";
+import useUploadFile from "../../../common/useUploadFile";
+import { database, firestore } from "../../../firebase";
+import { Events } from "../../../models";
+import { resizeImage } from "../../../utils/helpers/helpers";
+import { getEventTicketByUserId } from "../../HomePage/services";
+import EventCard from "../EventCard";
+import TicketCard from "./TicketCard";
 
 const EmptyCard = () => (
   <div style={{ marginTop: 10, marginBottom: 10 }}>
     <IonIcon
       icon={fileTray}
       style={{
-        display: 'block',
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        display: "block",
+        marginLeft: "auto",
+        marginRight: "auto",
         width: 100,
         height: 100,
-        color: '#B5B5B5',
+        color: "#B5B5B5",
       }}
     />
     <IonLabel
       style={{
-        display: 'block',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: 'max-content',
+        display: "block",
+        marginLeft: "auto",
+        marginRight: "auto",
+        width: "max-content",
       }}
-      color='medium'
+      color="medium"
     >
       <p>Trống </p>
     </IonLabel>
@@ -87,20 +87,20 @@ const TicketPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton text='' defaultHref='/my/event' />
+          <IonButtons slot="start">
+            <IonBackButton text="" defaultHref="/my/event" />
           </IonButtons>
           <IonTitle>Sự kiện của bạn</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className='ion-padding'>
-        <IonItemDivider color='primary'>
+      <IonContent className="ion-padding">
+        <IonItemDivider color="primary">
           <IonLabel>Sự kiện sắp tới</IonLabel>
         </IonItemDivider>
         <IonList>
           {(() => {
             const toShow = events.filter(
-              (event) => event.endDate >= Date.now()
+              (event) => event.endDate >= moment().valueOf()
             );
             return toShow.length ? (
               toShow.map((event, index) => (
@@ -117,7 +117,7 @@ const TicketPage: React.FC = () => {
           <br />
         </IonList>
 
-        <IonItemDivider color='primary'>
+        <IonItemDivider color="primary">
           <IonLabel>Sự kiện đã qua</IonLabel>
         </IonItemDivider>
         <IonList>

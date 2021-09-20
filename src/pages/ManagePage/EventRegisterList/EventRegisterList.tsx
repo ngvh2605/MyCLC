@@ -6,9 +6,15 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemDivider,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
   IonList,
   IonPage,
+  IonSearchbar,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -35,6 +41,7 @@ const EventRegisterList: React.FC = () => {
     }[]
   >();
   const [userInfo, setUserInfo] = useState<any[]>();
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (locationRef.state) {
@@ -85,6 +92,13 @@ const EventRegisterList: React.FC = () => {
       .update({ status: "checkin" });
   };
 
+  const handleUnCheckin = (index: number) => {
+    firestore
+      .collection("eventsTicket")
+      .doc(`${id}_${tickets[index].userId}`)
+      .update({ status: "register" });
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -96,32 +110,78 @@ const EventRegisterList: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonItemDivider color="primary">
+          <IonLabel>
+            Số lượng đăng ký: {tickets && tickets.length ? tickets.length : 0}
+          </IonLabel>
+        </IonItemDivider>
+        <IonSearchbar
+          placeholder="Tìm kiếm"
+          onIonChange={(e) => {
+            setSearch(e.detail.value);
+          }}
+        ></IonSearchbar>
         <IonList>
           {tickets &&
             tickets.length > 0 &&
             userInfo &&
             userInfo.length > 0 &&
-            userInfo.map((user, index) => (
-              <IonItem key={index} lines="full" detail={true}>
-                <IonIcon
-                  icon={checkmarkCircle}
-                  color="success"
-                  slot="start"
-                  style={{
-                    opacity: tickets[index].status === "checkin" ? 1 : 0,
-                  }}
-                />
-                <IonLabel text-wrap>{user.fullName}</IonLabel>
-                <IonButton
-                  onClick={() => {
-                    handleCheckin(index);
-                  }}
-                  hidden={tickets[index].status === "checkin"}
-                >
-                  Check in
-                </IonButton>
-              </IonItem>
-            ))}
+            userInfo
+              .filter(function (user) {
+                return (
+                  user.fullName.toLowerCase().includes(search.toLowerCase()) ||
+                  user.email.toLowerCase().includes(search.toLowerCase())
+                );
+              })
+              .map((user, index) => (
+                <IonItemSliding key={index}>
+                  <IonItem lines="full" detail={true}>
+                    <IonIcon
+                      icon={checkmarkCircle}
+                      color="success"
+                      slot="start"
+                      style={{
+                        opacity: tickets[index].status === "checkin" ? 1 : 0,
+                      }}
+                    />
+                    <IonLabel text-wrap>
+                      <IonText>
+                        <b>{user.fullName}</b>
+                      </IonText>
+                      <br />
+                      <IonText>{user.email}</IonText>
+                    </IonLabel>
+                    <IonButton
+                      onClick={() => {
+                        handleCheckin(index);
+                      }}
+                      hidden={true}
+                    >
+                      Check in
+                    </IonButton>
+                  </IonItem>
+
+                  <IonItemOptions side="end">
+                    <IonItemOption
+                      color="success"
+                      onClick={() => handleCheckin(index)}
+                      hidden={tickets[index].status === "checkin"}
+                    >
+                      Check in
+                    </IonItemOption>
+                  </IonItemOptions>
+
+                  <IonItemOptions side="start">
+                    <IonItemOption
+                      color="danger"
+                      onClick={() => handleUnCheckin(index)}
+                      hidden={!(tickets[index].status === "checkin")}
+                    >
+                      Huỷ check in
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
+              ))}
         </IonList>
       </IonContent>
     </IonPage>
