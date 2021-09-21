@@ -1,5 +1,5 @@
-import { storage } from '../../firebase';
-import jimp from 'jimp';
+import { storage } from "../../firebase";
+import jimp from "jimp";
 
 export const isEmail = (email) => {
   const re =
@@ -30,5 +30,8 @@ export const resizeImage = async (url: string, maxSize: number) => {
   } else image.resize(maxSize, jimp.AUTO);
   // Save and overwrite the image
   //await image.writeAsync("test/image.png");
-  return image.getBase64Async(jimp.MIME_JPEG);
+  return {
+    imageUrl: image.getBase64Async(jimp.MIME_JPEG),
+    imageRatio: width / height,
+  };
 };

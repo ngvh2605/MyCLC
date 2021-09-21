@@ -76,7 +76,7 @@ const AvatarPage: React.FC = () => {
 
       setIsDisabled(false);
 
-      const resizeUrl = await resizeImage(pictureUrl, 400);
+      const resizeUrl = await (await resizeImage(pictureUrl, 400)).imageUrl;
       setAvatarUrl(resizeUrl);
     }
   };
@@ -90,7 +90,9 @@ const AvatarPage: React.FC = () => {
           width: 600,
         });
 
-        const resizeUrl = await resizeImage(photo.webPath, 400);
+        const resizeUrl = await (
+          await resizeImage(photo.webPath, 400)
+        ).imageUrl;
         setAvatarUrl(resizeUrl);
 
         setIsDisabled(false);

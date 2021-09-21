@@ -92,7 +92,7 @@ const AddEventPage: React.FC = () => {
     if (event.target.files.length > 0) {
       const file = event.target.files.item(0);
       const pictureUrl = URL.createObjectURL(file);
-      const resizeUrl = await resizeImage(pictureUrl, 800);
+      const resizeUrl = await (await resizeImage(pictureUrl, 800)).imageUrl;
       setPictureUrl(resizeUrl);
     }
   };
@@ -106,7 +106,9 @@ const AddEventPage: React.FC = () => {
           width: 800,
         });
 
-        const resizeUrl = await resizeImage(photo.webPath, 800);
+        const resizeUrl = await (
+          await resizeImage(photo.webPath, 800)
+        ).imageUrl;
         setPictureUrl(resizeUrl);
       } catch (error) {
         console.log("Camera error:", error);

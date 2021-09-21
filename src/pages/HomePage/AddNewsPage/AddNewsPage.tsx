@@ -42,6 +42,7 @@ const AddNewsPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [pictureUrl, setPictureUrl] = useState("");
+  const [pictureRatio, setPictureRatio] = useState(1);
 
   const [news, setNews] = useState<News>();
 
@@ -68,8 +69,9 @@ const AddNewsPage: React.FC = () => {
     if (event.target.files.length > 0) {
       const file = event.target.files.item(0);
       const pictureUrl = URL.createObjectURL(file);
-      const resizeUrl = await resizeImage(pictureUrl, 800);
-      setPictureUrl(resizeUrl);
+      const resizeImg = await resizeImage(pictureUrl, 800);
+      setPictureUrl(await resizeImg.imageUrl);
+      setPictureRatio(resizeImg.imageRatio);
     }
   };
 
@@ -82,8 +84,9 @@ const AddNewsPage: React.FC = () => {
           width: 800,
         });
 
-        const resizeUrl = await resizeImage(photo.webPath, 800);
-        setPictureUrl(resizeUrl);
+        const resizeImg = await resizeImage(photo.webPath, 800);
+        setPictureUrl(await resizeImg.imageUrl);
+        setPictureRatio(resizeImg.imageRatio);
       } catch (error) {
         console.log("Camera error:", error);
       }
@@ -102,6 +105,7 @@ const AddNewsPage: React.FC = () => {
         title: title,
         body: encodeURI(body),
         pictureUrl: uploadedUrl,
+        pictureRatio: pictureRatio,
         author: userId,
         timestamp: moment().valueOf(),
       })
@@ -128,11 +132,13 @@ const AddNewsPage: React.FC = () => {
         title: title,
         body: encodeURI(body),
         pictureUrl:
-          pictureUrl && pictureUrl != news.pictureUrl
+          pictureUrl && pictureUrl !== news.pictureUrl
             ? uploadedUrl
             : news.pictureUrl
             ? news.pictureUrl
             : "",
+        pictureRatio:
+          pictureRatio !== news.pictureRatio ? pictureRatio : news.pictureRatio,
       })
       .then(() => {
         setStatus({ loading: false, error: false });

@@ -38,6 +38,7 @@ export interface News {
   title?: string;
   body: string;
   pictureUrl?: string;
+  pictureRatio?: number;
   reaction?: string[];
   comment?: Comment[];
   isLiked?: boolean;
