@@ -1,3 +1,3 @@
-import AddNewsPage from "./ViewNewsPage";
+import ViewNewsPage from "./ViewNewsPage";
 
-export default AddNewsPage;
+export default ViewNewsPage;

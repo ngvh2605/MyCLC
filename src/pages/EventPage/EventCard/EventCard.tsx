@@ -13,6 +13,7 @@ import {
   IonRow,
   IonSkeletonText,
   IonText,
+  IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
 import { linkOutline, location, ticket } from "ionicons/icons";
@@ -95,7 +96,12 @@ const EventCard: React.FC<Props> = (props) => {
         event.body && (
           <IonCard>
             {event.pictureUrl && (
-              <div>
+              <IonThumbnail
+                style={{
+                  height: calImgScale().height,
+                  width: calImgScale().width,
+                }}
+              >
                 {imgLoaded ? null : (
                   <IonSkeletonText
                     animated
@@ -106,21 +112,12 @@ const EventCard: React.FC<Props> = (props) => {
                     }}
                   />
                 )}
-                <img
+                <IonImg
                   src={event.pictureUrl}
-                  alt=""
-                  style={
-                    !imgLoaded
-                      ? { display: "none" }
-                      : {
-                          objectFit: "cover",
-                          height: calImgScale().height,
-                          width: calImgScale().width,
-                        }
-                  }
-                  onLoad={() => setImgLoaded(true)}
+                  style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
+                  onIonImgDidLoad={() => setImgLoaded(true)}
                 />
-              </div>
+              </IonThumbnail>
             )}
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">
@@ -144,7 +141,16 @@ const EventCard: React.FC<Props> = (props) => {
             </IonItem>
             <IonCardContent
               style={{ paddingTop: 0, paddingBottom: 0 }}
-              onClick={() => {}}
+              onClick={() => {
+                history.push({
+                  pathname: `/my/event/view/${event.id}`,
+                  state: {
+                    event: event,
+                    authorInfo: authorInfo,
+                    isBuy: isBuy,
+                  },
+                });
+              }}
             >
               <IonCardSubtitle color="primary">
                 {moment(event.startDate)

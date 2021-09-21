@@ -51,6 +51,7 @@ const NewsCard: React.FC<any> = (props) => {
   const [news, setNews] = useState<News>();
   const [isLiked, setIsLiked] = useState(false);
   const [authorInfo, setAuthorInfo] = useState<any>({});
+  const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
@@ -88,11 +89,36 @@ const NewsCard: React.FC<any> = (props) => {
       {news ? (
         news.body && (
           <IonCard>
-            {news.pictureUrl && (
-              <IonImg
-                hidden={!news.pictureUrl}
-                src={news.pictureUrl || "/assets/image/placeholder.png"}
-              />
+            {news.pictureUrl && news.pictureRatio && (
+              <>
+                {imgLoaded ? null : (
+                  <IonSkeletonText
+                    animated
+                    style={{
+                      width: window.screen.width - 64,
+                      height: (window.screen.width - 64) / news.pictureRatio,
+                      margin: 0,
+                    }}
+                  />
+                )}
+                <IonImg
+                  hidden={!news.pictureUrl}
+                  src={news.pictureUrl}
+                  onIonImgDidLoad={(event) => {
+                    setImgLoaded(true);
+                  }}
+                  onClick={() => {
+                    history.push({
+                      pathname: `/my/home/view/${news.id}`,
+                      state: {
+                        news: news,
+                        authorInfo: authorInfo,
+                        isLiked: isLiked,
+                      },
+                    });
+                  }}
+                />
+              </>
             )}
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">

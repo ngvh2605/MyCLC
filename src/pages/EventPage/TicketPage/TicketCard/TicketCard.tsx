@@ -3,6 +3,7 @@ import {
   IonCard,
   IonCardContent,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
   IonSkeletonText,
@@ -95,18 +96,19 @@ const TicketCard: React.FC<Props> = (props) => {
                 {imgLoaded ? null : (
                   <IonSkeletonText animated style={{ borderRadius: 10 }} />
                 )}
-                <img
+                <IonImg
                   src={event.pictureUrl}
-                  alt=""
                   style={
                     !imgLoaded
-                      ? { display: "none" }
+                      ? { opacity: 0, borderRadius: 10 }
                       : {
-                          objectFit: "cover",
+                          opacity: 1,
                           borderRadius: 10,
                         }
                   }
-                  onLoad={() => setImgLoaded(true)}
+                  onIonImgDidLoad={(event) => {
+                    setImgLoaded(true);
+                  }}
                 />
               </IonThumbnail>
             )}

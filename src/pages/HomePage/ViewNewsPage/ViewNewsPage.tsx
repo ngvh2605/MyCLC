@@ -122,7 +122,7 @@ const ViewNewsPage: React.FC = () => {
         console.log(error);
       }
     }
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     const fetchAuthorInfo = async () => {

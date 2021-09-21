@@ -20,6 +20,7 @@ import EmailVerify from "./pages/ProfilePage/EmailVerify";
 import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
 import EventPage from "./pages/EventPage";
+import ViewEventPage from "./pages/EventPage/ViewEventPage";
 import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AvatarPage from "./pages/ProfilePage/AvatarPage";
@@ -78,6 +79,12 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/event">
         <EventPage />
+      </Route>
+      <Route exact path="/my/event/view">
+        <ViewEventPage />
+      </Route>
+      <Route exact path="/my/event/view/:id">
+        <ViewEventPage />
       </Route>
       <Route exact path="/my/event/ticket">
         <TicketPage />

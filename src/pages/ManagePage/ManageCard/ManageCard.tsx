@@ -15,6 +15,7 @@ import {
   IonRow,
   IonSkeletonText,
   IonText,
+  IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
 import {
@@ -89,7 +90,12 @@ const ManageCard: React.FC<Props> = (props) => {
         event.body && (
           <IonCard>
             {event.pictureUrl && (
-              <div>
+              <IonThumbnail
+                style={{
+                  height: calImgScale().height,
+                  width: calImgScale().width,
+                }}
+              >
                 {imgLoaded ? null : (
                   <IonSkeletonText
                     animated
@@ -100,21 +106,12 @@ const ManageCard: React.FC<Props> = (props) => {
                     }}
                   />
                 )}
-                <img
+                <IonImg
                   src={event.pictureUrl}
-                  alt=""
-                  style={
-                    !imgLoaded
-                      ? { display: "none" }
-                      : {
-                          objectFit: "cover",
-                          height: calImgScale().height,
-                          width: calImgScale().width,
-                        }
-                  }
-                  onLoad={() => setImgLoaded(true)}
+                  style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
+                  onIonImgDidLoad={() => setImgLoaded(true)}
                 />
-              </div>
+              </IonThumbnail>
             )}
 
             <IonCardContent style={{ paddingBottom: 0 }} onClick={() => {}}>
