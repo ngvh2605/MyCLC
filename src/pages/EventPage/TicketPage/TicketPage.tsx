@@ -98,27 +98,22 @@ const TicketPage: React.FC = () => {
           <IonLabel>Sự kiện sắp tới</IonLabel>
         </IonItemDivider>
         <IonList>
-          {events.filter(function (event) {
-            return moment(event.endDate).isSameOrAfter(moment().valueOf());
-          }).length > 0 ? (
-            events
-              .filter(function (event) {
-                return moment(event.endDate).isSameOrAfter(moment().valueOf());
-              })
-              .sort(
-                (a, b) =>
-                  moment(a.startDate).valueOf() - moment(b.startDate).valueOf()
-              )
-              .map((event, index) => (
+          {(() => {
+            const toShow = events.filter(
+              (event) => event.endDate >= moment().valueOf()
+            );
+            return toShow.length ? (
+              toShow.map((event, index) => (
                 <TicketCard
                   event={event}
                   status={tickets[index].status}
                   key={index}
                 />
               ))
-          ) : (
-            <EmptyCard />
-          )}
+            ) : (
+              <EmptyCard />
+            );
+          })()}
           <br />
         </IonList>
 

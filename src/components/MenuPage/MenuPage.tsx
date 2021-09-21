@@ -35,7 +35,7 @@ import {
   buildOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database } from "../../firebase";
 import { VerifyStatus } from "../../models";
@@ -45,6 +45,7 @@ const MenuPage = () => {
   const { userId } = useAuth();
 
   const history = useHistory();
+  const location = useLocation();
   const menuEl = useRef<HTMLIonMenuElement>(null);
   const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
     emailVerify: false,
@@ -125,15 +126,20 @@ const MenuPage = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonList lines="none" className="ion-margin">
+        <IonList lines="none">
           <IonItem
             onClick={() => {
               history.push("/my/home");
               menuClose();
             }}
             detail={false}
+            color={location.pathname === "/my/home" ? "primary" : ""}
           >
-            <IonIcon icon={newspaperOutline} color="primary" slot="start" />
+            <IonIcon
+              icon={newspaperOutline}
+              color={location.pathname !== "/my/home" ? "primary" : ""}
+              slot="start"
+            />
             <IonLabel>CLC News</IonLabel>
           </IonItem>
           <IonItem
@@ -142,8 +148,13 @@ const MenuPage = () => {
               menuClose();
             }}
             detail={false}
+            color={location.pathname === "/my/profile" ? "primary" : ""}
           >
-            <IonIcon icon={personOutline} color="primary" slot="start" />
+            <IonIcon
+              icon={personOutline}
+              color={location.pathname !== "/my/profile" ? "primary" : ""}
+              slot="start"
+            />
             <IonLabel>Hồ sơ</IonLabel>
           </IonItem>
           <IonItem
@@ -159,8 +170,13 @@ const MenuPage = () => {
                 verifyStatus.personalInfo
               )
             }
+            color={location.pathname === "/my/event" ? "primary" : ""}
           >
-            <IonIcon icon={calendarOutline} color="primary" slot="start" />
+            <IonIcon
+              icon={calendarOutline}
+              color={location.pathname !== "/my/event" ? "primary" : ""}
+              slot="start"
+            />
             <IonLabel>Sự kiện</IonLabel>
           </IonItem>
 
@@ -169,8 +185,13 @@ const MenuPage = () => {
               history.push("/my/about");
               menuClose();
             }}
+            color={location.pathname === "/my/about" ? "primary" : ""}
           >
-            <IonIcon icon={sparklesOutline} color="primary" slot="start" />
+            <IonIcon
+              icon={sparklesOutline}
+              color={location.pathname !== "/my/about" ? "primary" : ""}
+              slot="start"
+            />
             <IonLabel>Giới thiệu</IonLabel>
           </IonItem>
 
@@ -180,43 +201,66 @@ const MenuPage = () => {
               menuClose();
             }}
             hidden
+            color={location.pathname === "/my/settings" ? "primary" : ""}
           >
-            <IonIcon icon={settingsOutline} color="primary" slot="start" />
+            <IonIcon
+              icon={settingsOutline}
+              color={location.pathname !== "/my/settings" ? "primary" : ""}
+              slot="start"
+            />
             <IonLabel>Cài đặt</IonLabel>
           </IonItem>
           <IonItem
             href="https://m.me/CLCMultimedia"
             target="_blank"
-            detail={true}
-            detailIcon={logoFacebook}
+            detail={false}
           >
             <IonIcon icon={sendOutline} color="primary" slot="start" />
             <IonLabel>Liên hệ</IonLabel>
+            <IonIcon
+              icon={logoFacebook}
+              color="medium"
+              size="small"
+              slot="end"
+              style={{ marginRight: 16 }}
+            />
           </IonItem>
           <IonItem
             href="https://www.facebook.com/groups/ChuyenLaoCai"
             target="_blank"
-            detail={true}
-            detailIcon={logoFacebook}
+            detail={false}
           >
             <IonIcon icon={chatbubbleOutline} color="primary" slot="start" />
             <IonLabel>Thảo luận</IonLabel>
+            <IonIcon
+              icon={logoFacebook}
+              color="medium"
+              size="small"
+              slot="end"
+              style={{ marginRight: 16 }}
+            />
           </IonItem>
         </IonList>
       </IonContent>
       <IonFooter className="ion-no-border">
         <IonToolbar>
-          <IonList lines="none" className="ion-margin">
+          <IonList lines="none">
             <IonItem>
-              <IonLabel>Phiên bản: 1.5</IonLabel>
+              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 1.5</IonLabel>
             </IonItem>
             <IonItem
               onClick={() => {
                 history.push("/my/manage");
                 menuClose();
               }}
+              detail={false}
+              color={location.pathname === "/my/manage" ? "primary" : ""}
             >
-              <IonIcon icon={buildOutline} color="primary" slot="start" />
+              <IonIcon
+                icon={buildOutline}
+                color={location.pathname !== "/my/manage" ? "primary" : ""}
+                slot="start"
+              />
               <IonLabel>Quản lý</IonLabel>
             </IonItem>
             <IonItem
