@@ -213,11 +213,7 @@ const ViewNewsPage: React.FC = () => {
 
       {news ? (
         <IonContent>
-          {news.pictureUrl ? (
-            <IonImg src={news.pictureUrl ? news.pictureUrl : ""} />
-          ) : (
-            <></>
-          )}
+          {news.pictureUrl && <IonImg src={news.pictureUrl} />}
           <div>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
               <IonAvatar slot="start">
@@ -609,7 +605,7 @@ const ViewNewsPage: React.FC = () => {
           ></IonActionSheet>
         </IonContent>
       ) : (
-        <></>
+        <IonContent></IonContent>
       )}
       <IonFooter>
         <IonToolbar>

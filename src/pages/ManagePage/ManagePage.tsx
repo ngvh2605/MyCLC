@@ -43,8 +43,7 @@ const ManagePage: React.FC = () => {
     const { docs } = await firestore
       .collection("events")
       .where("author", "==", userId)
-      .orderBy("startDate", "desc")
-      .where("startDate", ">=", moment().valueOf())
+      .where("endDate", ">=", moment().valueOf())
       .get();
 
     setEvents(docs.map(toEvents));
@@ -52,8 +51,7 @@ const ManagePage: React.FC = () => {
     const { docs: oldDocs } = await firestore
       .collection("events")
       .where("author", "==", userId)
-      .orderBy("startDate", "desc")
-      .where("startDate", "<", moment().valueOf())
+      .where("endDate", "<", moment().valueOf())
       .limit(10)
       .get();
 

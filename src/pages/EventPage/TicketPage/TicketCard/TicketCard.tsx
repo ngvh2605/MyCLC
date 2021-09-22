@@ -19,7 +19,7 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../../auth";
 import { firestore } from "../../../../firebase";
 import { Events } from "../../../../models";
-import { getInfoByUserId } from "../../../HomePage/services";
+import { cancelTicket, getInfoByUserId } from "../../../HomePage/services";
 import "./TicketCard.scss";
 
 const Skeleton = () => (
@@ -177,6 +177,23 @@ const TicketCard: React.FC<Props> = (props) => {
                 style={{ marginTop: 10 }}
                 disabled={status === "checkin"}
                 hidden={isPast}
+                onClick={() => {
+                  presentAlert({
+                    header: event.title,
+                    message:
+                      "Bạn có chắc chắn huỷ đăng ký tham gia sự kiện này không?",
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Đồng ý",
+                        handler: (d) => {
+                          cancelTicket(userId, event.id);
+                        },
+                      },
+                    ],
+                    onDidDismiss: (e) => console.log("did dismiss"),
+                  });
+                }}
               >
                 <IonIcon icon={trashBin} slot="start" size="small" />
                 Huỷ đăng ký

@@ -224,7 +224,7 @@ const AddEventPage: React.FC = () => {
             </IonLabel>
             <IonDatetime
               displayFormat="DD/MM/YYYY lúc HH:mm"
-              minuteValues="0,15,30,45"
+              minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
               min={moment().toISOString()}
               cancelText="Huỷ"
               doneText="Xác nhận"

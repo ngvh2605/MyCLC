@@ -168,9 +168,7 @@ const EventCard: React.FC<Props> = (props) => {
               </IonLabel>
               <IonLabel color="medium" text-wrap>
                 <p>
-                  <IonIcon icon={location} slot="start" />
-                  {"  "}
-                  {event.location}
+                  <IonIcon icon={location} slot="start" /> {event.location}
                 </p>
               </IonLabel>
               <IonLabel text-wrap color="dark">
