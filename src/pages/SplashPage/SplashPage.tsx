@@ -10,29 +10,40 @@ import {
   IonSlides,
   IonToolbar,
 } from "@ionic/react";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
 
 const SplashPage: React.FC = () => {
   const history = useHistory();
+  const slidesRef = useRef<any>();
+
+  useEffect(() => {
+    slidesRef.current.startAutoplay();
+  });
 
   const { loggedIn } = useAuth();
   if (loggedIn) {
     return <Redirect to="/my/home" />;
   }
+
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonImg
             src="/assets/image/Logo.svg"
-            style={{ width: "20%", marginLeft: "auto", marginRight: "auto" }}
+            style={{ width: 150, marginLeft: "auto", marginRight: "auto" }}
           />
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonSlides style={{ height: "100%" }} pager={true}>
+        <IonSlides
+          style={{ height: "100%" }}
+          pager={true}
+          ref={slidesRef}
+          options={{ loop: true }}
+        >
           <IonSlide>
             <div className="ion-margin" style={{}}>
               <IonImg

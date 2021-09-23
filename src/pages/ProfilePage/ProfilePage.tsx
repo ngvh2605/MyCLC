@@ -42,8 +42,6 @@ const ProfilePage: React.FC = () => {
 
   var QRCode = require("qrcode.react");
 
-  const [QRvalue, setQRvalue] = useState(userId);
-
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -228,7 +226,7 @@ const ProfilePage: React.FC = () => {
         <br />
         <br />
         <div style={{ marginLeft: "auto", marginRight: "auto", width: 150 }}>
-          <QRCode value={QRvalue} size={150} />
+          <QRCode value={userId} size={150} />
         </div>
         <br />
         <br />

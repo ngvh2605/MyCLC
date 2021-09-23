@@ -16,7 +16,9 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
+  IonListHeader,
   IonLoading,
+  IonModal,
   IonPage,
   IonSkeletonText,
   IonThumbnail,
@@ -24,7 +26,7 @@ import {
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { fileTray, image, ticket } from "ionicons/icons";
+import { close, fileTray, image, qrCodeOutline, ticket } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
@@ -66,9 +68,12 @@ const EmptyCard = () => (
 const TicketPage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
+  var QRCode = require("qrcode.react");
 
   const [tickets, setTickets] = useState<any[]>([]);
   const [events, setEvents] = useState<Events[]>([]);
+
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -90,14 +95,25 @@ const TicketPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton text="" defaultHref="/my/event" />
           </IonButtons>
+          <IonButtons
+            slot="end"
+            onClick={() => {
+              setShowModal(true);
+            }}
+          >
+            <IonButton>
+              <IonIcon icon={qrCodeOutline} color="primary" />
+            </IonButton>
+          </IonButtons>
           <IonTitle>Sự kiện của bạn</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <IonItemDivider color="primary">
+      <IonContent>
+        <IonListHeader color="primary">
           <IonLabel>Sự kiện sắp tới</IonLabel>
-        </IonItemDivider>
-        <IonList>
+        </IonListHeader>
+
+        <IonList className="ion-margin">
           {(() => {
             const toShow = events.filter(
               (event) => event.endDate >= moment().valueOf()
@@ -117,10 +133,10 @@ const TicketPage: React.FC = () => {
           <br />
         </IonList>
 
-        <IonItemDivider color="primary">
+        <IonListHeader color="primary">
           <IonLabel>Sự kiện đã qua</IonLabel>
-        </IonItemDivider>
-        <IonList>
+        </IonListHeader>
+        <IonList className="ion-margin">
           {events.filter(function (event) {
             return moment(event.endDate).isBefore(moment().valueOf());
           }).length > 0 ? (
@@ -144,6 +160,32 @@ const TicketPage: React.FC = () => {
             <EmptyCard />
           )}
         </IonList>
+
+        <IonModal
+          isOpen={showModal}
+          cssClass="my-custom-class"
+          onDidDismiss={() => setShowModal(false)}
+        >
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Mã QR của bạn</IonTitle>{" "}
+              <IonButtons slot="end" onClick={() => setShowModal(false)}>
+                <IonButton>
+                  <IonIcon icon={close} color="primary" />
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonTitle>
+              <div
+                style={{ marginLeft: "auto", marginRight: "auto", width: 250 }}
+              >
+                <QRCode value={userId} size={250} />
+              </div>
+            </IonTitle>
+          </IonContent>
+        </IonModal>
       </IonContent>
     </IonPage>
   );
