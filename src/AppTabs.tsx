@@ -30,6 +30,7 @@ import TicketPage from "./pages/EventPage/TicketPage";
 import ManagePage from "./pages/ManagePage";
 import AddEventPage from "./pages/ManagePage/AddEventPage";
 import EventRegisterList from "./pages/ManagePage/EventRegisterList";
+import TimetablePage from "./pages/TimetablePage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -103,6 +104,10 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/manage/list/:id">
         <EventRegisterList />
+      </Route>
+
+      <Route exact path="/my/timetable">
+        <TimetablePage />
       </Route>
 
       <Switch>
