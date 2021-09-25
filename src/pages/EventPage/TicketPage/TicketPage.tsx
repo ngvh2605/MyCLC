@@ -1,42 +1,25 @@
-import { Camera, CameraResultType, CameraSource } from "@capacitor/core";
 import {
-  IonAlert,
-  IonAvatar,
   IonBackButton,
   IonButton,
   IonButtons,
-  IonCard,
-  IonChip,
   IonContent,
-  IonFooter,
   IonHeader,
   IonIcon,
-  IonImg,
-  IonItem,
-  IonItemDivider,
   IonLabel,
   IonList,
   IonListHeader,
-  IonLoading,
   IonModal,
   IonPage,
-  IonSkeletonText,
-  IonThumbnail,
   IonTitle,
   IonToolbar,
-  isPlatform,
 } from "@ionic/react";
-import { close, fileTray, image, qrCodeOutline, ticket } from "ionicons/icons";
+import { close, fileTray, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import useUploadFile from "../../../common/useUploadFile";
-import { database, firestore } from "../../../firebase";
 import { Events } from "../../../models";
-import { resizeImage } from "../../../utils/helpers/helpers";
 import { getEventTicketByUserId } from "../../HomePage/services";
-import EventCard from "../EventCard";
 import TicketCard from "./TicketCard";
 
 const EmptyCard = () => (
@@ -168,7 +151,7 @@ const TicketPage: React.FC = () => {
         >
           <IonHeader>
             <IonToolbar>
-              <IonTitle>Mã QR của bạn</IonTitle>{" "}
+              <IonTitle>Mã QR của bạn</IonTitle>
               <IonButtons slot="end" onClick={() => setShowModal(false)}>
                 <IonButton>
                   <IonIcon icon={close} color="primary" />
