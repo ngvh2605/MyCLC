@@ -61,11 +61,14 @@ interface LessonItem {
 const TimetablePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
-  const [chosenClass, setChosenClass] = useState<ClassItem>();
+  const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
+  const [chosenClassPM, setChosenClassPM] = useState<ClassItem[]>();
   const [lessons, setLessons] = useState<LessonItem[]>();
 
   const [weekList, setWeekList] = useState<WeekItem[]>([]);
-  const [classList, setClassList] = useState<ClassItem[]>([]);
+  const [classListAM, setClassListAM] = useState<ClassItem[]>([]);
+  const [classListPM, setClassListPM] = useState<ClassItem[]>([]);
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -83,17 +86,16 @@ const TimetablePage: React.FC = () => {
     const temp: WeekItem[] = [];
     await database
       .ref()
-      .child("timetable")
+      .child("timetableAM")
       .once("value")
       .then(function (snapshot) {
-        //console.log(snapshot.val());
+        console.log(snapshot.val());
         snapshot.forEach(function (child) {
           console.log(child.val().Name);
           //console.log(child.key);
           temp.push({
             key: child.key,
-            name: child.val().Name,
-            startDate: child.val().StartDate,
+            name: child.val().name,
           });
         });
       });
@@ -105,25 +107,24 @@ const TimetablePage: React.FC = () => {
     const temp: ClassItem[] = [];
     await database
       .ref()
-      .child("timetable")
+      .child("timetableAM")
       .child(week)
-      .child("ClassList")
+      .child("classList")
       .once("value")
       .then(function (snapshot) {
         snapshot.forEach(function (child) {
-          console.log(child.val().Name);
           temp.push({
             key: child.key,
-            name: child.val().Name,
+            name: child.val().name,
           });
         });
       });
-    setClassList(temp);
+    setClassListAM(temp);
     console.log(temp);
   };
 
   const writeTimetable = () => {
-    const timetableRef = database.ref().child("timetable");
+    const timetableRef = database.ref().child("timetableAM");
     const newPostRef = timetableRef.push();
     newPostRef
       .set({
@@ -139,7 +140,9 @@ const TimetablePage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => console.log(chosenWeek)}>Click</IonButton>
+            <IonButton onClick={() => console.log(chosenClassAM)}>
+              Click
+            </IonButton>
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Thời khoá biểu</IonTitle>
@@ -271,8 +274,7 @@ const TimetablePage: React.FC = () => {
                 >
                   {weekList.map((week, index) => (
                     <IonSelectOption key={index} value={week}>
-                      {week.name} (từ{" "}
-                      {moment(week.startDate).format("DD/M/YYYY")})
+                      {week.name} (từ {moment(week.key).format("DD/M/YYYY")})
                     </IonSelectOption>
                   ))}
                 </IonSelect>
@@ -281,22 +283,25 @@ const TimetablePage: React.FC = () => {
 
             <IonList>
               <IonItem>
-                <IonLabel position="floating">Chọn lớp học</IonLabel>
+                <IonLabel position="floating">Chọn lớp học (tối đa 2)</IonLabel>
 
                 <IonSelect
-                  interface="action-sheet"
-                  value={chosenClass}
+                  value={chosenClassAM}
                   onIonChange={(e) => {
-                    setChosenClass(e.detail.value);
+                    if (e.detail.value.length < 3)
+                      setChosenClassAM(e.detail.value);
+                    else setChosenClassAM([]);
                   }}
+                  multiple={true}
                 >
-                  {classList
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((item, index) => (
-                      <IonSelectOption key={index} value={item}>
-                        {item.name}
-                      </IonSelectOption>
-                    ))}
+                  {classListAM.length > 0 &&
+                    classListAM
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((item, index) => (
+                        <IonSelectOption key={index} value={item}>
+                          {item.name}
+                        </IonSelectOption>
+                      ))}
                 </IonSelect>
               </IonItem>
             </IonList>
