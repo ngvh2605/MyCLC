@@ -3,6 +3,7 @@ import {
   IonAvatar,
   IonButton,
   IonButtons,
+  IonCheckbox,
   IonChip,
   IonContent,
   IonHeader,
@@ -68,6 +69,14 @@ interface LessonItem {
 
 const TimetablePage: React.FC = () => {
   const dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const [color, setColor] = useState([
+    "lovewins1",
+    "lovewins2",
+    "lovewins3",
+    "lovewins4",
+    "lovewins5",
+    "lovewins6",
+  ]);
   const [showModal, setShowModal] = useState(false);
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
   const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
@@ -158,7 +167,7 @@ const TimetablePage: React.FC = () => {
             //console.log(list.indexOf(item));
             temp.push({
               key: list.indexOf(item).toString(),
-              day: item.key,
+              day: list.indexOf(item),
               ...item,
             });
           });
@@ -166,6 +175,7 @@ const TimetablePage: React.FC = () => {
       });
 
     console.log("finlla", temp);
+    setLessons(temp);
   };
 
   const writeTimetable = () => {
@@ -233,49 +243,50 @@ const TimetablePage: React.FC = () => {
       </IonHeader>
       <IonContent>
         <IonSlides
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: "100%", height: "max-content" }}
           options={{ loop: true }}
         >
           <IonSlide>
             <IonList lines="none" style={{ width: "100%" }}>
-              <IonItem color="primary">
-                <IonNote slot="start">
-                  <IonLabel color="light">
-                    <p>20:00</p>
-                    <p>21:00</p>
-                  </IonLabel>
-                </IonNote>
-                <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <IonLabel text-wrap>
-                    <IonText
-                      style={{
-                        fontSize: "x-large",
-                        lineHeight: "90%",
-                      }}
-                    >
-                      <b>
-                        Nguyeenx Viet hoang day la mot day text rat la dai luon
-                      </b>
-                    </IonText>
-                  </IonLabel>
-                  <IonLabel text-wrap>
-                    <p>Cô Hoá Toans tin su dia sinh van</p>
-                  </IonLabel>
-                  <IonChip
-                    color="light"
-                    outline={true}
-                    className="ion-no-margin"
-                  >
-                    <IonAvatar>
-                      <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
-                    </IonAvatar>
-                    <IonLabel color="light">Avatar Chip</IonLabel>
-                  </IonChip>
-                </div>
-                <IonNote slot="end" color="light">
-                  <IonLabel text-wrap></IonLabel>
-                </IonNote>
-              </IonItem>
+              {lessons &&
+                lessons.map((item) => (
+                  <IonItem className={color[lessons.indexOf(item) % 6]}>
+                    <IonNote slot="start">
+                      <IonLabel>
+                        <p>{item.start}</p>
+                        <p>{item.end}</p>
+                      </IonLabel>
+                    </IonNote>
+                    <div style={{ marginTop: 8, marginBottom: 8 }}>
+                      <IonLabel text-wrap>
+                        <IonText
+                          style={{
+                            fontSize: "x-large",
+                            lineHeight: "90%",
+                          }}
+                        >
+                          <b>{item.title}</b>
+                        </IonText>
+                      </IonLabel>
+                      <IonLabel text-wrap>
+                        <p>{item.note}</p>
+                      </IonLabel>
+                      <IonChip
+                        color="light"
+                        outline={true}
+                        className="ion-no-margin"
+                      >
+                        <IonAvatar>
+                          <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
+                        </IonAvatar>
+                        <IonLabel>Avatar Chip</IonLabel>
+                      </IonChip>
+                    </div>
+                    <IonNote slot="end" color="light">
+                      <IonLabel text-wrap></IonLabel>
+                    </IonNote>
+                  </IonItem>
+                ))}
             </IonList>
           </IonSlide>
           <IonSlide>
@@ -324,11 +335,11 @@ const TimetablePage: React.FC = () => {
                   ))}
                 </IonSelect>
               </IonItem>
-            </IonList>
 
-            <IonList>
               <IonItem>
-                <IonLabel position="floating">Chọn lớp học (tối đa 2)</IonLabel>
+                <IonLabel position="floating">
+                  Chọn lớp học buổi sáng (tối đa 2)
+                </IonLabel>
 
                 <IonSelect
                   value={chosenClassAM}
@@ -348,6 +359,37 @@ const TimetablePage: React.FC = () => {
                         </IonSelectOption>
                       ))}
                 </IonSelect>
+              </IonItem>
+            </IonList>
+            <IonList>
+              <IonItem lines="none">
+                <IonLabel>Chọn bảng màu</IonLabel>
+              </IonItem>
+              <IonItem lines="none">
+                <div
+                  style={{
+                    width: 150,
+                    height: 20,
+                    borderRadius: 30,
+                    background:
+                      "linear-gradient(90deg, rgba(234,80,72,1) 0%, rgba(252,178,43,1) 20%, rgba(255,227,47,1) 40%, rgba(140,225,62,1) 60%, rgba(98,142,254,1) 80%, rgba(200,123,251,1) 100%)",
+                  }}
+                />
+                <IonNote slot="end">Love Wins</IonNote>
+                <IonCheckbox slot="end" />
+              </IonItem>
+              <IonItem lines="none">
+                <div
+                  style={{
+                    width: 150,
+                    height: 20,
+                    borderRadius: 30,
+                    background:
+                      "linear-gradient(90deg, rgba(234,80,72,1) 0%, rgba(252,178,43,1) 20%, rgba(255,227,47,1) 40%, rgba(140,225,62,1) 60%, rgba(98,142,254,1) 80%, rgba(200,123,251,1) 100%)",
+                  }}
+                />
+                <IonNote slot="end">Blue Ocean</IonNote>
+                <IonCheckbox slot="end" />
               </IonItem>
             </IonList>
           </IonContent>

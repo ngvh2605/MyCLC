@@ -2,4 +2,30 @@
   ion-slide.swiper-slide {
     align-items: flex-start;
   }
+
+  ion-item {
+    --color: white;
+    p {
+      color: white;
+    }
+  }
+
+  .lovewins1 {
+    --background: #ea5048;
+  }
+  .lovewins2 {
+    --background: #fcb22b;
+  }
+  .lovewins3 {
+    --background: #ffe32f;
+  }
+  .lovewins4 {
+    --background: #8ce13e;
+  }
+  .lovewins5 {
+    --background: #628efe;
+  }
+  .lovewins6 {
+    --background: #c87bfb;
+  }
 }
