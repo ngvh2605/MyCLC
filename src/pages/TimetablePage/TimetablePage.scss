@@ -1,6 +1,10 @@
 #timetable-page {
   ion-slide.swiper-slide {
     align-items: flex-start;
+    overflow-y: scroll;
+    display: block;
+    overflow: hidden;
+    height: initial;
   }
 
   ion-item {
@@ -11,21 +15,21 @@
   }
 
   .lovewins1 {
-    --background: #ea5048;
+    --background: #ca3231;
   }
   .lovewins2 {
-    --background: #fcb22b;
+    --background: #f39a3e;
   }
   .lovewins3 {
-    --background: #ffe32f;
+    --background: #f9ca47;
   }
   .lovewins4 {
-    --background: #8ce13e;
+    --background: #71c333;
   }
   .lovewins5 {
-    --background: #628efe;
+    --background: #4074e1;
   }
   .lovewins6 {
-    --background: #c87bfb;
+    --background: #aa62e0;
   }
 }

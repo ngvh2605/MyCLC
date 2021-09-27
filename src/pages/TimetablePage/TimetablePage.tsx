@@ -64,7 +64,7 @@ interface LessonItem {
   note?: string;
   class?: string;
   room?: string;
-  day?: number;
+  day?: string;
 }
 
 const TimetablePage: React.FC = () => {
@@ -162,12 +162,12 @@ const TimetablePage: React.FC = () => {
         snapshot.forEach(function (child) {
           //console.log(child.val());
           const list: any[] = child.val();
-
+          console.log("list", child.key);
           list.forEach((item: any) => {
             //console.log(list.indexOf(item));
             temp.push({
               key: list.indexOf(item).toString(),
-              day: list.indexOf(item),
+              day: child.key,
               ...item,
             });
           });
@@ -189,6 +189,47 @@ const TimetablePage: React.FC = () => {
         console.log("done");
       });
   };
+
+  const displayList = (lessons: LessonItem[]) => (
+    <IonList lines="none" style={{ width: "100%" }}>
+      {lessons &&
+        lessons.length > 0 &&
+        lessons.map((item) => (
+          <IonItem className={color[lessons.indexOf(item) % 6]}>
+            <IonNote slot="start">
+              <IonLabel>
+                <p>{item.start}</p>
+                <p>{item.end}</p>
+              </IonLabel>
+            </IonNote>
+            <div style={{ marginTop: 8, marginBottom: 8 }}>
+              <IonLabel text-wrap>
+                <IonText
+                  style={{
+                    fontSize: "x-large",
+                    lineHeight: "90%",
+                  }}
+                >
+                  <b>{item.title}</b>
+                </IonText>
+              </IonLabel>
+              <IonLabel text-wrap>
+                <p>{item.note}</p>
+              </IonLabel>
+              <IonChip color="light" outline={true} className="ion-no-margin">
+                <IonAvatar>
+                  <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
+                </IonAvatar>
+                <IonLabel>Avatar Chip</IonLabel>
+              </IonChip>
+            </div>
+            <IonNote slot="end" color="light">
+              <IonLabel text-wrap></IonLabel>
+            </IonNote>
+          </IonItem>
+        ))}
+    </IonList>
+  );
 
   return (
     <IonPage id="timetable-page">
@@ -243,61 +284,64 @@ const TimetablePage: React.FC = () => {
       </IonHeader>
       <IonContent>
         <IonSlides
-          style={{ width: "100%", height: "max-content" }}
-          options={{ loop: true }}
+          style={{ width: "100%" }}
+          options={{
+            loop: true,
+          }}
         >
           <IonSlide>
-            <IonList lines="none" style={{ width: "100%" }}>
-              {lessons &&
-                lessons.map((item) => (
-                  <IonItem className={color[lessons.indexOf(item) % 6]}>
-                    <IonNote slot="start">
-                      <IonLabel>
-                        <p>{item.start}</p>
-                        <p>{item.end}</p>
-                      </IonLabel>
-                    </IonNote>
-                    <div style={{ marginTop: 8, marginBottom: 8 }}>
-                      <IonLabel text-wrap>
-                        <IonText
-                          style={{
-                            fontSize: "x-large",
-                            lineHeight: "90%",
-                          }}
-                        >
-                          <b>{item.title}</b>
-                        </IonText>
-                      </IonLabel>
-                      <IonLabel text-wrap>
-                        <p>{item.note}</p>
-                      </IonLabel>
-                      <IonChip
-                        color="light"
-                        outline={true}
-                        className="ion-no-margin"
-                      >
-                        <IonAvatar>
-                          <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
-                        </IonAvatar>
-                        <IonLabel>Avatar Chip</IonLabel>
-                      </IonChip>
-                    </div>
-                    <IonNote slot="end" color="light">
-                      <IonLabel text-wrap></IonLabel>
-                    </IonNote>
-                  </IonItem>
-                ))}
-            </IonList>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "0";
+                })
+              )}
           </IonSlide>
           <IonSlide>
-            <IonList>
-              <IonItem color="primary"></IonItem>
-            </IonList>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "1";
+                })
+              )}
           </IonSlide>
           <IonSlide>
-            <IonList>
-              <IonItem color="primary"></IonItem>
-            </IonList>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "2";
+                })
+              )}
+          </IonSlide>
+          <IonSlide>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "3";
+                })
+              )}
+          </IonSlide>
+          <IonSlide>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "4";
+                })
+              )}
+          </IonSlide>
+          <IonSlide>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "5";
+                })
+              )}
           </IonSlide>
         </IonSlides>
 
