@@ -49,20 +49,30 @@ interface ClassItem {
   lessons?: LessonItem[];
 }
 
+interface DayItem {
+  key: string;
+  name: string;
+  lessons?: LessonItem[];
+}
+
 interface LessonItem {
   key: string;
-  start: string;
-  end: string;
-  title: string;
-  teacher?: string;
+  start?: string;
+  end?: string;
+  title?: string;
   note?: string;
+  class?: string;
+  room?: string;
+  day?: number;
 }
 
 const TimetablePage: React.FC = () => {
+  const dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const [showModal, setShowModal] = useState(false);
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
   const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
   const [chosenClassPM, setChosenClassPM] = useState<ClassItem[]>();
+  const [data, setData] = useState<DayItem[]>();
   const [lessons, setLessons] = useState<LessonItem[]>();
 
   const [weekList, setWeekList] = useState<WeekItem[]>([]);
@@ -80,6 +90,11 @@ const TimetablePage: React.FC = () => {
   useEffect(() => {
     if (chosenWeek) fetchClassData(chosenWeek.key);
   }, [chosenWeek]);
+
+  useEffect(() => {
+    if (chosenClassAM && chosenClassAM.length > 0)
+      chosenClassAM.forEach((item) => fetchLessonData(item));
+  }, [chosenClassAM]);
 
   const fetchWeekData = async () => {
     //setChosenWeek({ key: "week1", name: "Tuần 1 Kì 1" });
@@ -116,11 +131,41 @@ const TimetablePage: React.FC = () => {
           temp.push({
             key: child.key,
             name: child.val().name,
+            room: child.val().room,
           });
         });
       });
     setClassListAM(temp);
     console.log(temp);
+  };
+
+  const fetchLessonData = async (item: ClassItem) => {
+    let temp: LessonItem[] = [];
+    await database
+      .ref()
+      .child("timetableAM")
+      .child(chosenWeek.key)
+      .child("classList")
+      .child(item.key)
+      .child("lessons")
+      .once("value")
+      .then(function (snapshot) {
+        snapshot.forEach(function (child) {
+          //console.log(child.val());
+          const list: any[] = child.val();
+
+          list.forEach((item: any) => {
+            //console.log(list.indexOf(item));
+            temp.push({
+              key: list.indexOf(item).toString(),
+              day: item.key,
+              ...item,
+            });
+          });
+        });
+      });
+
+    console.log("finlla", temp);
   };
 
   const writeTimetable = () => {
@@ -160,7 +205,7 @@ const TimetablePage: React.FC = () => {
         <IonToolbar>
           <IonSlides
             style={{}}
-            options={{ slidesPerView: 3, spaceBetween: 50 }}
+            options={{ slidesPerView: 3, spaceBetween: 50, loop: true }}
           >
             <IonSlide>
               <IonLabel>Thứ Hai</IonLabel>
