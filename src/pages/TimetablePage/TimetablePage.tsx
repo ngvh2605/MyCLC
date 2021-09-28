@@ -33,7 +33,8 @@ import {
   close,
 } from "ionicons/icons";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import "./TimetablePage.scss";
 
@@ -68,7 +69,16 @@ interface LessonItem {
   day?: string;
 }
 
+function classToArray(list: ClassItem[]) {
+  let temp: String[] = [];
+  list.forEach((item) => {
+    temp.push(item.name);
+  });
+  return temp;
+}
+
 const TimetablePage: React.FC = () => {
+  const { userId } = useAuth();
   const dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const [color, setColor] = useState([
     "lovewins1",
@@ -90,41 +100,96 @@ const TimetablePage: React.FC = () => {
   const [classListAM, setClassListAM] = useState<ClassItem[]>([]);
   const [classListPM, setClassListPM] = useState<ClassItem[]>([]);
 
+  const slideRef = useRef<any>();
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    //todo
+    slideRef.current.slideTo(moment().day() - 1);
+    const readSetting = async () => {
+      await database
+        .ref()
+        .child("usersTimetable")
+        .child(userId)
+        .child("setting")
+        .once("value")
+        .then(function (snapshot) {
+          if (snapshot.val() !== null) {
+            const data = snapshot.val();
+            if (data.chosenWeek) setChosenWeek(data.chosenWeek);
+            if (data.chosenClassAM) setChosenClassAM(data.chosenClassAM);
+            if (data.chosenClassPM) setChosenClassPM(data.chosenClassPM);
+            if (data.chosenColor) {
+              setChosenColor(data.chosenColor);
+              switch (data.chosenColor) {
+                case "lovewins":
+                  setColor([
+                    "lovewins1",
+                    "lovewins2",
+                    "lovewins3",
+                    "lovewins4",
+                    "lovewins5",
+                    "lovewins6",
+                  ]);
+                  break;
+                case "blue":
+                  setColor([
+                    "blue1",
+                    "blue2",
+                    "blue3",
+                    "blue4",
+                    "blue5",
+                    "blue6",
+                  ]);
+                  break;
+                case "green":
+                  setColor([
+                    "green1",
+                    "green2",
+                    "green3",
+                    "green4",
+                    "green5",
+                    "green6",
+                  ]);
+                  break;
+                default:
+                //nothing
+              }
+            }
+          }
+        });
+    };
+    readSetting();
   }, []);
 
   useEffect(() => {
-    if (chosenWeek) {
+    if (chosenWeek && showModal) {
       fetchAMClassData(chosenWeek.key);
       fetchPMClassData(chosenWeek.key);
     }
-  }, [chosenWeek]);
+  }, [chosenWeek, showModal]);
 
   useEffect(() => {
     async function fetchData() {
-      if (chosenClassAM && chosenClassPM) {
+      if (chosenWeek && chosenClassAM && chosenClassPM) {
         let data: LessonItem[] = [];
         for (const item of chosenClassAM) {
           const temp = await fetchLessonData(item, "timetableAM");
           data = data.concat(temp);
-          console.log("temp", temp);
+          //console.log("temp", temp);
         }
         for (const item of chosenClassPM) {
           const temp = await fetchLessonData(item, "timetablePM");
           data = data.concat(temp);
-          console.log("temp", temp);
+          //console.log("temp", temp);
         }
-        console.log("data", data);
+        //console.log("data", data);
         setLessons(data);
       }
     }
     fetchData();
-  }, [chosenClassAM, chosenClassPM]);
+  }, [chosenWeek, chosenClassAM, chosenClassPM]);
 
   const fetchWeekData = async () => {
     //setChosenWeek({ key: "week1", name: "Tuần 1 Kì 1" });
@@ -216,8 +281,7 @@ const TimetablePage: React.FC = () => {
           });
         });
       });
-
-    console.log("finlla", temp);
+    //console.log("finlla", temp);
     //setLessons(temp);
     return temp;
   };
@@ -232,6 +296,16 @@ const TimetablePage: React.FC = () => {
       .then(() => {
         console.log("done");
       });
+  };
+
+  const doneSettings = () => {
+    const dataRef = database.ref().child("usersTimetable");
+    dataRef.child(userId).child("setting").set({
+      chosenWeek,
+      chosenClassAM,
+      chosenClassPM,
+      chosenColor,
+    });
   };
 
   const displayDate = (title: string, index: number) => (
@@ -316,7 +390,7 @@ const TimetablePage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton hidden onClick={() => console.log(chosenClassAM)}>
+            <IonButton onClick={() => console.log(moment().day())}>
               Click
             </IonButton>
             <IonMenuButton />
@@ -336,7 +410,11 @@ const TimetablePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonSlides style={{ width: "100%", minHeight: "100%" }} options={{}}>
+        <IonSlides
+          style={{ width: "100%", minHeight: "100%" }}
+          options={{}}
+          ref={slideRef}
+        >
           <IonSlide>
             <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
             {lessons &&
@@ -417,9 +495,22 @@ const TimetablePage: React.FC = () => {
           <IonHeader>
             <IonToolbar>
               <IonTitle>Thiết lập</IonTitle>
-              <IonButtons slot="end" onClick={() => setShowModal(false)}>
-                <IonButton>
-                  <IonIcon icon={close} color="primary" />
+              <IonButtons slot="end">
+                <IonButton
+                  disabled={
+                    !chosenWeek ||
+                    !chosenClassAM ||
+                    (chosenClassAM && chosenClassAM.length === 0) ||
+                    !chosenClassPM ||
+                    (chosenClassPM && chosenClassPM.length === 0) ||
+                    !chosenColor
+                  }
+                  onClick={() => {
+                    setShowModal(false);
+                    doneSettings();
+                  }}
+                >
+                  <b>Xong</b>
                 </IonButton>
               </IonButtons>
             </IonToolbar>
@@ -427,30 +518,39 @@ const TimetablePage: React.FC = () => {
           <IonContent>
             <IonList>
               <IonItem>
-                <IonLabel position="floating">Chọn tuần học</IonLabel>
-
+                <IonLabel position="stacked">Chọn tuần học</IonLabel>
                 <IonSelect
+                  placeholder={"Tuần ... Kì ..."}
                   interface="action-sheet"
                   value={chosenWeek}
+                  compareWith={function compareWeek(a: WeekItem, b: WeekItem) {
+                    if (a && b && a.startDate === b.startDate) return true;
+                    else return false;
+                  }}
                   onIonChange={(e) => {
                     setChosenWeek(e.detail.value);
                   }}
                 >
                   {weekList.map((week, index) => (
                     <IonSelectOption key={index} value={week}>
-                      {week.name} (từ {moment(week.key).format("DD/M/YYYY")})
+                      {week.name} (từ {moment(week.key).format("D/M/YYYY")})
                     </IonSelectOption>
                   ))}
                 </IonSelect>
               </IonItem>
 
               <IonItem>
-                <IonLabel position="floating">
-                  Chọn lớp học buổi sáng (tối đa 2)
-                </IonLabel>
-
+                <IonLabel position="stacked">Chọn lớp học buổi sáng</IonLabel>
                 <IonSelect
+                  placeholder={"Tối đa 2 lớp"}
                   value={chosenClassAM}
+                  compareWith={function compareWeek(
+                    a: ClassItem,
+                    b: ClassItem
+                  ) {
+                    if (a && b && a.name === b.name) return true;
+                    else return false;
+                  }}
                   onIonChange={(e) => {
                     if (e.detail.value.length < 3)
                       setChosenClassAM(e.detail.value);
@@ -470,12 +570,18 @@ const TimetablePage: React.FC = () => {
               </IonItem>
 
               <IonItem>
-                <IonLabel position="floating">
-                  Chọn lớp học buổi chiều (tối đa 2)
-                </IonLabel>
+                <IonLabel position="stacked">Chọn lớp học buổi chiều</IonLabel>
 
                 <IonSelect
+                  placeholder={"Tối đa 2 lớp"}
                   value={chosenClassPM}
+                  compareWith={function compareWeek(
+                    a: ClassItem,
+                    b: ClassItem
+                  ) {
+                    if (a && b && a.name === b.name) return true;
+                    else return false;
+                  }}
                   onIonChange={(e) => {
                     if (e.detail.value.length < 3)
                       setChosenClassPM(e.detail.value);
