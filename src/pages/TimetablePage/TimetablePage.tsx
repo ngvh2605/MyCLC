@@ -8,6 +8,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
   IonList,
@@ -77,6 +78,7 @@ const TimetablePage: React.FC = () => {
     "lovewins5",
     "lovewins6",
   ]);
+  const [chosenColor, setChosenColor] = useState("lovewins");
   const [showModal, setShowModal] = useState(false);
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
   const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
@@ -97,13 +99,32 @@ const TimetablePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (chosenWeek) fetchClassData(chosenWeek.key);
+    if (chosenWeek) {
+      fetchAMClassData(chosenWeek.key);
+      fetchPMClassData(chosenWeek.key);
+    }
   }, [chosenWeek]);
 
   useEffect(() => {
-    if (chosenClassAM && chosenClassAM.length > 0)
-      chosenClassAM.forEach((item) => fetchLessonData(item));
-  }, [chosenClassAM]);
+    async function fetchData() {
+      if (chosenClassAM && chosenClassPM) {
+        let data: LessonItem[] = [];
+        for (const item of chosenClassAM) {
+          const temp = await fetchLessonData(item, "timetableAM");
+          data = data.concat(temp);
+          console.log("temp", temp);
+        }
+        for (const item of chosenClassPM) {
+          const temp = await fetchLessonData(item, "timetablePM");
+          data = data.concat(temp);
+          console.log("temp", temp);
+        }
+        console.log("data", data);
+        setLessons(data);
+      }
+    }
+    fetchData();
+  }, [chosenClassAM, chosenClassPM]);
 
   const fetchWeekData = async () => {
     //setChosenWeek({ key: "week1", name: "Tuần 1 Kì 1" });
@@ -115,7 +136,7 @@ const TimetablePage: React.FC = () => {
       .then(function (snapshot) {
         console.log(snapshot.val());
         snapshot.forEach(function (child) {
-          console.log(child.val().Name);
+          //console.log(child.val().Name);
           //console.log(child.key);
           temp.push({
             key: child.key,
@@ -127,7 +148,7 @@ const TimetablePage: React.FC = () => {
     console.log(temp);
   };
 
-  const fetchClassData = async (week: string) => {
+  const fetchAMClassData = async (week: string) => {
     const temp: ClassItem[] = [];
     await database
       .ref()
@@ -145,14 +166,34 @@ const TimetablePage: React.FC = () => {
         });
       });
     setClassListAM(temp);
-    console.log(temp);
+    //console.log(temp);
   };
 
-  const fetchLessonData = async (item: ClassItem) => {
+  const fetchPMClassData = async (week: string) => {
+    const temp: ClassItem[] = [];
+    await database
+      .ref()
+      .child("timetablePM")
+      .child(week)
+      .child("classList")
+      .once("value")
+      .then(function (snapshot) {
+        snapshot.forEach(function (child) {
+          temp.push({
+            key: child.key,
+            name: child.val().name,
+            room: child.val().room,
+          });
+        });
+      });
+    setClassListPM(temp);
+  };
+
+  const fetchLessonData = async (item: ClassItem, timetable: string) => {
     let temp: LessonItem[] = [];
     await database
       .ref()
-      .child("timetableAM")
+      .child(timetable)
       .child(chosenWeek.key)
       .child("classList")
       .child(item.key)
@@ -162,20 +203,23 @@ const TimetablePage: React.FC = () => {
         snapshot.forEach(function (child) {
           //console.log(child.val());
           const list: any[] = child.val();
-          console.log("list", child.key);
-          list.forEach((item: any) => {
+          //console.log("list", child.key);
+          list.forEach((date: any) => {
             //console.log(list.indexOf(item));
             temp.push({
-              key: list.indexOf(item).toString(),
+              key: list.indexOf(date).toString(),
               day: child.key,
-              ...item,
+              class: item.name,
+              room: item.room,
+              ...date,
             });
           });
         });
       });
 
     console.log("finlla", temp);
-    setLessons(temp);
+    //setLessons(temp);
+    return temp;
   };
 
   const writeTimetable = () => {
@@ -190,44 +234,80 @@ const TimetablePage: React.FC = () => {
       });
   };
 
+  const displayDate = (title: string, index: number) => (
+    <div className="ion-padding-horizontal">
+      <IonLabel
+        color="primary"
+        className="ion-float-left"
+        style={{ verticalAlign: "middle", lineHeight: "28px" }}
+      >
+        {chosenWeek && chosenWeek.name}
+      </IonLabel>
+      <IonLabel
+        className="ion-text-center"
+        style={{
+          fontSize: "x-large",
+          fontWeight: "bold",
+        }}
+      >
+        {title}
+      </IonLabel>
+      <IonLabel
+        color="primary"
+        className="ion-float-right"
+        style={{ verticalAlign: "middle", lineHeight: "28px" }}
+      >
+        {chosenWeek && moment(chosenWeek.key).day(index).format("Do MMMM")}
+      </IonLabel>
+    </div>
+  );
+
   const displayList = (lessons: LessonItem[]) => (
     <IonList lines="none" style={{ width: "100%" }}>
       {lessons &&
         lessons.length > 0 &&
-        lessons.map((item) => (
-          <IonItem className={color[lessons.indexOf(item) % 6]}>
-            <IonNote slot="start">
-              <IonLabel>
-                <p>{item.start}</p>
-                <p>{item.end}</p>
-              </IonLabel>
-            </IonNote>
-            <div style={{ marginTop: 8, marginBottom: 8 }}>
-              <IonLabel text-wrap>
-                <IonText
-                  style={{
-                    fontSize: "x-large",
-                    lineHeight: "90%",
-                  }}
-                >
-                  <b>{item.title}</b>
-                </IonText>
-              </IonLabel>
-              <IonLabel text-wrap>
-                <p>{item.note}</p>
-              </IonLabel>
-              <IonChip color="light" outline={true} className="ion-no-margin">
-                <IonAvatar>
-                  <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
-                </IonAvatar>
-                <IonLabel>Avatar Chip</IonLabel>
-              </IonChip>
-            </div>
-            <IonNote slot="end" color="light">
-              <IonLabel text-wrap></IonLabel>
-            </IonNote>
-          </IonItem>
-        ))}
+        lessons
+          .sort((a, b) => a.start.localeCompare(b.start))
+          .map((item, index) => (
+            <IonItem
+              className={`${color[lessons.indexOf(item) % 6]}`}
+              key={index}
+            >
+              <IonNote slot="start">
+                <IonLabel>
+                  <p>{item.start}</p>
+                  <p>{item.end}</p>
+                </IonLabel>
+              </IonNote>
+              <div style={{ marginTop: 16, marginBottom: 16 }}>
+                <IonLabel text-wrap style={{ paddingBottom: 5 }}>
+                  <IonText
+                    style={{
+                      fontSize: "x-large",
+                      lineHeight: "90%",
+                    }}
+                  >
+                    <b>{item.title}</b>
+                  </IonText>
+                </IonLabel>
+                <IonLabel text-wrap>
+                  <p>• {item.note}</p>
+                  <p>
+                    • {item.class} (P. {item.room})
+                  </p>
+                </IonLabel>
+                <IonChip className="ion-no-margin" style={{ marginTop: 8 }}>
+                  <IonAvatar>
+                    <IonImg src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
+                  </IonAvatar>
+                  <IonLabel>Avatar Chip</IonLabel>
+                </IonChip>
+              </div>
+              <IonNote slot="end" color="light">
+                <IonLabel text-wrap></IonLabel>
+              </IonNote>
+            </IonItem>
+          ))}
     </IonList>
   );
 
@@ -253,43 +333,11 @@ const TimetablePage: React.FC = () => {
             </IonButton>
           </IonButtons>
         </IonToolbar>
-        <IonToolbar>
-          <IonSlides
-            style={{}}
-            options={{ slidesPerView: 3, spaceBetween: 50, loop: true }}
-          >
-            <IonSlide>
-              <IonLabel>Thứ Hai</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Thứ Ba</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Thứ Tư</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Thứ Năm</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Thứ Sáu</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Thứ Bảy</IonLabel>
-            </IonSlide>
-            <IonSlide>
-              <IonLabel>Chủ nhật</IonLabel>
-            </IonSlide>
-          </IonSlides>
-        </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonSlides
-          style={{ width: "100%" }}
-          options={{
-            loop: true,
-          }}
-        >
+        <IonSlides style={{ width: "100%", minHeight: "100%" }} options={{}}>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
@@ -299,6 +347,7 @@ const TimetablePage: React.FC = () => {
               )}
           </IonSlide>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Ba", 2)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
@@ -308,6 +357,7 @@ const TimetablePage: React.FC = () => {
               )}
           </IonSlide>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Tư", 3)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
@@ -317,6 +367,7 @@ const TimetablePage: React.FC = () => {
               )}
           </IonSlide>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Năm", 4)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
@@ -326,6 +377,7 @@ const TimetablePage: React.FC = () => {
               )}
           </IonSlide>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Sáu", 5)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
@@ -335,11 +387,22 @@ const TimetablePage: React.FC = () => {
               )}
           </IonSlide>
           <IonSlide>
+            <IonToolbar>{displayDate("Thứ Bảy", 6)}</IonToolbar>
             {lessons &&
               lessons.length > 0 &&
               displayList(
                 lessons.filter(function (item) {
                   return item.day === "5";
+                })
+              )}
+          </IonSlide>
+          <IonSlide>
+            <IonToolbar>{displayDate("Chủ Nhật", 7)}</IonToolbar>
+            {lessons &&
+              lessons.length > 0 &&
+              displayList(
+                lessons.filter(function (item) {
+                  return item.day === "6";
                 })
               )}
           </IonSlide>
@@ -404,7 +467,33 @@ const TimetablePage: React.FC = () => {
                       ))}
                 </IonSelect>
               </IonItem>
+
+              <IonItem>
+                <IonLabel position="floating">
+                  Chọn lớp học buổi chiều (tối đa 2)
+                </IonLabel>
+
+                <IonSelect
+                  value={chosenClassPM}
+                  onIonChange={(e) => {
+                    if (e.detail.value.length < 3)
+                      setChosenClassPM(e.detail.value);
+                    else setChosenClassPM([]);
+                  }}
+                  multiple={true}
+                >
+                  {classListPM.length > 0 &&
+                    classListPM
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((item, index) => (
+                        <IonSelectOption key={index} value={item}>
+                          {item.name}
+                        </IonSelectOption>
+                      ))}
+                </IonSelect>
+              </IonItem>
             </IonList>
+            <br />
             <IonList>
               <IonItem lines="none">
                 <IonLabel>Chọn bảng màu</IonLabel>
@@ -416,11 +505,28 @@ const TimetablePage: React.FC = () => {
                     height: 20,
                     borderRadius: 30,
                     background:
-                      "linear-gradient(90deg, rgba(234,80,72,1) 0%, rgba(252,178,43,1) 20%, rgba(255,227,47,1) 40%, rgba(140,225,62,1) 60%, rgba(98,142,254,1) 80%, rgba(200,123,251,1) 100%)",
+                      "linear-gradient(90deg, rgba(202,50,49,1) 0%, rgba(243,154,62,1) 20%, rgba(249,202,71,1) 40%, rgba(113,195,51,1) 60%, rgba(64,116,225,1) 80%, rgba(170,98,224,1) 100%)",
                   }}
                 />
                 <IonNote slot="end">Love Wins</IonNote>
-                <IonCheckbox slot="end" />
+                <IonCheckbox
+                  slot="end"
+                  checked={chosenColor === "lovewins"}
+                  onIonChange={(e) => {
+                    console.log(e.detail.checked);
+                    if (e.detail.checked) {
+                      setChosenColor("lovewins");
+                      setColor([
+                        "lovewins1",
+                        "lovewins2",
+                        "lovewins3",
+                        "lovewins4",
+                        "lovewins5",
+                        "lovewins6",
+                      ]);
+                    }
+                  }}
+                />
               </IonItem>
               <IonItem lines="none">
                 <div
@@ -429,11 +535,27 @@ const TimetablePage: React.FC = () => {
                     height: 20,
                     borderRadius: 30,
                     background:
-                      "linear-gradient(90deg, rgba(234,80,72,1) 0%, rgba(252,178,43,1) 20%, rgba(255,227,47,1) 40%, rgba(140,225,62,1) 60%, rgba(98,142,254,1) 80%, rgba(200,123,251,1) 100%)",
+                      "linear-gradient(90deg, rgba(77,185,255,1) 0%, rgba(19,164,255,1) 20%, rgba(0,132,225,1) 40%, rgba(0,103,193,1) 60%, rgba(0,78,158,1) 80%, rgba(0,55,121,1) 100%)",
                   }}
                 />
-                <IonNote slot="end">Blue Ocean</IonNote>
-                <IonCheckbox slot="end" />
+                <IonNote slot="end">Ocean Breeze</IonNote>
+                <IonCheckbox
+                  slot="end"
+                  checked={chosenColor === "blue"}
+                  onIonChange={(e) => {
+                    if (e.detail.checked) {
+                      setChosenColor("blue");
+                      setColor([
+                        "blue1",
+                        "blue2",
+                        "blue3",
+                        "blue4",
+                        "blue5",
+                        "blue6",
+                      ]);
+                    }
+                  }}
+                />
               </IonItem>
             </IonList>
           </IonContent>
