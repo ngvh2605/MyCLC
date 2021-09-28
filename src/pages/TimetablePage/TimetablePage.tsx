@@ -95,7 +95,7 @@ const TimetablePage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    fetchWeekData();
+    //todo
   }, []);
 
   useEffect(() => {
@@ -316,7 +316,7 @@ const TimetablePage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => console.log(chosenClassAM)}>
+            <IonButton hidden onClick={() => console.log(chosenClassAM)}>
               Click
             </IonButton>
             <IonMenuButton />
@@ -325,6 +325,7 @@ const TimetablePage: React.FC = () => {
           <IonButtons
             slot="end"
             onClick={() => {
+              fetchWeekData();
               setShowModal(true);
             }}
           >
@@ -552,6 +553,35 @@ const TimetablePage: React.FC = () => {
                         "blue4",
                         "blue5",
                         "blue6",
+                      ]);
+                    }
+                  }}
+                />
+              </IonItem>
+              <IonItem lines="none">
+                <div
+                  style={{
+                    width: 150,
+                    height: 20,
+                    borderRadius: 30,
+                    background:
+                      "linear-gradient(90deg, rgba(131,214,77,1) 0%, rgba(96,202,51,1) 20%, rgba(79,171,42,1) 40%, rgba(61,136,31,1) 60%, rgba(43,99,20,1) 80%, rgba(21,56,7,1) 100%)",
+                  }}
+                />
+                <IonNote slot="end">Lime Soda</IonNote>
+                <IonCheckbox
+                  slot="end"
+                  checked={chosenColor === "green"}
+                  onIonChange={(e) => {
+                    if (e.detail.checked) {
+                      setChosenColor("green");
+                      setColor([
+                        "green1",
+                        "green2",
+                        "green3",
+                        "green4",
+                        "green5",
+                        "green6",
                       ]);
                     }
                   }}
