@@ -22,8 +22,8 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import { SplashScreen } from "@capacitor/splash-screen";
 
-const { SplashScreen } = Plugins;
 ReactDOM.render(<App />, document.getElementById("root"));
 SplashScreen.hide();
 

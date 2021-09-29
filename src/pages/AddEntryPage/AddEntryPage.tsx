@@ -15,7 +15,8 @@ import {
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { CameraResultType, CameraSource, Plugins } from "@capacitor/core";
+import { CameraResultType, CameraSource } from "@capacitor/camera";
+import { Plugins } from "@capacitor/core";
 import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";

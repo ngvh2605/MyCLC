@@ -1,4 +1,4 @@
-import { Camera, CameraResultType, CameraSource } from "@capacitor/core";
+import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
   IonAlert,
   IonBackButton,

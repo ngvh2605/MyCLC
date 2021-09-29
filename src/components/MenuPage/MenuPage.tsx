@@ -33,6 +33,7 @@ import {
   logoFacebook,
   sparklesOutline,
   buildOutline,
+  bookOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
@@ -163,13 +164,6 @@ const MenuPage = () => {
               menuClose();
             }}
             detail={false}
-            hidden={
-              !(
-                verifyStatus.emailVerify &&
-                verifyStatus.phoneVerify &&
-                verifyStatus.personalInfo
-              )
-            }
             color={location.pathname === "/my/event" ? "primary" : ""}
           >
             <IonIcon
@@ -178,6 +172,21 @@ const MenuPage = () => {
               slot="start"
             />
             <IonLabel>Sự kiện</IonLabel>
+          </IonItem>
+
+          <IonItem
+            onClick={() => {
+              history.push("/my/timetable");
+              menuClose();
+            }}
+            color={location.pathname === "/my/timetable" ? "primary" : ""}
+          >
+            <IonIcon
+              icon={bookOutline}
+              color={location.pathname !== "/my/timetablet" ? "primary" : ""}
+              slot="start"
+            />
+            <IonLabel>Thời khoá biểu</IonLabel>
           </IonItem>
 
           <IonItem
