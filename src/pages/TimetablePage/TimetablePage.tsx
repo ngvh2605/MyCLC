@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonAlert,
   IonAvatar,
@@ -6,17 +7,21 @@ import {
   IonCheckbox,
   IonChip,
   IonContent,
+  IonDatetime,
+  IonFab,
+  IonFabButton,
   IonHeader,
   IonIcon,
   IonImg,
+  IonInput,
   IonItem,
   IonLabel,
   IonList,
+  IonLoading,
   IonMenuButton,
   IonModal,
   IonNote,
   IonPage,
-  IonPicker,
   IonSelect,
   IonSelectOption,
   IonSlide,
@@ -24,18 +29,14 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
-import {
-  closeCircle,
-  informationCircle,
-  qrCodeOutline,
-  settingsOutline,
-  close,
-} from "ionicons/icons";
+import { add, settingsOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth";
 import { database } from "../../firebase";
+import { getInfoByUserId } from "../HomePage/services";
 import "./TimetablePage.scss";
 
 interface WeekItem {
@@ -67,12 +68,12 @@ interface LessonItem {
   class?: string;
   room?: string;
   day?: string;
+  author?: string;
 }
 
-function classToArray(list: ClassItem[]) {
-  let temp: String[] = [];
-  list.forEach((item) => {
-    temp.push(item.name);
+function findUserInfo(userId: string, list: any[]) {
+  const temp = list.find(function (a) {
+    return a.userId === userId;
   });
   return temp;
 }
@@ -90,23 +91,40 @@ const TimetablePage: React.FC = () => {
   ]);
   const [chosenColor, setChosenColor] = useState("lovewins");
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
   const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
   const [chosenClassPM, setChosenClassPM] = useState<ClassItem[]>();
   const [data, setData] = useState<DayItem[]>();
   const [lessons, setLessons] = useState<LessonItem[]>();
+  const [userLessons, setUserLessons] = useState<LessonItem[]>();
+  const [newLesson, setNewLesson] = useState<LessonItem>({
+    key: "",
+    start: "",
+    end: "",
+    title: "",
+    note: "",
+    class: "",
+    room: "",
+    day: "",
+  });
 
   const [weekList, setWeekList] = useState<WeekItem[]>([]);
   const [classListAM, setClassListAM] = useState<ClassItem[]>([]);
   const [classListPM, setClassListPM] = useState<ClassItem[]>([]);
 
+  const [authors, setAuthors] = useState<any[]>([]);
+
   const slideRef = useRef<any>();
+  const [status, setStatus] = useState({ loading: false, error: false });
+  const [presentAlert] = useIonAlert();
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
-    slideRef.current.slideTo(moment().day() - 1);
+    if (moment().day() === 0) slideRef.current.slideTo(6);
+    else slideRef.current.slideTo(moment().day() - 1);
     const readSetting = async () => {
       await database
         .ref()
@@ -164,6 +182,10 @@ const TimetablePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (chosenWeek) fetchUserLessons(chosenWeek.key);
+  }, [chosenWeek]);
+
+  useEffect(() => {
     if (chosenWeek && showModal) {
       fetchAMClassData(chosenWeek.key);
       fetchPMClassData(chosenWeek.key);
@@ -191,6 +213,33 @@ const TimetablePage: React.FC = () => {
     fetchData();
   }, [chosenWeek, chosenClassAM, chosenClassPM]);
 
+  useEffect(() => {
+    const fetchAuthorInfo = async () => {
+      let tempInfo = [];
+      if (userLessons && userLessons.length > 0) {
+        for (let item of userLessons) {
+          if (item.author && !findUserInfo(item.author, tempInfo))
+            tempInfo.push({
+              ...(await getInfoByUserId(item.author)),
+              userId: item.author,
+            });
+        }
+      }
+      if (lessons && lessons.length > 0) {
+        for (let item of lessons) {
+          if (item.author && !findUserInfo(item.author, tempInfo))
+            tempInfo.push({
+              ...(await getInfoByUserId(item.author)),
+              userId: item.author,
+            });
+        }
+      }
+      console.log(tempInfo);
+      setAuthors(tempInfo);
+    };
+    fetchAuthorInfo();
+  }, [lessons, userLessons]);
+
   const fetchWeekData = async () => {
     //setChosenWeek({ key: "week1", name: "Tuần 1 Kì 1" });
     const temp: WeekItem[] = [];
@@ -211,6 +260,26 @@ const TimetablePage: React.FC = () => {
       });
     setWeekList(temp);
     console.log(temp);
+  };
+
+  const fetchUserLessons = async (week: string) => {
+    const temp: LessonItem[] = [];
+    await database
+      .ref()
+      .child("usersTimetable")
+      .child(userId)
+      .child("lessons")
+      .child(week)
+      .once("value")
+      .then(function (snapshot) {
+        snapshot.forEach(function (child) {
+          if (child.val().title) {
+            temp.push({ ...child.val() });
+          }
+        });
+      });
+    console.log(temp);
+    setUserLessons(temp);
   };
 
   const fetchAMClassData = async (week: string) => {
@@ -286,15 +355,51 @@ const TimetablePage: React.FC = () => {
     return temp;
   };
 
-  const writeTimetable = () => {
-    const timetableRef = database.ref().child("timetableAM");
-    const newPostRef = timetableRef.push();
-    newPostRef
+  const addNewLesson = () => {
+    setStatus({ loading: true, error: false });
+    const temp = {
+      title: newLesson.title,
+      start: moment(newLesson.start).format("HH:mm"),
+      end: newLesson.end ? moment(newLesson.end).format("HH:mm") : "",
+      note: newLesson.note,
+      class: newLesson.class,
+      day:
+        moment(newLesson.day).day() === 0
+          ? "6"
+          : (moment(newLesson.day).day() - 1).toString(),
+      author: userId,
+    };
+    const dataRef = database
+      .ref()
+      .child("usersTimetable")
+      .child(userId)
+      .child("lessons")
+      .child(moment(newLesson.day).day(1).format("YYYY-MM-DD"));
+    const newLessonRef = dataRef.push();
+    newLessonRef
       .set({
-        week2: "none",
+        ...temp,
       })
       .then(() => {
-        console.log("done");
+        setStatus({ loading: false, error: false });
+        if (
+          moment(newLesson.day).day(1).format("YYYY-MM-DD") === chosenWeek.key
+        )
+          setUserLessons((userLessons) => [
+            ...userLessons,
+            { ...temp, key: moment().format() },
+          ]);
+        setNewLesson({
+          key: "",
+          start: "",
+          end: "",
+          title: "",
+          note: "",
+          class: "",
+          room: "",
+          day: "",
+        });
+        setShowAddModal(false);
       });
   };
 
@@ -365,17 +470,34 @@ const TimetablePage: React.FC = () => {
                   </IonText>
                 </IonLabel>
                 <IonLabel text-wrap>
-                  <p>• {item.note}</p>
-                  <p>
-                    • {item.class} (P. {item.room})
-                  </p>
+                  {item.note && <p>• {item.note}</p>}
+                  {item.class && (
+                    <p>
+                      • {item.class}{" "}
+                      {item.room && <span>(P. {item.room})</span>}
+                    </p>
+                  )}
                 </IonLabel>
-                <IonChip className="ion-no-margin" style={{ marginTop: 8 }}>
-                  <IonAvatar>
-                    <IonImg src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
-                  </IonAvatar>
-                  <IonLabel>Avatar Chip</IonLabel>
-                </IonChip>
+                {item.author && (
+                  <IonChip className="ion-no-margin" style={{ marginTop: 8 }}>
+                    <IonAvatar>
+                      <IonImg
+                        src={
+                          findUserInfo(item.author, authors) &&
+                          findUserInfo(item.author, authors).avatar
+                            ? findUserInfo(item.author, authors).avatar
+                            : "/assets/image/placeholder.png"
+                        }
+                      />
+                    </IonAvatar>
+                    <IonLabel>
+                      {findUserInfo(item.author, authors) &&
+                      findUserInfo(item.author, authors).fullName
+                        ? findUserInfo(item.author, authors).fullName
+                        : ""}
+                    </IonLabel>
+                  </IonChip>
+                )}
               </div>
               <IonNote slot="end" color="light">
                 <IonLabel text-wrap></IonLabel>
@@ -390,9 +512,6 @@ const TimetablePage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => console.log(moment().day())}>
-              Click
-            </IonButton>
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Thời khoá biểu</IonTitle>
@@ -420,7 +539,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "0";
                 })
               )}
@@ -430,7 +549,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "1";
                 })
               )}
@@ -440,7 +559,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "2";
                 })
               )}
@@ -450,7 +569,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "3";
                 })
               )}
@@ -460,7 +579,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "4";
                 })
               )}
@@ -470,7 +589,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "5";
                 })
               )}
@@ -480,7 +599,7 @@ const TimetablePage: React.FC = () => {
             {lessons &&
               lessons.length > 0 &&
               displayList(
-                lessons.filter(function (item) {
+                lessons.concat(userLessons).filter(function (item) {
                   return item.day === "6";
                 })
               )}
@@ -696,6 +815,165 @@ const TimetablePage: React.FC = () => {
             </IonList>
           </IonContent>
         </IonModal>
+
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton
+            onClick={() => {
+              setShowAddModal(true);
+            }}
+          >
+            <IonIcon icon={add} />
+          </IonFabButton>
+        </IonFab>
+
+        <IonModal
+          isOpen={showAddModal}
+          cssClass="my-custom-class"
+          onDidDismiss={() => setShowAddModal(false)}
+        >
+          <IonHeader>
+            <IonToolbar>
+              <IonButtons slot="start">
+                <IonButton
+                  onClick={() => {
+                    if (newLesson.title) {
+                      presentAlert({
+                        header: "Huỷ?",
+                        message: "Những thay đổi của bạn sẽ không được lưu",
+                        buttons: [
+                          "Tiếp tục chỉnh sửa",
+                          {
+                            text: "Xoá tác vụ",
+                            handler: (d) => {
+                              setNewLesson({
+                                key: "",
+                                start: "",
+                                end: "",
+                                title: "",
+                                note: "",
+                                class: "",
+                                room: "",
+                                day: "",
+                              });
+                              setShowAddModal(false);
+                            },
+                          },
+                        ],
+                        onDidDismiss: (e) => console.log("did dismiss"),
+                      });
+                    } else setShowAddModal(false);
+                  }}
+                >
+                  Huỷ
+                </IonButton>
+              </IonButtons>
+              <IonButtons slot="end">
+                <IonButton
+                  disabled={
+                    !newLesson.title || !newLesson.day || !newLesson.start
+                  }
+                  onClick={() => {
+                    addNewLesson();
+                  }}
+                >
+                  <b>Lưu</b>
+                </IonButton>
+              </IonButtons>
+              <IonTitle>Tác vụ</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            <IonButton
+              onClick={() =>
+                console.log(moment(newLesson.day).day(1).format("YYYY-MM-DD"))
+              }
+            >
+              Click
+            </IonButton>
+            <IonList>
+              <IonItem>
+                <IonLabel position="floating">
+                  Tiêu đề <span style={{ color: "red" }}>*</span>
+                </IonLabel>
+                <IonInput
+                  type="text"
+                  value={newLesson.title}
+                  onIonChange={(e) => {
+                    setNewLesson({ ...newLesson, title: e.detail.value });
+                  }}
+                />
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">
+                  Ngày <span style={{ color: "red" }}>*</span>
+                </IonLabel>
+                <IonDatetime
+                  displayFormat="DD MM YYYY"
+                  value={newLesson.day}
+                  onIonChange={(e) => {
+                    setNewLesson({
+                      ...newLesson,
+                      day: moment(e.detail.value).format("YYYY-MM-DD"),
+                    });
+                  }}
+                  max={moment().add(3, "months").format("YYYY-MM-DD")}
+                />
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">
+                  Bắt đầu <span style={{ color: "red" }}>*</span>
+                </IonLabel>
+                <IonDatetime
+                  displayFormat="HH:mm"
+                  value={newLesson.start}
+                  onIonChange={(e) => {
+                    setNewLesson({
+                      ...newLesson,
+                      start: e.detail.value,
+                    });
+                  }}
+                  max={moment().add(3, "months").format("YYYY-MM-DD")}
+                />
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Kết thúc</IonLabel>
+                <IonDatetime
+                  displayFormat="HH:mm"
+                  value={newLesson.end}
+                  onIonChange={(e) => {
+                    setNewLesson({
+                      ...newLesson,
+                      end: e.detail.value,
+                    });
+                  }}
+                  max={moment().add(3, "months").format("YYYY-MM-DD")}
+                />
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Ghi chú</IonLabel>
+                <IonInput
+                  type="text"
+                  value={newLesson.note}
+                  onIonChange={(e) => {
+                    setNewLesson({ ...newLesson, note: e.detail.value });
+                  }}
+                />
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Địa điểm</IonLabel>
+                <IonInput
+                  type="text"
+                  value={newLesson.class}
+                  onIonChange={(e) => {
+                    setNewLesson({ ...newLesson, class: e.detail.value });
+                  }}
+                />
+              </IonItem>
+            </IonList>
+          </IonContent>
+        </IonModal>
+
+        <IonLoading isOpen={status.loading} />
       </IonContent>
 
       <IonAlert
