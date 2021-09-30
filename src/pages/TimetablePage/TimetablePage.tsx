@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  IonActionSheet,
   IonAlert,
   IonAvatar,
   IonButton,
@@ -31,7 +32,14 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { add, settingsOutline } from "ionicons/icons";
+import {
+  add,
+  brush,
+  ellipsisHorizontal,
+  settingsOutline,
+  trash,
+  close,
+} from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth";
@@ -116,8 +124,12 @@ const TimetablePage: React.FC = () => {
   const [authors, setAuthors] = useState<any[]>([]);
 
   const slideRef = useRef<any>();
+  const [currentSlide, setCurrentSlide] = useState(
+    moment().day() === 0 ? 6 : moment().day() - 1
+  );
   const [status, setStatus] = useState({ loading: false, error: false });
   const [presentAlert] = useIonAlert();
+  const [showNewsActionSheet, setShowNewsActionSheet] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -358,6 +370,7 @@ const TimetablePage: React.FC = () => {
   const addNewLesson = () => {
     setStatus({ loading: true, error: false });
     const temp = {
+      key: newLesson.key ? newLesson.key : moment().valueOf().toString(),
       title: newLesson.title,
       start: moment(newLesson.start).format("HH:mm"),
       end: newLesson.end ? moment(newLesson.end).format("HH:mm") : "",
@@ -374,9 +387,9 @@ const TimetablePage: React.FC = () => {
       .child("usersTimetable")
       .child(userId)
       .child("lessons")
-      .child(moment(newLesson.day).day(1).format("YYYY-MM-DD"));
-    const newLessonRef = dataRef.push();
-    newLessonRef
+      .child(moment(newLesson.day).day(1).format("YYYY-MM-DD"))
+      .child(temp.key);
+    dataRef
       .set({
         ...temp,
       })
@@ -386,20 +399,36 @@ const TimetablePage: React.FC = () => {
           moment(newLesson.day).day(1).format("YYYY-MM-DD") === chosenWeek.key
         )
           setUserLessons((userLessons) => [
-            ...userLessons,
-            { ...temp, key: moment().format() },
+            ...userLessons.filter((item) => {
+              return item.key !== temp.key;
+            }),
+            { ...temp },
           ]);
-        setNewLesson({
-          key: "",
-          start: "",
-          end: "",
-          title: "",
-          note: "",
-          class: "",
-          room: "",
-          day: "",
-        });
+      })
+      .then(() => {
+        for (let member in newLesson) newLesson[member] = "";
         setShowAddModal(false);
+      });
+  };
+
+  const deleteLesson = () => {
+    database
+      .ref()
+      .child("usersTimetable")
+      .child(userId)
+      .child("lessons")
+      .child(chosenWeek.key)
+      .child(newLesson.key)
+      .remove()
+      .then(() => {
+        setUserLessons((userLessons) => [
+          ...userLessons.filter((item) => {
+            return item.key !== newLesson.key;
+          }),
+        ]);
+      })
+      .then(() => {
+        for (let member in newLesson) newLesson[member] = "";
       });
   };
 
@@ -458,16 +487,41 @@ const TimetablePage: React.FC = () => {
                   <p>{item.end}</p>
                 </IonLabel>
               </IonNote>
-              <div style={{ marginTop: 16, marginBottom: 16 }}>
-                <IonLabel text-wrap style={{ paddingBottom: 5 }}>
-                  <IonText
+              <div style={{ marginTop: 16, marginBottom: 16, width: "100%" }}>
+                <IonLabel
+                  text-wrap
+                  style={{
+                    paddingBottom: 5,
+                    width: "100%",
+                  }}
+                >
+                  {item && item.author === userId && (
+                    <IonIcon
+                      icon={ellipsisHorizontal}
+                      className="ion-float-right"
+                      onClick={() => {
+                        setNewLesson({
+                          ...item,
+                          day: moment(chosenWeek.key)
+                            .day(currentSlide + 1)
+                            .format(),
+                          start: moment(item.start, "HH:mm").format(),
+                          end: item.end
+                            ? moment(item.end, "HH:mm").format()
+                            : "",
+                        });
+                        setShowNewsActionSheet(true);
+                      }}
+                      style={{ fontSize: "large" }}
+                    />
+                  )}
+                  <p
                     style={{
                       fontSize: "x-large",
-                      lineHeight: "90%",
                     }}
                   >
                     <b>{item.title}</b>
-                  </IonText>
+                  </p>
                 </IonLabel>
                 <IonLabel text-wrap>
                   {item.note && <p>• {item.note}</p>}
@@ -507,6 +561,12 @@ const TimetablePage: React.FC = () => {
     </IonList>
   );
 
+  const getSlideIndex = async () => {
+    const data = await slideRef.current.getActiveIndex();
+    console.log(data);
+    setCurrentSlide(data);
+  };
+
   return (
     <IonPage id="timetable-page">
       <IonHeader>
@@ -533,6 +593,9 @@ const TimetablePage: React.FC = () => {
           style={{ width: "100%", minHeight: "100%" }}
           options={{}}
           ref={slideRef}
+          onIonSlideDidChange={(e) => {
+            getSlideIndex();
+          }}
         >
           <IonSlide>
             <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
@@ -819,6 +882,7 @@ const TimetablePage: React.FC = () => {
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton
             onClick={() => {
+              for (let member in newLesson) newLesson[member] = "";
               setShowAddModal(true);
             }}
           >
@@ -836,32 +900,31 @@ const TimetablePage: React.FC = () => {
               <IonButtons slot="start">
                 <IonButton
                   onClick={() => {
-                    if (newLesson.title) {
+                    let hasData = false;
+                    for (let member in newLesson) {
+                      if (newLesson[member]) hasData = true;
+                    }
+                    if (hasData) {
                       presentAlert({
                         header: "Huỷ?",
                         message: "Những thay đổi của bạn sẽ không được lưu",
                         buttons: [
                           "Tiếp tục chỉnh sửa",
                           {
-                            text: "Xoá tác vụ",
+                            text: "Xoá thay đổi",
                             handler: (d) => {
-                              setNewLesson({
-                                key: "",
-                                start: "",
-                                end: "",
-                                title: "",
-                                note: "",
-                                class: "",
-                                room: "",
-                                day: "",
-                              });
+                              for (let member in newLesson)
+                                newLesson[member] = "";
                               setShowAddModal(false);
                             },
                           },
                         ],
                         onDidDismiss: (e) => console.log("did dismiss"),
                       });
-                    } else setShowAddModal(false);
+                    } else {
+                      for (let member in newLesson) newLesson[member] = "";
+                      setShowAddModal(false);
+                    }
                   }}
                 >
                   Huỷ
@@ -883,13 +946,7 @@ const TimetablePage: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-            <IonButton
-              onClick={() =>
-                console.log(moment(newLesson.day).day(1).format("YYYY-MM-DD"))
-              }
-            >
-              Click
-            </IonButton>
+            <IonButton onClick={() => console.log(newLesson)}>Click</IonButton>
             <IonList>
               <IonItem>
                 <IonLabel position="floating">
@@ -913,7 +970,7 @@ const TimetablePage: React.FC = () => {
                   onIonChange={(e) => {
                     setNewLesson({
                       ...newLesson,
-                      day: moment(e.detail.value).format("YYYY-MM-DD"),
+                      day: e.detail.value,
                     });
                   }}
                   max={moment().add(3, "months").format("YYYY-MM-DD")}
@@ -974,6 +1031,50 @@ const TimetablePage: React.FC = () => {
         </IonModal>
 
         <IonLoading isOpen={status.loading} />
+
+        <IonActionSheet
+          isOpen={showNewsActionSheet}
+          onDidDismiss={() => setShowNewsActionSheet(false)}
+          cssClass="my-custom-class"
+          buttons={[
+            {
+              text: "Chỉnh sửa",
+              icon: brush,
+              handler: () => {
+                setShowAddModal(true);
+              },
+            },
+            {
+              text: "Xoá",
+              role: "destructive",
+              icon: trash,
+              handler: () => {
+                presentAlert({
+                  header: "Xoá",
+                  message: "Bạn có chắc chắn xoá vĩnh viễn tác vụ này không?",
+                  buttons: [
+                    "Huỷ",
+                    {
+                      text: "Xoá",
+                      handler: (d) => {
+                        deleteLesson();
+                      },
+                    },
+                  ],
+                  onDidDismiss: (e) => console.log("did dismiss"),
+                });
+              },
+            },
+            {
+              text: "Cancel",
+              icon: close,
+              role: "cancel",
+              handler: () => {
+                console.log("Cancel clicked");
+              },
+            },
+          ]}
+        ></IonActionSheet>
       </IonContent>
 
       <IonAlert

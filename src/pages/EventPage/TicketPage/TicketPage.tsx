@@ -5,6 +5,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItemDivider,
   IonLabel,
   IonList,
   IonListHeader,
@@ -92,11 +93,15 @@ const TicketPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonListHeader color="primary">
-          <IonLabel>Sự kiện sắp tới</IonLabel>
-        </IonListHeader>
-
-        <IonList className="ion-margin">
+        <IonItemDivider
+          color="primary"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
+        >
+          <IonLabel className="ion-padding-horizontal">
+            Sự kiện sắp tới
+          </IonLabel>
+        </IonItemDivider>
+        <IonList className="ion-margin-horizontal">
           {(() => {
             const toShow = events.filter(
               (event) => event.endDate >= moment().valueOf()
@@ -115,11 +120,14 @@ const TicketPage: React.FC = () => {
           })()}
           <br />
         </IonList>
-
-        <IonListHeader color="primary">
-          <IonLabel>Sự kiện đã qua</IonLabel>
-        </IonListHeader>
-        <IonList className="ion-margin">
+        <br />
+        <IonItemDivider
+          color="primary"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
+        >
+          <IonLabel className="ion-padding-horizontal">Sự kiện đã qua</IonLabel>
+        </IonItemDivider>
+        <IonList className="ion-margin-horizontal">
           {events.filter(function (event) {
             return moment(event.endDate).isBefore(moment().valueOf());
           }).length > 0 ? (
@@ -143,7 +151,8 @@ const TicketPage: React.FC = () => {
             <EmptyCard />
           )}
         </IonList>
-
+        <br />
+        <br />
         <IonModal
           isOpen={showModal}
           cssClass="my-custom-class"

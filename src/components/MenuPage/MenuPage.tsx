@@ -1,3 +1,4 @@
+import { Storage } from "@capacitor/storage";
 import {
   IonAvatar,
   IonCol,
@@ -11,29 +12,23 @@ import {
   IonLabel,
   IonList,
   IonMenu,
-  IonPage,
   IonRow,
   IonSkeletonText,
-  IonTitle,
   IonToolbar,
+  useIonToast,
 } from "@ionic/react";
 import {
-  homeSharp,
-  warningSharp,
-  hammerSharp,
-  person,
-  newspaperOutline,
-  settingsOutline,
-  personOutline,
-  logOutOutline,
-  calendarOutline,
-  mailOutline,
-  chatbubbleOutline,
-  sendOutline,
-  logoFacebook,
-  sparklesOutline,
-  buildOutline,
   bookOutline,
+  buildOutline,
+  calendarOutline,
+  chatbubbleOutline,
+  logoFacebook,
+  logOutOutline,
+  newspaperOutline,
+  personOutline,
+  sendOutline,
+  settingsOutline,
+  sparklesOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
@@ -57,6 +52,7 @@ const MenuPage = () => {
 
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [presentToast, dismissToast] = useIonToast();
 
   useEffect(() => {
     if (userId) {
@@ -96,6 +92,23 @@ const MenuPage = () => {
 
   const menuClose = () => {
     menuEl.current.close();
+  };
+
+  const onItemClick = async (link: string) => {
+    const { value } = await Storage.get({ key: "verify" });
+    if (value === "true") {
+      history.push(link);
+      menuClose();
+    } else {
+      presentToast({
+        message: "Bạn cần hoàn thành 3 bước xác minh trước!",
+        duration: 2000,
+        color: "danger",
+        onDidDismiss: () => console.log("dismissed"),
+        onWillDismiss: () => console.log("will dismiss"),
+      });
+      menuClose();
+    }
   };
 
   return (
@@ -160,8 +173,7 @@ const MenuPage = () => {
           </IonItem>
           <IonItem
             onClick={() => {
-              history.push("/my/event");
-              menuClose();
+              onItemClick("/my/event");
             }}
             detail={false}
             color={location.pathname === "/my/event" ? "primary" : ""}
@@ -176,14 +188,13 @@ const MenuPage = () => {
 
           <IonItem
             onClick={() => {
-              history.push("/my/timetable");
-              menuClose();
+              onItemClick("/my/timetable");
             }}
             color={location.pathname === "/my/timetable" ? "primary" : ""}
           >
             <IonIcon
               icon={bookOutline}
-              color={location.pathname !== "/my/timetablet" ? "primary" : ""}
+              color={location.pathname !== "/my/timetable" ? "primary" : ""}
               slot="start"
             />
             <IonLabel>Thời khoá biểu</IonLabel>

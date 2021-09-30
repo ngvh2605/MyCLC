@@ -15,6 +15,7 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
+  IonListHeader,
   IonMenuButton,
   IonPage,
   IonSkeletonText,
@@ -106,7 +107,7 @@ const ProfilePage: React.FC = () => {
           <IonTitle>Hồ sơ</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent className="ion-padding-vertical">
         <IonFab horizontal="center" style={{ paddingLeft: 45, paddingTop: 88 }}>
           <IonFabButton
             style={{ width: 30, height: 30 }}
@@ -151,85 +152,98 @@ const ProfilePage: React.FC = () => {
           <b>{fullName}</b>
         </p>
         <br />
-        <IonItemDivider color="primary">
-          <IonLabel>Xác minh 3 bước</IonLabel>
-        </IonItemDivider>
-        <IonChip
+
+        <IonItemDivider
           color="primary"
-          style={{ height: "max-content", marginBottom: 10 }}
-          className="ion-margin"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
         >
-          <IonLabel text-wrap className="ion-padding">
-            Để xây dựng một cộng đồng kết nối Chuyên Lào Cai - MyCLC an toàn và
-            bền vững. Bạn cần thực hiện đủ 3 bước xác minh để có thể sử dụng
-            được các chức năng khác!
+          <IonLabel className="ion-padding-horizontal">
+            Xác minh 3 bước
           </IonLabel>
-        </IonChip>
-        <IonList lines="none">
-          <IonItem
-            detail={!emailVerified}
-            disabled={emailVerified}
-            onClick={() => {
-              history.push("/my/profile/email");
-            }}
-          >
-            <IonCheckbox
-              checked={emailVerified}
-              hidden={!emailVerified}
-              slot="end"
-            />
-            <IonLabel>Xác minh Email</IonLabel>
-          </IonItem>
-          <IonItem
-            detail={!verifyStatus?.phoneVerify}
-            disabled={verifyStatus?.phoneVerify}
-            onClick={() => {
-              history.push("/my/profile/phone");
-            }}
-          >
-            <IonCheckbox
-              checked={verifyStatus?.phoneVerify}
-              hidden={!verifyStatus?.phoneVerify}
-              slot="end"
-            />
-            <IonLabel>Xác minh Số điện thoại</IonLabel>
-          </IonItem>
-          <IonItem
-            detail={!verifyStatus?.personalInfo}
-            disabled={verifyStatus?.personalInfo}
-            onClick={() => {
-              history.push("/my/profile/personal");
-            }}
-          >
-            <IonCheckbox
-              checked={verifyStatus?.personalInfo}
-              hidden={!verifyStatus?.personalInfo}
-              slot="end"
-            />
-            <IonLabel>Xác thực danh tính</IonLabel>
-          </IonItem>
-        </IonList>
-        <br />
-        <IonItemDivider color="primary">
-          <IonLabel>Mã QR của bạn</IonLabel>
         </IonItemDivider>
-        <IonChip
-          color="primary"
-          style={{ height: "max-content", marginBottom: 10 }}
-          className="ion-margin"
-        >
-          <IonLabel text-wrap className="ion-padding">
-            Mã QR này sử dụng cho các tính năng kết nối và check in khi tham gia
-            các sự kiện sẽ được ra mắt trong thời gian tới
-          </IonLabel>
-        </IonChip>
-        <br />
-        <br />
-        <div style={{ marginLeft: "auto", marginRight: "auto", width: 150 }}>
-          <QRCode value={userId} size={150} />
+        <div className="ion-padding">
+          <IonChip
+            color="primary"
+            style={{ height: "max-content", marginBottom: 10 }}
+            className="ion-margin"
+          >
+            <IonLabel text-wrap className="ion-padding">
+              Để cùng xây dựng một cộng đồng kết nối Chuyên Lào Cai - MyCLC an
+              toàn và bền vững. Bạn cần thực hiện đủ 3 bước xác minh để có thể
+              sử dụng được các chức năng khác!
+            </IonLabel>
+          </IonChip>
+          <IonList lines="none">
+            <IonItem
+              detail={!emailVerified}
+              disabled={emailVerified}
+              onClick={() => {
+                history.push("/my/profile/email");
+              }}
+            >
+              <IonCheckbox
+                checked={emailVerified}
+                hidden={!emailVerified}
+                slot="end"
+              />
+              <IonLabel>Xác minh Email</IonLabel>
+            </IonItem>
+            <IonItem
+              detail={!verifyStatus?.phoneVerify}
+              disabled={verifyStatus?.phoneVerify}
+              onClick={() => {
+                history.push("/my/profile/phone");
+              }}
+            >
+              <IonCheckbox
+                checked={verifyStatus?.phoneVerify}
+                hidden={!verifyStatus?.phoneVerify}
+                slot="end"
+              />
+              <IonLabel>Xác minh Số điện thoại</IonLabel>
+            </IonItem>
+            <IonItem
+              detail={!verifyStatus?.personalInfo}
+              disabled={verifyStatus?.personalInfo}
+              onClick={() => {
+                history.push("/my/profile/personal");
+              }}
+            >
+              <IonCheckbox
+                checked={verifyStatus?.personalInfo}
+                hidden={!verifyStatus?.personalInfo}
+                slot="end"
+              />
+              <IonLabel>Xác thực danh tính</IonLabel>
+            </IonItem>
+          </IonList>
         </div>
         <br />
+        <IonItemDivider
+          color="primary"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
+        >
+          <IonLabel className="ion-padding-horizontal">Mã QR của bạn</IonLabel>
+        </IonItemDivider>
+        <div className="ion-padding">
+          <IonChip
+            color="primary"
+            style={{ height: "max-content", marginBottom: 10 }}
+            className="ion-margin"
+          >
+            <IonLabel text-wrap className="ion-padding">
+              Mã QR này sử dụng cho các tính năng kết nối và check in khi tham
+              gia các sự kiện sẽ được ra mắt trong thời gian tới
+            </IonLabel>
+          </IonChip>
+          <br />
+          <br />
+          <div style={{ marginLeft: "auto", marginRight: "auto", width: 150 }}>
+            <QRCode value={userId} size={150} />
+          </div>
+        </div>
         <br />
+
         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => {
