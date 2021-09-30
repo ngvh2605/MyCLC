@@ -31,6 +31,7 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
+  useIonPopover,
 } from "@ionic/react";
 import {
   add,
@@ -46,8 +47,9 @@ import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
 import "./TimetablePage.scss";
+import { DatePopover, WeekPopover } from "./TimetablePopover";
 
-interface WeekItem {
+export interface WeekItem {
   key: string;
   name: string;
   startDate?: string;
@@ -88,7 +90,6 @@ function findUserInfo(userId: string, list: any[]) {
 
 const TimetablePage: React.FC = () => {
   const { userId } = useAuth();
-  const dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const [color, setColor] = useState([
     "lovewins1",
     "lovewins2",
@@ -103,7 +104,6 @@ const TimetablePage: React.FC = () => {
   const [chosenWeek, setChosenWeek] = useState<WeekItem>();
   const [chosenClassAM, setChosenClassAM] = useState<ClassItem[]>();
   const [chosenClassPM, setChosenClassPM] = useState<ClassItem[]>();
-  const [data, setData] = useState<DayItem[]>();
   const [lessons, setLessons] = useState<LessonItem[]>();
   const [userLessons, setUserLessons] = useState<LessonItem[]>();
   const [newLesson, setNewLesson] = useState<LessonItem>({
@@ -130,13 +130,44 @@ const TimetablePage: React.FC = () => {
   const [status, setStatus] = useState({ loading: false, error: false });
   const [presentAlert] = useIonAlert();
   const [showNewsActionSheet, setShowNewsActionSheet] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+
+  const [presentWeekPopover, dismissWeek] = useIonPopover(WeekPopover, {
+    onHide: () => dismissWeek(),
+    list: weekList,
+    onSelect: (item: WeekItem) => {
+      setChosenWeek(item);
+    },
+  });
+
+  const [presentDatePopover, dismissDate] = useIonPopover(DatePopover, {
+    onHide: () => dismissDate(),
+    selected: chosenWeek,
+    onSelect: (slide: number) => {
+      slideRef.current.slideTo(slide);
+    },
+  });
 
   useEffect(() => {
     if (moment().day() === 0) slideRef.current.slideTo(6);
     else slideRef.current.slideTo(moment().day() - 1);
+
+    const readCurrentWeek = async () => {
+      await database
+        .ref()
+        .child("timetableAM")
+        .child(moment().day(1).format("YYYY-MM-DD"))
+        .once("value")
+        .then(function (snapshot) {
+          if (snapshot !== null) {
+            const data = snapshot.val();
+            setChosenWeek({
+              key: moment().day(1).format("YYYY-MM-DD"),
+              name: data.name,
+            });
+          }
+        });
+    };
+
     const readSetting = async () => {
       await database
         .ref()
@@ -147,7 +178,12 @@ const TimetablePage: React.FC = () => {
         .then(function (snapshot) {
           if (snapshot.val() !== null) {
             const data = snapshot.val();
-            if (data.chosenWeek) setChosenWeek(data.chosenWeek);
+            if (
+              data.chosenWeek &&
+              data.chosenWeek.key === moment().day(1).format("YYYY-MM-DD")
+            )
+              setChosenWeek(data.chosenWeek);
+            else readCurrentWeek();
             if (data.chosenClassAM) setChosenClassAM(data.chosenClassAM);
             if (data.chosenClassPM) setChosenClassPM(data.chosenClassPM);
             if (data.chosenColor) {
@@ -194,7 +230,7 @@ const TimetablePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (chosenWeek) fetchUserLessons(chosenWeek.key);
+    if (chosenWeek && chosenWeek.key) fetchUserLessons(chosenWeek.key);
   }, [chosenWeek]);
 
   useEffect(() => {
@@ -448,6 +484,14 @@ const TimetablePage: React.FC = () => {
         color="primary"
         className="ion-float-left"
         style={{ verticalAlign: "middle", lineHeight: "28px" }}
+        onClick={(e) => {
+          //open week selection
+          console.log(weekList);
+          if (!weekList || weekList.length === 0) fetchWeekData();
+          presentWeekPopover({
+            event: e.nativeEvent,
+          });
+        }}
       >
         {chosenWeek && chosenWeek.name}
       </IonLabel>
@@ -464,6 +508,11 @@ const TimetablePage: React.FC = () => {
         color="primary"
         className="ion-float-right"
         style={{ verticalAlign: "middle", lineHeight: "28px" }}
+        onClick={(e) => {
+          presentDatePopover({
+            event: e.nativeEvent,
+          });
+        }}
       >
         {chosenWeek && moment(chosenWeek.key).day(index).format("Do MMMM")}
       </IonLabel>
@@ -578,7 +627,7 @@ const TimetablePage: React.FC = () => {
           <IonButtons
             slot="end"
             onClick={() => {
-              fetchWeekData();
+              if (!weekList || weekList.length === 0) fetchWeekData();
               setShowModal(true);
             }}
           >
@@ -699,17 +748,18 @@ const TimetablePage: React.FC = () => {
           </IonHeader>
           <IonContent>
             <IonList>
+              {/*
               <IonItem>
                 <IonLabel position="stacked">Chọn tuần học</IonLabel>
                 <IonSelect
                   placeholder={"Tuần ... Kì ..."}
-                  interface="action-sheet"
                   value={chosenWeek}
                   compareWith={function compareWeek(a: WeekItem, b: WeekItem) {
-                    if (a && b && a.startDate === b.startDate) return true;
+                    if (a && b && a.key === b.key) return true;
                     else return false;
                   }}
                   onIonChange={(e) => {
+                    console.log("change", e.detail.value);
                     setChosenWeek(e.detail.value);
                   }}
                 >
@@ -720,6 +770,7 @@ const TimetablePage: React.FC = () => {
                   ))}
                 </IonSelect>
               </IonItem>
+              */}
 
               <IonItem>
                 <IonLabel position="stacked">Chọn lớp học buổi sáng</IonLabel>
@@ -946,7 +997,7 @@ const TimetablePage: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-            <IonButton onClick={() => console.log(newLesson)}>Click</IonButton>
+            <IonButton onClick={() => console.log(chosenWeek)}>Click</IonButton>
             <IonList>
               <IonItem>
                 <IonLabel position="floating">
@@ -1076,15 +1127,6 @@ const TimetablePage: React.FC = () => {
           ]}
         ></IonActionSheet>
       </IonContent>
-
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        cssClass="my-custom-class"
-        header={alertHeader}
-        message={alertMessage}
-        buttons={["OK"]}
-      />
     </IonPage>
   );
 };
