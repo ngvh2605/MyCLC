@@ -6,12 +6,13 @@ import {
   arrowUp,
   chevronDown,
   mailUnreadOutline,
+  close,
+  mailOpenOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 
 import { RefresherEventDetail } from "@ionic/core";
 import {
-  IonAlert,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -26,12 +27,15 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
+  IonList,
   IonMenuButton,
+  IonModal,
   IonNote,
   IonPage,
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -39,6 +43,7 @@ import {
 import { auth as firebaseAuth, firestore } from "../../firebase";
 import NewsCard from "./NewsCard";
 import { getNew } from "./services";
+import moment from "moment";
 
 const LoadingNews = () => (
   <IonCard>
@@ -74,10 +79,7 @@ const LoadingNews = () => (
 const HomePage: React.FC = () => {
   const [newsList, setNewsList] = useState<string[]>([]);
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-
+  const [showMailModal, setShowMailModal] = useState(false);
   const [newsCount, setNewsCount] = useState(3);
   const [totalNews, setTotalNews] = useState(0);
 
@@ -116,11 +118,7 @@ const HomePage: React.FC = () => {
           <IonButtons slot="end">
             <IonButton
               onClick={() => {
-                setAlertHeader("Hòm thư");
-                setAlertMessage(
-                  "Cảm ơn bạn đã thử ấn vào đây! Chức năng này sẽ được ra mắt trong thời gian tới. Hãy cùng đón chờ nhé!"
-                );
-                setShowAlert(true);
+                setShowMailModal(true);
               }}
             >
               <IonIcon icon={mailUnreadOutline} color="primary" />
@@ -206,16 +204,59 @@ const HomePage: React.FC = () => {
             <IonIcon icon={addIcon} />
           </IonFabButton>
         </IonFab>
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
+
+      <IonModal
+        isOpen={showMailModal}
+        cssClass="my-custom-class"
+        onDidDismiss={() => setShowMailModal(false)}
+      >
+        <IonHeader>
+          <IonToolbar>
+            <IonButtons slot="end" onClick={() => setShowMailModal(false)}>
+              <IonButton>
+                <IonIcon icon={close} color="primary" />
+              </IonButton>
+            </IonButtons>
+            <IonTitle>Hòm thư</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          <IonList lines="full">
+            <IonItem color="light">
+              <IonIcon icon={mailOpenOutline} slot="start" color="medium" />
+              <div className="ion-padding-vertical">
+                <IonLabel text-wrap style={{ paddingBottom: 5 }}>
+                  <b>CLC Multimedia</b>
+                  <span className="ion-float-right">
+                    <IonText color="medium">
+                      {moment("2021-09-26").fromNow()}
+                    </IonText>
+                  </span>
+                </IonLabel>
+                <IonLabel text-wrap>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                  irure dolor in reprehenderit in voluptate velit esse cillum
+                  dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+                  cupidatat non proident, sunt in culpa qui officia deserunt
+                  mollit anim id est laborum.
+                </IonLabel>
+              </div>
+            </IonItem>
+            <IonItem color="light">
+              <IonIcon icon={mailOpenOutline} slot="start" color="medium" />
+              <div className="ion-padding-vertical">
+                <IonLabel text-wrap>
+                  <i>Hòm thư trống</i>
+                </IonLabel>
+              </div>
+            </IonItem>
+          </IonList>
+        </IonContent>
+      </IonModal>
     </IonPage>
   );
 };
