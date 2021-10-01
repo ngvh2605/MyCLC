@@ -20,7 +20,7 @@ const SplashPage: React.FC = () => {
 
   useEffect(() => {
     slidesRef.current.startAutoplay();
-  });
+  }, []);
 
   const { loggedIn } = useAuth();
   if (loggedIn) {

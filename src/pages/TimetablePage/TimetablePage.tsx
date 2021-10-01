@@ -30,6 +30,7 @@ import {
   IonToolbar,
   useIonAlert,
   useIonPopover,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   add,
@@ -46,7 +47,8 @@ import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
 import "./TimetablePage.scss";
 import { DatePopover, WeekPopover } from "./TimetablePopover";
-
+import { Storage } from "@capacitor/storage";
+import { Redirect, useHistory } from "react-router";
 export interface WeekItem {
   key: string;
   name: string;
@@ -82,6 +84,7 @@ function findUserInfo(userId: string, list: any[]) {
 
 const TimetablePage: React.FC = () => {
   const { userId } = useAuth();
+  const history = useHistory();
   const [color, setColor] = useState([
     "lovewins1",
     "lovewins2",
@@ -137,6 +140,13 @@ const TimetablePage: React.FC = () => {
     onSelect: (slide: number) => {
       slideRef.current.slideTo(slide);
     },
+  });
+
+  useIonViewWillEnter(async () => {
+    const { value } = await Storage.get({ key: "verify" });
+    if (value === "false") {
+      history.replace("/my/home");
+    }
   });
 
   useEffect(() => {

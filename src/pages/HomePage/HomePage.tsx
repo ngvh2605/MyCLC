@@ -4,6 +4,7 @@ import "./HomePage.scss";
 import {
   add as addIcon,
   arrowUp,
+  checkmark,
   chevronDown,
   close,
   mailOpenOutline,
@@ -14,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -38,12 +40,14 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 
-import { auth as firebaseAuth, firestore } from "../../firebase";
+import { auth as firebaseAuth, database, firestore } from "../../firebase";
 import NewsCard from "./NewsCard";
 import { getNew } from "./services";
 import moment from "moment";
+import { useAuth } from "../../auth";
 
 const LoadingNews = () => (
   <IonCard>
@@ -76,19 +80,56 @@ const LoadingNews = () => (
   </IonCard>
 );
 
+interface Mail {
+  sender: string;
+  message: string;
+  timestamp: number;
+}
+
 const HomePage: React.FC = () => {
+  const { userId } = useAuth();
   const [newsList, setNewsList] = useState<string[]>([]);
 
-  const [showMailModal, setShowMailModal] = useState(false);
   const [newsCount, setNewsCount] = useState(3);
   const [totalNews, setTotalNews] = useState(0);
 
+  const [mailbox, setMailbox] = useState<Mail[]>([]);
+  const [showMailModal, setShowMailModal] = useState(false);
+  const [presentAlert] = useIonAlert();
+
   useEffect(() => {
-    //read size
+    //first login
+    if (
+      firebaseAuth.currentUser.metadata.creationTime ===
+      firebaseAuth.currentUser.metadata.lastSignInTime
+    )
+      firstLogin();
+    //read mail box
+    const readMailbox = async () => {
+      await database
+        .ref()
+        .child("mailbox")
+        .child(userId)
+        .once("value")
+        .then(function (snapshot) {
+          let temp: Mail[] = [];
+          if (snapshot !== null) {
+            snapshot.forEach((child) => {
+              temp.push({ ...child.val() });
+            });
+          }
+          setMailbox(temp);
+        });
+    };
+    readMailbox();
+    console.log(firebaseAuth.currentUser.metadata.lastSignInTime);
+  }, []);
+
+  useEffect(() => {
+    //read total news length
     firestore.collection("news").onSnapshot(({ docs }) => {
       setTotalNews(docs.length);
     });
-
     fetchNews();
   }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
 
@@ -107,6 +148,28 @@ const HomePage: React.FC = () => {
     }, 2000);
   };
 
+  const firstLogin = () => {
+    const temp: Mail = {
+      sender: "CLC Multimedia",
+      message:
+        "Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của MyCLC nhé!",
+      timestamp: moment().valueOf(),
+    };
+    database
+      .ref()
+      .child("mailbox")
+      .child(userId)
+      .push({
+        ...temp,
+      });
+    setMailbox([temp]);
+  };
+
+  const clearMailbox = () => {
+    database.ref().child("mailbox").child(userId).remove();
+    setMailbox([]);
+  };
+
   return (
     <IonPage id="home-page">
       <IonHeader>
@@ -120,8 +183,24 @@ const HomePage: React.FC = () => {
               onClick={() => {
                 setShowMailModal(true);
               }}
+              className={mailbox && mailbox.length > 0 ? "mail-button" : ""}
             >
-              <IonIcon icon={mailOutline} color="primary" />
+              <IonIcon icon={mailOutline} color="primary"></IonIcon>
+              {mailbox && mailbox.length > 0 && (
+                <IonBadge
+                  color="danger"
+                  style={{
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    paddingTop: 1,
+                    paddingBottom: 2,
+                  }}
+                >
+                  <IonText style={{ fontSize: "x-small" }}>
+                    {mailbox.length}
+                  </IonText>
+                </IonBadge>
+              )}
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -154,24 +233,6 @@ const HomePage: React.FC = () => {
             <IonLabel>Có tin mới</IonLabel>
           </IonButton>
         </IonFab>
-
-        <IonChip
-          color="primary"
-          style={{ height: "max-content", marginBottom: 10 }}
-          className="ion-margin"
-          hidden={
-            !(
-              firebaseAuth.currentUser.metadata.creationTime ===
-              firebaseAuth.currentUser.metadata.lastSignInTime
-            )
-          }
-        >
-          <IonLabel text-wrap className="ion-padding">
-            Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực
-            hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của
-            MyCLC nhé!
-          </IonLabel>
-        </IonChip>
 
         {totalNews ? (
           newsList
@@ -222,38 +283,77 @@ const HomePage: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          {mailbox && mailbox.length > 0 && (
+            <IonFab
+              vertical="bottom"
+              horizontal="center"
+              slot="fixed"
+              style={{ marginInlineStart: "-100px" }}
+              onClick={() => {
+                presentAlert({
+                  header: "Bạn có chắc?",
+                  message:
+                    "Tất cả các thư sẽ bị xoá vĩnh viễn và bạn không thể xem lại chúng",
+                  buttons: [
+                    "Huỷ",
+                    {
+                      text: "Đồng ý",
+                      handler: (d) => {
+                        clearMailbox();
+                      },
+                    },
+                  ],
+                  onDidDismiss: (e) => console.log("did dismiss"),
+                });
+              }}
+            >
+              <IonButton shape="round" onClick={() => {}}>
+                <IonIcon icon={checkmark} slot="start" />
+                <IonLabel>Làm trống hòm thư</IonLabel>
+              </IonButton>
+            </IonFab>
+          )}
+
           <IonList lines="full">
-            <IonItem color="light">
-              <IonIcon icon={mailOpenOutline} slot="start" color="medium" />
-              <div className="ion-padding-vertical">
-                <IonLabel text-wrap style={{ paddingBottom: 5 }}>
-                  <b>CLC Multimedia</b>
-                  <span className="ion-float-right">
-                    <IonText color="medium">
-                      {moment("2021-09-26").fromNow()}
-                    </IonText>
-                  </span>
-                </IonLabel>
-                <IonLabel text-wrap>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                  irure dolor in reprehenderit in voluptate velit esse cillum
-                  dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                  cupidatat non proident, sunt in culpa qui officia deserunt
-                  mollit anim id est laborum.
-                </IonLabel>
-              </div>
-            </IonItem>
-            <IonItem color="light">
-              <div className="ion-padding-vertical">
-                <IonLabel text-wrap>
-                  <i>Hòm thư trống</i>
-                </IonLabel>
-              </div>
-            </IonItem>
+            {mailbox &&
+              mailbox
+                .sort((a, b) => a.timestamp - b.timestamp)
+                .map((item, index) => (
+                  <IonItem color="light" key={index}>
+                    <IonIcon
+                      icon={mailOpenOutline}
+                      slot="start"
+                      color="medium"
+                    />
+                    <div className="ion-padding-vertical">
+                      <IonLabel text-wrap style={{ paddingBottom: 5 }}>
+                        <b>{item.sender}</b>
+                        <span className="ion-float-right">
+                          <IonText color="medium">
+                            {moment(item.timestamp).fromNow()}
+                          </IonText>
+                        </span>
+                      </IonLabel>
+                      <IonLabel text-wrap>{item.message}</IonLabel>
+                    </div>
+                  </IonItem>
+                ))}
+
+            {!mailbox ||
+              (mailbox && mailbox.length === 0 && (
+                <IonItem color="light">
+                  <div className="ion-padding-vertical">
+                    <IonLabel text-wrap>
+                      <i>Hòm thư trống</i>
+                    </IonLabel>
+                  </div>
+                </IonItem>
+              ))}
           </IonList>
+          <br />
+          <br />
+          <br />
+          <br />
         </IonContent>
       </IonModal>
     </IonPage>

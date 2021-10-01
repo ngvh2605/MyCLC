@@ -16,4 +16,16 @@
   .fab-center {
     margin-inline-start: -75px;
   }
+
+  .mail-button {
+    ion-badge {
+      position: absolute;
+      bottom: -0rem;
+      right: -0.2rem;
+      opacity: 0.9;
+    }
+    ion-icon {
+      margin-right: 0.2rem;
+    }
+  }
 }
