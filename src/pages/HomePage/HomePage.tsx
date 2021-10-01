@@ -5,9 +5,9 @@ import {
   add as addIcon,
   arrowUp,
   chevronDown,
-  mailUnreadOutline,
   close,
   mailOpenOutline,
+  mailOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 
@@ -121,7 +121,7 @@ const HomePage: React.FC = () => {
                 setShowMailModal(true);
               }}
             >
-              <IonIcon icon={mailUnreadOutline} color="primary" />
+              <IonIcon icon={mailOutline} color="primary" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -247,7 +247,6 @@ const HomePage: React.FC = () => {
               </div>
             </IonItem>
             <IonItem color="light">
-              <IonIcon icon={mailOpenOutline} slot="start" color="medium" />
               <div className="ion-padding-vertical">
                 <IonLabel text-wrap>
                   <i>Hòm thư trống</i>
