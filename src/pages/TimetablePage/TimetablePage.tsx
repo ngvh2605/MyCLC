@@ -1017,6 +1017,7 @@ const TimetablePage: React.FC = () => {
                     });
                   }}
                   max={moment().add(3, "months").format("YYYY-MM-DD")}
+                  min={moment().format("YYYY-MM-DD")}
                 />
               </IonItem>
               <IonItem>
@@ -1025,6 +1026,7 @@ const TimetablePage: React.FC = () => {
                 </IonLabel>
                 <IonDatetime
                   displayFormat="HH:mm"
+                  minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
                   value={newLesson.start}
                   onIonChange={(e) => {
                     setNewLesson({
@@ -1039,6 +1041,7 @@ const TimetablePage: React.FC = () => {
                 <IonLabel position="floating">Kết thúc</IonLabel>
                 <IonDatetime
                   displayFormat="HH:mm"
+                  minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
                   value={newLesson.end}
                   onIonChange={(e) => {
                     setNewLesson({

@@ -103,49 +103,54 @@ const ProfilePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding-vertical">
-        <IonFab horizontal="center" style={{ paddingLeft: 45, paddingTop: 88 }}>
-          <IonFabButton
-            style={{ width: 30, height: 30 }}
-            onClick={() => {
-              history.push("/my/profile/avatar");
+        <div className="ion-padding-horizontal">
+          <IonFab
+            horizontal="center"
+            style={{ paddingLeft: 45, paddingTop: 88 }}
+          >
+            <IonFabButton
+              style={{ width: 30, height: 30 }}
+              onClick={() => {
+                history.push("/my/profile/avatar");
+              }}
+            >
+              <IonIcon icon={camera} style={{ width: 18, height: 18 }} />
+            </IonFabButton>
+          </IonFab>
+
+          <IonAvatar
+            className="ion-margin"
+            style={{
+              width: 100,
+              height: 100,
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
-            <IonIcon icon={camera} style={{ width: 18, height: 18 }} />
-          </IonFabButton>
-        </IonFab>
-
-        <IonAvatar
-          className="ion-margin"
-          style={{
-            width: 100,
-            height: 100,
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          <IonSkeletonText animated hidden={avatarUrl ? true : false} />
-          <IonImg
-            hidden={avatarUrl ? false : true}
-            src={avatarUrl || "/assets/image/placeholder.png"}
-          />
-        </IonAvatar>
-        <p
-          style={{
-            marginLeft: "auto",
-            marginRight: "auto",
-            width: 150,
-            marginTop: 25,
-          }}
-          hidden={fullName ? true : false}
-        >
-          <IonSkeletonText animated style={{ width: "100%", height: 15 }} />
-        </p>
-        <p
-          style={{ textAlign: "center", fontSize: "large" }}
-          hidden={fullName ? false : true}
-        >
-          <b>{fullName}</b>
-        </p>
+            <IonSkeletonText animated hidden={avatarUrl ? true : false} />
+            <IonImg
+              hidden={avatarUrl ? false : true}
+              src={avatarUrl || "/assets/image/placeholder.png"}
+            />
+          </IonAvatar>
+          <p
+            style={{
+              marginLeft: "auto",
+              marginRight: "auto",
+              width: 150,
+              marginTop: 25,
+            }}
+            hidden={fullName ? true : false}
+          >
+            <IonSkeletonText animated style={{ width: "100%", height: 15 }} />
+          </p>
+          <p
+            style={{ textAlign: "center", fontSize: "large" }}
+            hidden={fullName ? false : true}
+          >
+            <b>{fullName}</b>
+          </p>
+        </div>
         <br />
 
         <IonItemDivider

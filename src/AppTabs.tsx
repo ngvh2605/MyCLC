@@ -23,6 +23,7 @@ import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
 import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
+import UserPage from "./pages/UserPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -100,6 +101,13 @@ const AppTabs: React.FC = () => {
 
       <Route exact path="/my/timetable">
         <TimetablePage />
+      </Route>
+
+      <Route exact path="/my/user">
+        <UserPage />
+      </Route>
+      <Route exact path="/my/user/:id">
+        <UserPage />
       </Route>
 
       <Switch>

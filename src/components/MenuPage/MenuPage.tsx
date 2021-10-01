@@ -96,7 +96,12 @@ const MenuPage = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <div className="ion-margin"></div>
-          <IonGrid>
+          <IonGrid
+            onClick={() => {
+              history.push(`/my/user/${userId}`);
+              menuClose();
+            }}
+          >
             <IonRow className="ion-align-items-center">
               <IonCol size="3.5">
                 <IonAvatar className="ion-margin">
@@ -113,6 +118,7 @@ const MenuPage = () => {
                 </IonLabel>
                 <IonLabel hidden={fullName ? false : true}>
                   <b>{fullName}</b>
+                  <p style={{ paddingTop: 3 }}>Xem trang cá nhân</p>
                 </IonLabel>
               </IonCol>
             </IonRow>
@@ -243,7 +249,7 @@ const MenuPage = () => {
         </IonList>
       </IonContent>
       <IonFooter className="ion-no-border">
-        <IonToolbar>
+        <IonToolbar className="ion-no-padding">
           <IonList lines="none">
             <IonItem>
               <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 1.5</IonLabel>

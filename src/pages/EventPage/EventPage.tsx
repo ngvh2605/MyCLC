@@ -25,6 +25,8 @@ import {
 import { Events } from "../../models";
 import EventCard from "./EventCard";
 import { getEvent, getNextEvent } from "./services";
+import { Storage } from "@capacitor/storage";
+import { UnAuth } from "../../components/CommonUI/UnAuth";
 
 const Skeleton = () => (
   <IonCard>
@@ -53,10 +55,15 @@ const EventPage: React.FC = () => {
   const [lastKey, setLastKey] = useState<number | string>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [isVerify, setIsVerify] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchEvents();
+    checkVerify();
   }, []);
+
+  useEffect(() => {
+    if (isVerify) fetchEvents();
+  }, [isVerify]);
 
   const fetchMore = async () => {
     const events = await getNextEvent(lastKey, 1);
@@ -81,6 +88,14 @@ const EventPage: React.FC = () => {
       event.detail.complete();
     }, 2000);
   };
+
+  const checkVerify = async () => {
+    const { value } = await Storage.get({ key: "verify" });
+    if (value === "true") {
+      setIsVerify(true);
+    } else setIsVerify(false);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -99,60 +114,68 @@ const EventPage: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <IonRefresher slot="fixed" onIonRefresh={refreshEvents}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+      {isVerify ? (
+        <IonContent className="ion-padding">
+          <IonRefresher slot="fixed" onIonRefresh={refreshEvents}>
+            <IonRefresherContent
+              style={{ marginTop: 10 }}
+              pullingIcon={chevronDown}
+              pullingText="Kéo xuống để làm mới"
+            ></IonRefresherContent>
+          </IonRefresher>
 
-        <IonFab
-          hidden={
-            eventsList.length > 0 ? eventsList.length >= totalEvents : true
-          }
-          vertical="top"
-          horizontal="center"
-          slot="fixed"
-          className="fab-center"
-        >
-          <IonButton
-            shape="round"
-            onClick={() => {
-              //setEventsList([]);
-              fetchEvents();
-            }}
+          <IonFab
+            hidden={
+              eventsList.length > 0 ? eventsList.length >= totalEvents : true
+            }
+            vertical="top"
+            horizontal="center"
+            slot="fixed"
+            className="fab-center"
           >
-            <IonIcon icon={arrowUp} slot="start" />
-            <IonLabel>Có tin mới</IonLabel>
+            <IonButton
+              shape="round"
+              onClick={() => {
+                //setEventsList([]);
+                fetchEvents();
+              }}
+            >
+              <IonIcon icon={arrowUp} slot="start" />
+              <IonLabel>Có tin mới</IonLabel>
+            </IonButton>
+          </IonFab>
+
+          {!loading ? (
+            eventsList.map((item, index) => (
+              <EventCard event={item} key={index} />
+            ))
+          ) : (
+            <>
+              <Skeleton />
+            </>
+          )}
+
+          {/* <SampleEvents /> */}
+          <IonButton
+            style={{
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+            fill="clear"
+            hidden={false}
+            onClick={() => fetchMore()}
+          >
+            <IonLabel>
+              Đọc thêm
+              <br />
+              <IonIcon icon={chevronDown} />
+            </IonLabel>
           </IonButton>
-        </IonFab>
-
-        {!loading ? (
-          eventsList.map((item, index) => (
-            <EventCard event={item} key={index} />
-          ))
-        ) : (
-          <>
-            <Skeleton />
-          </>
-        )}
-
-        {/* <SampleEvents /> */}
-        <IonButton
-          style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
-          fill="clear"
-          hidden={false}
-          onClick={() => fetchMore()}
-        >
-          <IonLabel>
-            Đọc thêm
-            <br />
-            <IonIcon icon={chevronDown} />
-          </IonLabel>
-        </IonButton>
-      </IonContent>
+        </IonContent>
+      ) : (
+        <UnAuth />
+      )}
     </IonPage>
   );
 };
