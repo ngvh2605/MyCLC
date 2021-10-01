@@ -1,3 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import {
+  informationCircle,
+  linkOutline,
+  location,
+  ticket,
+  time,
+} from "ionicons/icons";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router";
+
 import {
   IonAvatar,
   IonBackButton,
@@ -14,7 +26,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonNote,
   IonPage,
   IonSkeletonText,
   IonThumbnail,
@@ -22,18 +33,9 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router";
+
 import { useAuth } from "../../../auth";
-import { Events, News } from "../../../models";
-import {
-  informationCircle,
-  linkOutline,
-  location,
-  ticket,
-  time,
-} from "ionicons/icons";
-import moment from "moment";
+import { Events } from "../../../models";
 import { buyTicket } from "../../HomePage/services";
 
 interface stateType {
@@ -45,8 +47,6 @@ interface stateType {
 const ViewEventPage: React.FC = () => {
   const { userId } = useAuth();
   const locationRef = useLocation<stateType>();
-
-  const history = useHistory();
 
   const [event, setEvent] = useState<Events>();
   const [authorInfo, setAuthorInfo] = useState<any>({});

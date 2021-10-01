@@ -1,6 +1,5 @@
-import moment from "moment";
-import { database, firestore, storage } from "../../firebase";
-import { News, toComment, toEvents, toNews } from "../../models";
+import { firestore } from "../../firebase";
+import { toEvents } from "../../models";
 
 export const getEvent = async (limit: number) => {
   const eventsRef = firestore.collection("events");

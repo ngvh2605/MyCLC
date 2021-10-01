@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonActionSheet,
   IonAvatar,
@@ -32,7 +33,7 @@ import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
-import { database, firestore } from "../../../firebase";
+import { firestore } from "../../../firebase";
 import { News, toNews } from "../../../models";
 import {
   deleteNews,
@@ -138,7 +139,7 @@ const NewsCard: React.FC<any> = (props) => {
                   onClick={() => {
                     setShowActionSheet(true);
                   }}
-                  hidden={news.author != userId}
+                  hidden={news.author !== userId}
                   style={{ fontSize: "large" }}
                 />
                 <p>

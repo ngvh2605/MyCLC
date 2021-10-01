@@ -1,3 +1,10 @@
+import "moment/locale/vi";
+import "./TicketCard.scss";
+
+import { location, ticket, time, trashBin } from "ionicons/icons";
+import moment from "moment";
+import React, { useState } from "react";
+
 import {
   IonButton,
   IonCard,
@@ -11,16 +18,10 @@ import {
   IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
-import { location, ticket, time, trashBin } from "ionicons/icons";
-import moment from "moment";
-import "moment/locale/vi";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+
 import { useAuth } from "../../../../auth";
-import { firestore } from "../../../../firebase";
 import { Events } from "../../../../models";
-import { cancelTicket, getInfoByUserId } from "../../../HomePage/services";
-import "./TicketCard.scss";
+import { cancelTicket } from "../../../HomePage/services";
 
 const Skeleton = () => (
   <IonCard>
@@ -44,47 +45,13 @@ interface Props {
   status: String;
   isPast?: boolean;
 }
-
-function calImgScale() {
-  const width = window.screen.width - 32;
-  const height = (width * 9) / 16;
-  return { width: width, height: height };
-}
-
 const TicketCard: React.FC<Props> = (props) => {
-  const history = useHistory();
   const { userId } = useAuth();
 
   const { event, status, isPast } = props;
 
-  const [authorInfo, setAuthorInfo] = useState<any>({});
-  const [isBuy, setIsBuy] = useState(false);
-
-  const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
-
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    const getAuthor = async () => {
-      setAuthorInfo(await getInfoByUserId(event.author));
-    };
-    getAuthor();
-
-    //is user buy ticket?
-    const checkIsBuy = firestore
-      .collection("eventsTicket")
-      .where("eventId", "==", event.id)
-      .where("userId", "==", userId)
-      .onSnapshot((doc) => {
-        if (doc.empty) setIsBuy(false);
-        else setIsBuy(true);
-      });
-
-    return () => {
-      checkIsBuy();
-    };
-  }, [event]);
 
   return (
     <>

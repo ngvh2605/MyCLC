@@ -16,7 +16,6 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
-  useIonAlert,
 } from "@ionic/react";
 import firebase from "firebase";
 import React, { useEffect, useState } from "react";
@@ -31,14 +30,12 @@ const PhoneVerify: React.FC = () => {
   const history = useHistory();
   const [phone, setPhone] = useState("");
   const [dialCode, setDialCode] = useState("+84");
-  const [pin, setPin] = useState("");
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
   const [changeDisabled, setChangeDisabled] = useState(false);
-  const [present] = useIonAlert();
 
   useEffect(() => {
     let list: any = [];

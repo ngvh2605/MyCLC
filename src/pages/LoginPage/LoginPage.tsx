@@ -18,14 +18,13 @@ import {
 } from "@ionic/react";
 import { closeCircle, eye, eyeOff } from "ionicons/icons";
 import React, { useState } from "react";
-import { Redirect, useHistory } from "react-router";
+import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth } from "../../firebase";
 import "./LoginPage.scss";
 
 const LoginPage: React.FC = () => {
   const { loggedIn } = useAuth();
-  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordType, setPasswordType] = useState<any>("password");
@@ -120,7 +119,6 @@ const LoginPage: React.FC = () => {
                 slot="end"
                 size="small"
                 color="medium"
-                hidden={!password ? true : false}
                 onClick={() => {
                   if (passwordType === "password") {
                     setPasswordType("text");

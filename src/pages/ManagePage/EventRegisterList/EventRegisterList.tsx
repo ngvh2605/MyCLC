@@ -18,7 +18,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { alertCircle, checkmarkCircle } from "ionicons/icons";
+import { checkmarkCircle } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { firestore } from "../../../firebase";
@@ -56,7 +56,7 @@ const EventRegisterList: React.FC = () => {
       .where("eventId", "==", id)
       .onSnapshot(({ docs }) => {
         let temp: any[] = [];
-        docs.map((doc) => {
+        docs.forEach((doc) => {
           temp.push({ userId: doc.data().userId, status: doc.data().status });
         });
         setTickets(temp);

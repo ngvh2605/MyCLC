@@ -1,42 +1,30 @@
+import { arrowUp, chevronDown, ticketOutline } from "ionicons/icons";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+
+import { RefresherEventDetail } from "@ionic/core";
 import {
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
+  IonFab,
   IonHeader,
   IonIcon,
   IonLabel,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonButtons,
   IonMenuButton,
-  IonButton,
-  IonAlert,
-  IonChip,
+  IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonFab,
-  IonFabButton,
-  IonCard,
-  IonItem,
-  IonAvatar,
   IonSkeletonText,
-  IonNote,
-  IonCardSubtitle,
-  IonCardContent,
+  IonTitle,
+  IonToolbar,
 } from "@ionic/react";
-import {
-  arrowUp,
-  chevronDown,
-  add as addIcon,
-  ticketOutline,
-} from "ionicons/icons";
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../auth";
-import { auth as firebaseAuth, firestore } from "../../firebase";
+
+import { Events } from "../../models";
 import EventCard from "./EventCard";
 import { getEvent, getNextEvent } from "./services";
-import { RefresherEventDetail } from "@ionic/core";
-import { Events } from "../../models";
-import { useHistory } from "react-router-dom";
 
 const Skeleton = () => (
   <IonCard>
@@ -56,13 +44,9 @@ const Skeleton = () => (
 );
 
 const EventPage: React.FC = () => {
-  const { userId } = useAuth();
   const history = useHistory();
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-
+  //todo: query total event
   const [totalEvents, setTotalEvents] = useState(0);
 
   const [eventsList, setEventsList] = useState<Events[]>([]);
@@ -72,7 +56,7 @@ const EventPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []); //user id ko thay đổi trong suốt phiên làm việc nên ko cần cho vào đây
+  }, []);
 
   const fetchMore = async () => {
     const events = await getNextEvent(lastKey, 1);
@@ -168,25 +152,7 @@ const EventPage: React.FC = () => {
             <IonIcon icon={chevronDown} />
           </IonLabel>
         </IonButton>
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
-
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        cssClass="my-custom-class"
-        header={alertHeader}
-        message={alertMessage}
-        buttons={["OK"]}
-      />
     </IonPage>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonBackButton,
   IonButton,
@@ -8,7 +9,6 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
-  IonListHeader,
   IonModal,
   IonPage,
   IonTitle,
@@ -17,7 +17,6 @@ import {
 import { close, fileTray, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { Events } from "../../../models";
 import { getEventTicketByUserId } from "../../HomePage/services";
@@ -51,7 +50,6 @@ const EmptyCard = () => (
 );
 const TicketPage: React.FC = () => {
   const { userId } = useAuth();
-  const history = useHistory();
   var QRCode = require("qrcode.react");
 
   const [tickets, setTickets] = useState<any[]>([]);

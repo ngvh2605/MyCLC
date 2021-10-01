@@ -1,11 +1,14 @@
+import { image } from "ionicons/icons";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory, useLocation } from "react-router";
+
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
-  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons,
   IonCard,
-  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -22,14 +25,10 @@ import {
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { chevronBack, image } from "ionicons/icons";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import { useHistory, useLocation, useParams } from "react-router";
+
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
-
-import { auth as firebaseAuth, firestore, storage } from "../../../firebase";
+import { firestore, storage } from "../../../firebase";
 import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
@@ -45,10 +44,6 @@ const AddNewsPage: React.FC = () => {
   const [pictureRatio, setPictureRatio] = useState(1);
 
   const [news, setNews] = useState<News>();
-
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
 
   const { handleUploadImage } = useUploadFile();
 
@@ -121,7 +116,7 @@ const AddNewsPage: React.FC = () => {
   const handleEdit = async () => {
     setStatus({ loading: true, error: false });
     let uploadedUrl = "";
-    if (pictureUrl && pictureUrl != news.pictureUrl) {
+    if (pictureUrl && pictureUrl !== news.pictureUrl) {
       uploadedUrl = await handleUploadImage(pictureUrl, "news");
       if (news.pictureUrl) storage.refFromURL(news.pictureUrl).delete();
     }
@@ -210,18 +205,6 @@ const AddNewsPage: React.FC = () => {
         </IonCard>
 
         <IonLoading isOpen={status.loading} />
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-            history.replace("/my/home");
-          }}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter className="ion-no-border">
         <IonToolbar>

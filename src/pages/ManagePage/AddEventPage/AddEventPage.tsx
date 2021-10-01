@@ -1,6 +1,5 @@
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
-  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -17,26 +16,23 @@ import {
   IonLabel,
   IonList,
   IonLoading,
-  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
   IonText,
   IonTextarea,
-  IonThumbnail,
   IonTitle,
   IonToolbar,
   isPlatform,
 } from "@ionic/react";
-import { chevronBack, heart, image } from "ionicons/icons";
+import { image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory, useLocation, useParams } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
-
-import { auth as firebaseAuth, firestore, storage } from "../../../firebase";
-import { Events, News } from "../../../models";
+import { firestore, storage } from "../../../firebase";
+import { Events } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AddEventPage: React.FC = () => {
@@ -59,10 +55,6 @@ const AddEventPage: React.FC = () => {
   const [pictureUrl, setPictureUrl] = useState("");
 
   const [events, setEvents] = useState<Events>();
-
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
 
   const { handleUploadImage } = useUploadFile();
 
@@ -151,7 +143,7 @@ const AddEventPage: React.FC = () => {
   const handleEdit = async () => {
     setStatus({ loading: true, error: false });
     let uploadedUrl = "";
-    if (pictureUrl && pictureUrl != events.pictureUrl) {
+    if (pictureUrl && pictureUrl !== events.pictureUrl) {
       uploadedUrl = await handleUploadImage(pictureUrl, "events");
       if (events.pictureUrl) storage.refFromURL(events.pictureUrl).delete();
     }
@@ -170,7 +162,7 @@ const AddEventPage: React.FC = () => {
         totalTicket,
         externalLink,
         pictureUrl:
-          pictureUrl && pictureUrl != events.pictureUrl
+          pictureUrl && pictureUrl !== events.pictureUrl
             ? uploadedUrl
             : events.pictureUrl
             ? events.pictureUrl
@@ -383,18 +375,6 @@ const AddEventPage: React.FC = () => {
         </IonCard>
 
         <IonLoading isOpen={status.loading} />
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-            history.replace("/my/home");
-          }}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter className="ion-no-border">
         <IonToolbar>

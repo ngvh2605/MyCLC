@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonActionSheet,
-  IonAlert,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -43,23 +43,11 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory, useLocation, useParams } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
-import {
-  deleteNews,
-  getInfoByUserId,
-  isNewLikedByUser,
-  likeNews,
-  unlikeNews,
-} from "../services";
-import {
-  Comment,
-  News,
-  toComment,
-  toNews,
-  VerifyStatus,
-} from "./../../../models";
+import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
+import { Comment, News, toComment, VerifyStatus } from "./../../../models";
 
 interface stateType {
   news: News;
@@ -91,10 +79,6 @@ const ViewNewsPage: React.FC = () => {
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showNewsActionSheet, setShowNewsActionSheet] = useState(false);
-
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
 
   const [presentAlert] = useIonAlert();
 
@@ -233,7 +217,7 @@ const ViewNewsPage: React.FC = () => {
                   onClick={() => {
                     setShowNewsActionSheet(true);
                   }}
-                  hidden={news && news.author != userId}
+                  hidden={news && news.author !== userId}
                   style={{ fontSize: "large" }}
                 />
                 <p>
@@ -396,7 +380,7 @@ const ViewNewsPage: React.FC = () => {
                               setChosenComment(comment);
                               setShowActionSheet(true);
                             }}
-                            hidden={comment.author != userId}
+                            hidden={comment.author !== userId}
                             style={{ fontSize: "large" }}
                           />
                           {commentAuthors[index] &&
@@ -451,18 +435,6 @@ const ViewNewsPage: React.FC = () => {
             </IonButton>
           </div>
           <IonLoading isOpen={false} />
-
-          <IonAlert
-            isOpen={showAlert}
-            onDidDismiss={() => {
-              setShowAlert(false);
-              history.replace("/my/home");
-            }}
-            cssClass="my-custom-class"
-            header={alertHeader}
-            message={alertMessage}
-            buttons={["OK"]}
-          />
 
           <IonActionSheet
             isOpen={showActionSheet}

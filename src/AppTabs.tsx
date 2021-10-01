@@ -1,35 +1,27 @@
-import {
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-} from "@ionic/react";
-import { home as homeIcon, settings as settingsIcon } from "ionicons/icons";
+import { IonRouterOutlet } from "@ionic/react";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { useAuth } from "./auth";
-import HomePage from "./pages/HomePage";
-import AddEntryPage from "./pages/AddEntryPage";
-import EntryPage from "./pages/EntryPage";
-import AllEntryPage from "./pages/AllEntryPage";
-import SettingsPage from "./pages/SettingsPage";
-import ProfilePage from "./pages/ProfilePage";
-import EmailVerify from "./pages/ProfilePage/EmailVerify";
-import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
-import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
-import EventPage from "./pages/EventPage";
-import ViewEventPage from "./pages/EventPage/ViewEventPage";
 import AboutPage from "./pages/AboutPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import AvatarPage from "./pages/ProfilePage/AvatarPage";
+import AddEntryPage from "./pages/AddEntryPage";
+import AllEntryPage from "./pages/AllEntryPage";
+import EntryPage from "./pages/EntryPage";
+import EventPage from "./pages/EventPage";
+import TicketPage from "./pages/EventPage/TicketPage";
+import ViewEventPage from "./pages/EventPage/ViewEventPage";
+import HomePage from "./pages/HomePage";
 import AddNewsPage from "./pages/HomePage/AddNewsPage";
 import ViewNewsPage from "./pages/HomePage/ViewNewsPage";
-import TicketPage from "./pages/EventPage/TicketPage";
 import ManagePage from "./pages/ManagePage";
 import AddEventPage from "./pages/ManagePage/AddEventPage";
 import EventRegisterList from "./pages/ManagePage/EventRegisterList";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProfilePage from "./pages/ProfilePage";
+import AvatarPage from "./pages/ProfilePage/AvatarPage";
+import EmailVerify from "./pages/ProfilePage/EmailVerify";
+import PersonalInfo from "./pages/ProfilePage/PersonalInfo";
+import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
+import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 
 const AppTabs: React.FC = () => {

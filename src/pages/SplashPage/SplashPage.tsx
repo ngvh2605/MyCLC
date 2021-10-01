@@ -128,6 +128,4 @@ const SplashPage: React.FC = () => {
   );
 };
 
-const logo = "";
-const slide1 = "";
 export default SplashPage;

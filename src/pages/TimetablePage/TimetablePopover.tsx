@@ -1,10 +1,4 @@
-import {
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
-  IonText,
-} from "@ionic/react";
+import { IonItem, IonList, IonListHeader, IonText } from "@ionic/react";
 import moment from "moment";
 import React from "react";
 import { WeekItem } from "./TimetablePage";

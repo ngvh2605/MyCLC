@@ -1,26 +1,20 @@
 import {
+  IonAvatar,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardSubtitle,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
+  IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
-  IonImg,
-  IonButtons,
-  IonMenuButton,
-  IonButton,
-  IonCard,
-  IonAlert,
-  IonCardSubtitle,
-  IonCardContent,
-  IonAvatar,
-  IonChip,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonBadge,
 } from "@ionic/react";
 import {
   globe,
@@ -28,17 +22,10 @@ import {
   logoInstagram,
   logoLinkedin,
   logoYoutube,
-  mail,
-  mailUnreadOutline,
 } from "ionicons/icons";
-import React, { useState, useEffect } from "react";
-import { auth as firebaseAuth } from "../../firebase";
+import React from "react";
 
 const AboutPage: React.FC = () => {
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-
   return (
     <IonPage>
       <IonHeader>
@@ -124,6 +111,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.clcmultimedia.com"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -134,6 +122,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.facebook.com/CLCMultimedia"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -144,6 +133,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.facebook.com/groups/ChuyenLaoCai"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -154,6 +144,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.instagram.com/clc_multimedia"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -164,6 +155,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.instagram.com/chuyenlaocai_/"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -174,6 +166,7 @@ const AboutPage: React.FC = () => {
             <a
               href="https://www.youtube.com/c/CLCMultimedia"
               target="_blank"
+              rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
               <IonChip color="secondary">
@@ -219,6 +212,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.linkedin.com/in/vithong/"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -229,6 +223,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.facebook.com/ngvh2605/"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -239,6 +234,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.instagram.com/vithong_au/"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -249,6 +245,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.youtube.com/channel/UCWtgnKLCEFnL78dbv5oiaBw"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -294,6 +291,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.linkedin.com/in/v%C5%A9-anh-0a76771ab/"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -304,6 +302,7 @@ const AboutPage: React.FC = () => {
               <a
                 href="https://www.facebook.com/vuanh2999"
                 target="_blank"
+                rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
                 <IonChip color="secondary">
@@ -315,15 +314,6 @@ const AboutPage: React.FC = () => {
           </IonCardContent>
         </IonCard>
       </IonContent>
-
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        cssClass="my-custom-class"
-        header={alertHeader}
-        message={alertMessage}
-        buttons={["OK"]}
-      />
     </IonPage>
   );
 };

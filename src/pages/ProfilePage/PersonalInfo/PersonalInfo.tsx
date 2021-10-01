@@ -1,3 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+
 import {
   IonAlert,
   IonBackButton,
@@ -8,33 +13,23 @@ import {
   IonDatetime,
   IonFooter,
   IonHeader,
-  IonIcon,
   IonInput,
   IonItem,
-  IonItemDivider,
   IonLabel,
   IonList,
-  IonLoading,
-  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
-  IonTextarea,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronBack } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
+
 import { useAuth } from "../../../auth";
-import { auth as firebaseAuth, database } from "../../../firebase";
-import moment from "moment";
+import { database } from "../../../firebase";
 
 const PersonalInfo: React.FC = () => {
   const { userId, userEmail } = useAuth();
   const history = useHistory();
-  //const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [status, setStatus] = useState({ loading: false, error: false });
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertHeader, setAlertHeader] = useState("");
@@ -169,7 +164,7 @@ const PersonalInfo: React.FC = () => {
 
   function checkCode() {
     var isAvailable = false;
-    codeList.map((item) => {
+    codeList.forEach((item) => {
       if (
         clubCode === item.code &&
         (item.value === "available" || item.value === userId)
@@ -181,8 +176,8 @@ const PersonalInfo: React.FC = () => {
   }
 
   function getCodeIndex() {
-    var index;
-    codeList.map((item) => {
+    let index: number;
+    codeList.forEach((item) => {
       if (
         clubCode === item.code &&
         (item.value === "available" || item.value === userId)
@@ -237,9 +232,12 @@ const PersonalInfo: React.FC = () => {
           await userData.child("users").child(userId).child("verify").update({
             personalInfo: true,
           });
-          await userData.child("clubCode").child(getCodeIndex()).update({
-            value: userId,
-          });
+          await userData
+            .child("clubCode")
+            .child(getCodeIndex().toString())
+            .update({
+              value: userId,
+            });
           setAlertHeader("Hoàn thành!");
           setAlertMessage("Thông tin của bạn đã được lưu thành công");
           setShowAlert(true);
@@ -480,7 +478,6 @@ const PersonalInfo: React.FC = () => {
             {"Bạn là học sinh lớp: " + gradeClass}
           </IonLabel>
         </IonChip>
-        <IonLoading isOpen={status.loading} />
 
         {/* Giáo viên/Nhân viên */}
         <IonList hidden={role !== "teacher"}>

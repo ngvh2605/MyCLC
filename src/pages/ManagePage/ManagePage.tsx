@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { RefresherEventDetail } from "@ionic/core";
 import {
-  IonButton,
   IonButtons,
   IonContent,
   IonFab,
@@ -15,21 +16,18 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { add, chevronDown, mailUnreadOutline } from "ionicons/icons";
+import { add, chevronDown } from "ionicons/icons";
+import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import { firestore } from "../../firebase";
 import { Events, toEvents } from "../../models";
 import ManageCard from "./ManageCard";
 import "./ManagePage.scss";
-import { RefresherEventDetail } from "@ionic/core";
-import moment from "moment";
 
 const ManagePage: React.FC = () => {
   const { userId } = useAuth();
-  const history = useHistory();
 
   const [events, setEvents] = useState<Events[]>();
   const [oldEvents, setOldEvents] = useState<Events[]>();

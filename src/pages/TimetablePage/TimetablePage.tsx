@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonActionSheet,
-  IonAlert,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -27,7 +26,6 @@ import {
   IonSelectOption,
   IonSlide,
   IonSlides,
-  IonText,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -60,12 +58,6 @@ interface ClassItem {
   key: string;
   name: string;
   room?: string;
-  lessons?: LessonItem[];
-}
-
-interface DayItem {
-  key: string;
-  name: string;
   lessons?: LessonItem[];
 }
 
@@ -223,7 +215,7 @@ const TimetablePage: React.FC = () => {
                 //nothing
               }
             }
-          }
+          } else readCurrentWeek();
         });
     };
     readSetting();

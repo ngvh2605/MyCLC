@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Storage } from "@capacitor/storage";
 import {
   IonAvatar,
@@ -34,7 +35,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database } from "../../firebase";
-import { VerifyStatus } from "../../models";
 import "./MenuPage.scss";
 
 const MenuPage = () => {
@@ -43,16 +43,10 @@ const MenuPage = () => {
   const history = useHistory();
   const location = useLocation();
   const menuEl = useRef<HTMLIonMenuElement>(null);
-  const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
-    emailVerify: false,
-    phoneVerify: false,
-    personalInfo: false,
-    hasAvatar: false,
-  });
 
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [presentToast, dismissToast] = useIonToast();
+  const [presentToast] = useIonToast();
 
   useEffect(() => {
     if (userId) {
@@ -62,20 +56,6 @@ const MenuPage = () => {
 
   const readStatus = () => {
     const userData = database.ref().child("users").child(userId);
-    userData.child("verify").on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        setVerifyStatus(data);
-      } else {
-        setVerifyStatus({
-          emailVerify: false,
-          phoneVerify: false,
-          personalInfo: false,
-          hasAvatar: false,
-        });
-        console.log("No data available");
-      }
-    });
 
     userData.child("personal").on("value", (snapshot) => {
       if (snapshot.exists()) {

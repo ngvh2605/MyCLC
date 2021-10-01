@@ -1,19 +1,11 @@
-import {
-  IonApp,
-  IonLoading,
-  IonRouterOutlet,
-  IonSplitPane,
-  setupConfig,
-} from "@ionic/react";
+import { IonApp, IonLoading, IonRouterOutlet, setupConfig } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import AppTabs from "./AppTabs";
 import { AuthContext, useAuthInit } from "./auth";
 import MenuPage from "./components/MenuPage";
-
 import LoginPage from "./pages/LoginPage";
-import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
 import SplashPage from "./pages/SplashPage";
 

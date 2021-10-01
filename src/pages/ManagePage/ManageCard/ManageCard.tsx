@@ -1,49 +1,32 @@
+import "moment/locale/vi";
+import "./ManageCard.scss";
+
+import {
+  brush,
+  close,
+  ellipsisHorizontal,
+  list,
+  location,
+  trash,
+} from "ionicons/icons";
+import moment from "moment";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+
 import {
   IonActionSheet,
-  IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
   IonCardSubtitle,
-  IonCol,
-  IonFabButton,
-  IonGrid,
   IonIcon,
   IonImg,
-  IonItem,
   IonLabel,
-  IonRow,
   IonSkeletonText,
-  IonText,
   IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
-import {
-  brush,
-  brushOutline,
-  ellipsisHorizontal,
-  linkOutline,
-  list,
-  location,
-  ticket,
-  trash,
-  trashBinOutline,
-  close,
-} from "ionicons/icons";
-import moment from "moment";
-import "moment/locale/vi";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useAuth } from "../../../auth";
-import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
-import {
-  cancelTicket,
-  deleteNews,
-  getInfoByUserId,
-} from "../../HomePage/services";
-import { buyTicket } from "../../HomePage/services";
-import "./ManageCard.scss";
 
 const Skeleton = () => (
   <IonCard>
@@ -75,7 +58,6 @@ function calImgScale() {
 
 const ManageCard: React.FC<Props> = (props) => {
   const history = useHistory();
-  const { userId } = useAuth();
 
   const { event, allowEdit } = props;
 

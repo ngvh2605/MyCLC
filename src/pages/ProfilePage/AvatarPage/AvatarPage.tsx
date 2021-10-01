@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
   IonAlert,
@@ -172,7 +173,7 @@ const AvatarPage: React.FC = () => {
           }}
         >
           <IonIcon icon={image} slot="start" />
-          {avatarUrl && avatarUrl != "/assets/image/placeholder.png"
+          {avatarUrl && avatarUrl !== "/assets/image/placeholder.png"
             ? "Đổi ảnh khác"
             : "Thêm hình ảnh"}
         </IonButton>

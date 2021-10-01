@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
-  IonAlert,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -15,7 +15,6 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
-  IonListHeader,
   IonMenuButton,
   IonPage,
   IonSkeletonText,
@@ -42,10 +41,6 @@ const ProfilePage: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
 
   var QRCode = require("qrcode.react");
-
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     readStatus();
@@ -243,17 +238,6 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
         <br />
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-          }}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
     </IonPage>
   );
