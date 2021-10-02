@@ -98,12 +98,6 @@ const HomePage: React.FC = () => {
   const [presentAlert] = useIonAlert();
 
   useEffect(() => {
-    //first login
-    if (
-      firebaseAuth.currentUser.metadata.creationTime ===
-      firebaseAuth.currentUser.metadata.lastSignInTime
-    )
-      firstLogin();
     //read mail box
     const readMailbox = async () => {
       await database
@@ -146,23 +140,6 @@ const HomePage: React.FC = () => {
     setTimeout(() => {
       event.detail.complete();
     }, 2000);
-  };
-
-  const firstLogin = () => {
-    const temp: Mail = {
-      sender: "CLC Multimedia",
-      message:
-        "Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của MyCLC nhé!",
-      timestamp: moment().valueOf(),
-    };
-    database
-      .ref()
-      .child("mailbox")
-      .child(userId)
-      .push({
-        ...temp,
-      });
-    setMailbox([temp]);
   };
 
   const clearMailbox = () => {

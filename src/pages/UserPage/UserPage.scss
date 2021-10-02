@@ -1,2 +1,11 @@
 #user-page {
+  .badge-chip {
+    --background: #f6f7f7;
+    height: 36px;
+    padding: 12px;
+    border-radius: 100px;
+    b {
+      color: black;
+    }
+  }
 }

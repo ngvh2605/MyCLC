@@ -129,7 +129,7 @@ const ViewEventPage: React.FC = () => {
           </IonCardContent>
           <IonList lines="none">
             <IonItem>
-              <IonIcon icon={time} color="medium" slot="start" />
+              <IonIcon icon={time} color="medium" size="small" slot="start" />
               <IonLabel text-wrap style={{ textTransform: "capitalize" }}>
                 {moment(event.startDate)
                   .locale("vi")
@@ -142,17 +142,27 @@ const ViewEventPage: React.FC = () => {
               </IonLabel>
             </IonItem>
             <IonItem>
-              <IonIcon icon={location} color="medium" slot="start" />
+              <IonIcon
+                icon={location}
+                color="medium"
+                size="small"
+                slot="start"
+              />
               <IonLabel text-wrap>{event.location}</IonLabel>
             </IonItem>
             {event.description && (
               <IonItem>
-                <IonIcon icon={informationCircle} color="medium" slot="start" />
+                <IonIcon
+                  icon={informationCircle}
+                  color="medium"
+                  size="small"
+                  slot="start"
+                />
                 <IonLabel text-wrap>{event.description}</IonLabel>
               </IonItem>
             )}
             <IonItem>
-              <IonIcon icon={ticket} color="medium" slot="start" />
+              <IonIcon icon={ticket} color="medium" size="small" slot="start" />
               <IonLabel text-wrap>
                 {event.sellTicket
                   ? event.sellInApp

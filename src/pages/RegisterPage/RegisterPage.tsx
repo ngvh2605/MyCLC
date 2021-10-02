@@ -17,10 +17,11 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { closeCircle, eye, eyeOff } from "ionicons/icons";
+import moment from "moment";
 import React, { useState } from "react";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
-import { auth } from "../../firebase";
+import { auth, database } from "../../firebase";
 import "./RegisterPage.scss";
 
 const RegisterPage: React.FC = () => {
@@ -58,10 +59,18 @@ const RegisterPage: React.FC = () => {
       try {
         setStatus({ loading: true, error: false });
 
-        const credential = await auth.createUserWithEmailAndPassword(
-          email,
-          password
-        );
+        const credential = await auth
+          .createUserWithEmailAndPassword(email, password)
+          .then((userInfo) => {
+            //add welcome message to mailbox
+            //console.log("userid", userInfo.user.uid);
+            database.ref().child("mailbox").child(userInfo.user.uid).push({
+              sender: "CLC Multimedia",
+              message:
+                "Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của MyCLC nhé!",
+              timestamp: moment().valueOf(),
+            });
+          });
         console.log("credential:", credential);
       } catch (error) {
         setStatus({ loading: false, error: true });
