@@ -154,20 +154,37 @@ const TimetablePage: React.FC = () => {
     else slideRef.current.slideTo(moment().day() - 1);
 
     const readCurrentWeek = async () => {
-      await database
-        .ref()
-        .child("timetableAM")
-        .child(moment().day(1).format("YYYY-MM-DD"))
-        .once("value")
-        .then(function (snapshot) {
-          if (snapshot !== null) {
-            const data = snapshot.val();
-            setChosenWeek({
-              key: moment().day(1).format("YYYY-MM-DD"),
-              name: data.name,
-            });
-          }
-        });
+      if (moment().day() === 0) {
+        await database
+          .ref()
+          .child("timetableAM")
+          .child(moment().add(-1, "days").day(1).format("YYYY-MM-DD"))
+          .once("value")
+          .then(function (snapshot) {
+            if (snapshot !== null) {
+              const data = snapshot.val();
+              setChosenWeek({
+                key: moment().add(-1, "days").day(1).format("YYYY-MM-DD"),
+                name: data.name,
+              });
+            }
+          });
+      } else {
+        await database
+          .ref()
+          .child("timetableAM")
+          .child(moment().day(1).format("YYYY-MM-DD"))
+          .once("value")
+          .then(function (snapshot) {
+            if (snapshot !== null) {
+              const data = snapshot.val();
+              setChosenWeek({
+                key: moment().day(1).format("YYYY-MM-DD"),
+                name: data.name,
+              });
+            }
+          });
+      }
     };
 
     const readSetting = async () => {
@@ -232,6 +249,7 @@ const TimetablePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log("chosenWeek", chosenWeek);
     if (chosenWeek && chosenWeek.key) fetchUserLessons(chosenWeek.key);
   }, [chosenWeek]);
 
@@ -291,7 +309,6 @@ const TimetablePage: React.FC = () => {
   }, [lessons, userLessons]);
 
   const fetchWeekData = async () => {
-    //setChosenWeek({ key: "week1", name: "Tuần 1 Kì 1" });
     const temp: WeekItem[] = [];
     await database
       .ref()
@@ -584,7 +601,13 @@ const TimetablePage: React.FC = () => {
                   )}
                 </IonLabel>
                 {item.author && (
-                  <IonChip className="ion-no-margin" style={{ marginTop: 8 }}>
+                  <IonChip
+                    className="ion-no-margin"
+                    style={{ marginTop: 8 }}
+                    onClick={() => {
+                      history.push(`/my/user/${item.author}`);
+                    }}
+                  >
                     <IonAvatar>
                       <IonImg
                         src={

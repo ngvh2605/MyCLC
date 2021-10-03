@@ -93,6 +93,7 @@ const EventCard: React.FC<Props> = (props) => {
   return (
     <>
       {true ? (
+        event &&
         event.body && (
           <IonCard>
             {event.pictureUrl && (
@@ -119,7 +120,13 @@ const EventCard: React.FC<Props> = (props) => {
                 />
               </IonThumbnail>
             )}
-            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+            <IonItem
+              lines="none"
+              style={{ marginTop: 10, marginBottom: 10 }}
+              onClick={() => {
+                history.push(`/my/user/${event.author}`);
+              }}
+            >
               <IonAvatar slot="start">
                 <IonImg
                   src={

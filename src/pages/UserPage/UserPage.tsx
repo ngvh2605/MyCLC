@@ -16,8 +16,10 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  useIonViewDidEnter,
+  useIonViewWillEnter,
 } from "@ionic/react";
-import { person } from "ionicons/icons";
+import { person, school } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { database } from "../../firebase";
@@ -38,6 +40,13 @@ interface User {
   studentClass?: string;
   studentStart?: string;
   studentEnd?: string;
+  teacherSubject?: string;
+  teacherClass?: string;
+  clubLink?: string;
+  childName?: string;
+  childClass?: string;
+  otherSpecify?: string;
+  otherPurpose?: string;
 }
 
 const UserPage: React.FC = () => {
@@ -47,27 +56,25 @@ const UserPage: React.FC = () => {
   const [badges, setBadges] = useState<String[]>([]);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      setUserInfo({ ...(await getInfoByUserId(id)) });
-    };
-    if (id) fetchUserInfo();
+    if (id) {
+      fetchUserInfo();
+    }
   }, [id]);
 
-  useEffect(() => {
-    const readBadge = async () => {
-      let temp: String[] = [];
-      await database
-        .ref()
-        .child("badge")
-        .child(id)
-        .get()
-        .then((snapshot) => {
-          temp.push(snapshot.val());
-        });
-      setBadges(temp);
-    };
-    readBadge();
-  }, [id]);
+  useIonViewDidEnter(() => {
+    if (id) {
+      readBadge();
+    }
+  });
+
+  const fetchUserInfo = async () => {
+    setUserInfo({ ...(await getInfoByUserId(id)) });
+  };
+
+  const readBadge = async () => {
+    const data = database.ref().child("badge").child(id).get();
+    setBadges((await data).val());
+  };
 
   return (
     <IonPage id="user-page">
@@ -76,7 +83,7 @@ const UserPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/my/home" text="" />
           </IonButtons>
-          <IonTitle></IonTitle>
+          <IonTitle>{userInfo && userInfo.fullName}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding-vertical">
@@ -104,27 +111,6 @@ const UserPage: React.FC = () => {
           </p>
         </div>
 
-        {badges && (
-          <>
-            <IonItemDivider
-              color="primary"
-              style={{ paddingTop: 6, paddingBottom: 6 }}
-            >
-              <IonLabel className="ion-padding-horizontal">Huy hiệu</IonLabel>
-            </IonItemDivider>
-
-            <div className="ion-padding">
-              {badges.length > 0 &&
-                badges.map((badge, index) => (
-                  <IonChip className="badge-chip">
-                    <IonText color="dark">
-                      <b>{badge}</b>
-                    </IonText>
-                  </IonChip>
-                ))}
-            </div>
-          </>
-        )}
         {userInfo && (
           <>
             <IonItemDivider
@@ -137,12 +123,7 @@ const UserPage: React.FC = () => {
               <IonList lines="none">
                 {userInfo.role && (
                   <IonItem>
-                    <IonIcon
-                      icon={person}
-                      slot="start"
-                      color="medium"
-                      size="small"
-                    />
+                    <IonIcon icon={person} slot="start" color="medium" />
                     {userInfo.role === "student" && (
                       <IonLabel text-wrap>Học sinh / Cựu học sinh</IonLabel>
                     )}
@@ -160,42 +141,67 @@ const UserPage: React.FC = () => {
                     )}
                   </IonItem>
                 )}
-                {userInfo.role && (
+                {userInfo.studentClass && userInfo.studentStart && (
                   <IonItem>
-                    <IonIcon
-                      icon={person}
-                      slot="start"
-                      color="medium"
-                      size="small"
-                    />
-                    {userInfo.role === "student" && (
-                      <IonLabel text-wrap>Học sinh / Cựu học sinh</IonLabel>
-                    )}
-                    {userInfo.role === "teacher" && (
-                      <IonLabel text-wrap>Giáo viên / Nhân viên</IonLabel>
-                    )}
-                    {userInfo.role === "parent" && (
-                      <IonLabel text-wrap>Phụ huynh / Người giám hộ</IonLabel>
-                    )}
-                    {userInfo.role === "club" && (
-                      <IonLabel text-wrap>Câu lạc bộ / Tổ chức</IonLabel>
-                    )}
-                    {userInfo.role === "other" && (
-                      <IonLabel text-wrap>Đối tượng khác</IonLabel>
-                    )}
+                    <IonIcon icon={school} slot="start" color="medium" />
+                    <IonLabel text-wrap>
+                      Lớp {userInfo.studentClass} Khoá{" "}
+                      {parseInt(userInfo.studentStart) - 2002}
+                    </IonLabel>
+                  </IonItem>
+                )}
+                {userInfo.teacherSubject && (
+                  <IonItem>
+                    <IonIcon icon={school} slot="start" color="medium" />
+                    <IonLabel text-wrap>
+                      Chuyên môn: {userInfo.teacherSubject}
+                    </IonLabel>
+                  </IonItem>
+                )}
+                {userInfo.teacherClass && (
+                  <IonItem>
+                    <IonIcon icon={school} slot="start" color="medium" />
+                    <IonLabel text-wrap>
+                      Chủ nhiệm: {userInfo.teacherClass}
+                    </IonLabel>
                   </IonItem>
                 )}
               </IonList>
             </div>
           </>
         )}
-        <IonButton
-          onClick={() => {
-            console.log(userInfo);
-          }}
+
+        <IonItemDivider
+          color="primary"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
         >
-          Click
-        </IonButton>
+          <IonLabel className="ion-padding-horizontal">Huy hiệu</IonLabel>
+        </IonItemDivider>
+
+        {badges && badges.length > 0 && badges[0] !== null ? (
+          <div className="ion-padding">
+            <IonList lines="none">
+              <IonItem>
+                {badges.length > 0 &&
+                  badges.map((badge, index) => (
+                    <IonChip className="badge-chip" color="medium" key={index}>
+                      <IonText color="dark">
+                        <b>{badge}</b>
+                      </IonText>
+                    </IonChip>
+                  ))}
+              </IonItem>
+            </IonList>
+          </div>
+        ) : (
+          <div className="ion-padding">
+            <IonList lines="none">
+              <IonItem>
+                <i>Trống</i>
+              </IonItem>
+            </IonList>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   );

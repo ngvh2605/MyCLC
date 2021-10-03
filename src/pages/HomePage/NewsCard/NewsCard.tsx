@@ -21,6 +21,7 @@ import {
 import {
   brush,
   chatbubbleEllipses,
+  checkmarkCircle,
   close,
   ellipsisHorizontal,
   heart,
@@ -118,11 +119,17 @@ const NewsCard: React.FC<any> = (props) => {
                       },
                     });
                   }}
+                  style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
                 />
               </>
             )}
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar slot="start">
+              <IonAvatar
+                slot="start"
+                onClick={() => {
+                  history.push(`/my/user/${news.author}`);
+                }}
+              >
                 <IonImg
                   src={
                     authorInfo && authorInfo.avatar
@@ -140,9 +147,13 @@ const NewsCard: React.FC<any> = (props) => {
                     setShowActionSheet(true);
                   }}
                   hidden={news.author !== userId}
-                  style={{ fontSize: "large" }}
+                  style={{ fontSize: "large", paddingLeft: 8 }}
                 />
-                <p>
+                <p
+                  onClick={() => {
+                    history.push(`/my/user/${news.author}`);
+                  }}
+                >
                   <b>
                     {authorInfo && authorInfo.fullName
                       ? authorInfo.fullName
@@ -152,13 +163,10 @@ const NewsCard: React.FC<any> = (props) => {
                 <IonLabel color="medium">
                   <IonNote color="primary">
                     <IonIcon
-                      icon={star}
-                      style={{
-                        fontSize: "x-small",
-                        verticalAlign: "baseline",
-                      }}
-                    />{" "}
-                    Club
+                      icon={checkmarkCircle}
+                      style={{ verticalAlign: "text-top" }}
+                    />
+                    {authorInfo && authorInfo.title && " " + authorInfo.title}
                     <IonText color="medium">
                       {" · "}
                       <i>

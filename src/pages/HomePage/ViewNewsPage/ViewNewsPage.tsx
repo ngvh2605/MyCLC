@@ -23,6 +23,7 @@ import {
   IonNote,
   IonPage,
   IonRow,
+  IonSkeletonText,
   IonSpinner,
   IonText,
   IonTitle,
@@ -32,6 +33,7 @@ import {
 import {
   brush,
   chatbubbleEllipses,
+  checkmarkCircle,
   chevronDown,
   close,
   ellipsisHorizontal,
@@ -43,7 +45,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
@@ -55,8 +57,14 @@ interface stateType {
   isLiked: boolean;
 }
 
+interface RouteParams {
+  id: string;
+}
+
 const ViewNewsPage: React.FC = () => {
   const { userId } = useAuth();
+  const { id } = useParams<RouteParams>();
+
   const location = useLocation<stateType>();
 
   const history = useHistory();
@@ -79,6 +87,8 @@ const ViewNewsPage: React.FC = () => {
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showNewsActionSheet, setShowNewsActionSheet] = useState(false);
+
+  const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
   const [presentAlert] = useIonAlert();
 
@@ -106,7 +116,7 @@ const ViewNewsPage: React.FC = () => {
         console.log(error);
       }
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const fetchAuthorInfo = async () => {
@@ -153,7 +163,7 @@ const ViewNewsPage: React.FC = () => {
       .doc(news.id)
       .collection("comment")
       .add({
-        body: text,
+        body: encodeURI(text),
         author: userId,
         timestamp: moment().valueOf(),
         order: news.count ? news.count + 1 : 1,
@@ -197,10 +207,36 @@ const ViewNewsPage: React.FC = () => {
 
       {news ? (
         <IonContent>
-          {news.pictureUrl && <IonImg src={news.pictureUrl} />}
+          {news.pictureUrl && (
+            <>
+              {imgLoaded ? null : (
+                <IonSkeletonText
+                  animated
+                  style={{
+                    width: window.screen.width,
+                    height: window.screen.width / news.pictureRatio,
+                  }}
+                  className="ion-no-margin"
+                />
+              )}
+
+              <IonImg
+                src={news.pictureUrl}
+                hidden={!news.pictureUrl}
+                onIonImgDidLoad={() => setImgLoaded(true)}
+                style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
+              />
+            </>
+          )}
+
           <div>
             <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar slot="start">
+              <IonAvatar
+                slot="start"
+                onClick={() => {
+                  history.push(`/my/user/${news.author}`);
+                }}
+              >
                 <IonImg
                   src={
                     news.authorInfo && news.authorInfo.avatar
@@ -218,9 +254,13 @@ const ViewNewsPage: React.FC = () => {
                     setShowNewsActionSheet(true);
                   }}
                   hidden={news && news.author !== userId}
-                  style={{ fontSize: "large" }}
+                  style={{ fontSize: "large", paddingLeft: 8 }}
                 />
-                <p>
+                <p
+                  onClick={() => {
+                    history.push(`/my/user/${news.author}`);
+                  }}
+                >
                   <b>
                     {news.authorInfo && news.authorInfo.fullName
                       ? news.authorInfo.fullName
@@ -230,13 +270,12 @@ const ViewNewsPage: React.FC = () => {
                 <IonLabel color="medium">
                   <IonNote color="primary">
                     <IonIcon
-                      icon={star}
-                      style={{
-                        fontSize: "x-small",
-                        verticalAlign: "baseline",
-                      }}
-                    />{" "}
-                    Club
+                      icon={checkmarkCircle}
+                      style={{ verticalAlign: "text-top" }}
+                    />
+                    {news.authorInfo &&
+                      news.authorInfo.title &&
+                      " " + news.authorInfo.title}
                     <IonText color="medium">
                       {" · "}
                       <i>
@@ -354,11 +393,21 @@ const ViewNewsPage: React.FC = () => {
                     style={{ marginTop: 10, marginBottom: 10 }}
                   >
                     {commentAuthors[index] && commentAuthors[index].avatar ? (
-                      <IonAvatar slot="start">
+                      <IonAvatar
+                        slot="start"
+                        onClick={() => {
+                          history.push(`/my/user/${comments[index].author}`);
+                        }}
+                      >
                         <IonImg src={commentAuthors[index].avatar} />
                       </IonAvatar>
                     ) : (
-                      <IonAvatar slot="start">
+                      <IonAvatar
+                        slot="start"
+                        onClick={() => {
+                          history.push(`/my/user/${comments[index].author}`);
+                        }}
+                      >
                         <IonImg src={"assets/image/placeholder.png"} />
                       </IonAvatar>
                     )}
@@ -381,11 +430,18 @@ const ViewNewsPage: React.FC = () => {
                               setShowActionSheet(true);
                             }}
                             hidden={comment.author !== userId}
-                            style={{ fontSize: "large" }}
+                            style={{ fontSize: "large", paddingLeft: 8 }}
                           />
                           {commentAuthors[index] &&
                             commentAuthors[index].fullName && (
-                              <p style={{ paddingBottom: 5 }}>
+                              <p
+                                style={{ paddingBottom: 5 }}
+                                onClick={() => {
+                                  history.push(
+                                    `/my/user/${comments[index].author}`
+                                  );
+                                }}
+                              >
                                 <b>{commentAuthors[index].fullName}</b>
                               </p>
                             )}
@@ -602,13 +658,16 @@ const ViewNewsPage: React.FC = () => {
               <IonInput
                 type="text"
                 color="dark"
-                placeholder="Nhập bình luận (tối thiểu 15 chữ cái)"
+                placeholder="Nhập bình luận (tối thiểu 30 chữ cái)"
                 autocapitalize="sentences"
-                minlength={15}
+                minlength={30}
                 value={text}
-                onIonChange={(e) => setText(e.detail.value)}
+                onIonChange={(e) => {
+                  setText(e.detail.value);
+                  console.log(e.detail.value.length);
+                }}
                 onKeyPress={(event) => {
-                  if (event.key === "Enter" && text.length >= 15) commentNews();
+                  if (event.key === "Enter" && text.length >= 30) commentNews();
                 }}
                 disabled={status.loading}
               ></IonInput>
@@ -616,11 +675,20 @@ const ViewNewsPage: React.FC = () => {
             <IonButton
               hidden={status.loading}
               fill="clear"
-              style={{ width: "wrap-content", float: "right" }}
-              disabled={text.length < 15}
-              onClick={commentNews}
+              style={
+                text.length < 30
+                  ? { width: "wrap-content", float: "right", opacity: 0.5 }
+                  : { width: "wrap-content", float: "right", opacity: 1 }
+              }
+              onClick={() => {
+                if (text.length >= 30) commentNews();
+              }}
             >
-              <IonIcon icon={send} style={{ textAlign: "right" }} />
+              <IonIcon
+                icon={send}
+                color="primary"
+                style={{ textAlign: "right" }}
+              />
             </IonButton>
             <IonSpinner
               hidden={!status.loading}

@@ -8,7 +8,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 import {
   IonAvatar,
@@ -46,6 +46,7 @@ interface stateType {
 
 const ViewEventPage: React.FC = () => {
   const { userId } = useAuth();
+  const history = useHistory();
   const locationRef = useLocation<stateType>();
 
   const [event, setEvent] = useState<Events>();
@@ -104,7 +105,13 @@ const ViewEventPage: React.FC = () => {
               />
             </IonThumbnail>
           )}
-          <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+          <IonItem
+            lines="none"
+            style={{ marginTop: 10, marginBottom: 10 }}
+            onClick={() => {
+              history.push(`/my/user/${event.author}`);
+            }}
+          >
             <IonAvatar slot="start">
               <IonImg
                 src={
@@ -129,7 +136,7 @@ const ViewEventPage: React.FC = () => {
           </IonCardContent>
           <IonList lines="none">
             <IonItem>
-              <IonIcon icon={time} color="medium" size="small" slot="start" />
+              <IonIcon icon={time} color="medium" slot="start" />
               <IonLabel text-wrap style={{ textTransform: "capitalize" }}>
                 {moment(event.startDate)
                   .locale("vi")
@@ -142,27 +149,17 @@ const ViewEventPage: React.FC = () => {
               </IonLabel>
             </IonItem>
             <IonItem>
-              <IonIcon
-                icon={location}
-                color="medium"
-                size="small"
-                slot="start"
-              />
+              <IonIcon icon={location} color="medium" slot="start" />
               <IonLabel text-wrap>{event.location}</IonLabel>
             </IonItem>
             {event.description && (
               <IonItem>
-                <IonIcon
-                  icon={informationCircle}
-                  color="medium"
-                  size="small"
-                  slot="start"
-                />
+                <IonIcon icon={informationCircle} color="medium" slot="start" />
                 <IonLabel text-wrap>{event.description}</IonLabel>
               </IonItem>
             )}
             <IonItem>
-              <IonIcon icon={ticket} color="medium" size="small" slot="start" />
+              <IonIcon icon={ticket} color="medium" slot="start" />
               <IonLabel text-wrap>
                 {event.sellTicket
                   ? event.sellInApp
