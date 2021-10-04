@@ -29,6 +29,7 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   brush,
@@ -50,7 +51,7 @@ import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
 import { Comment, News, toComment, VerifyStatus } from "./../../../models";
-
+import { Storage } from "@capacitor/storage";
 interface stateType {
   news: News;
   authorInfo: any;
@@ -69,12 +70,7 @@ const ViewNewsPage: React.FC = () => {
 
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
-  const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
-    emailVerify: false,
-    phoneVerify: false,
-    personalInfo: false,
-    hasAvatar: false,
-  });
+  const [isVerify, setIsVerify] = useState<boolean>(false);
 
   const [news, setNews] = useState<News>();
 
@@ -92,8 +88,11 @@ const ViewNewsPage: React.FC = () => {
 
   const [presentAlert] = useIonAlert();
 
+  useIonViewWillEnter(() => {
+    checkVerify();
+  });
+
   useEffect(() => {
-    readStatus();
     if (location.state) {
       try {
         const temp = location.state["news"];
@@ -130,24 +129,6 @@ const ViewNewsPage: React.FC = () => {
       fetchAuthorInfo();
     }
   }, [comments]);
-
-  const readStatus = () => {
-    const userData = database.ref().child("users").child(userId);
-    userData.child("verify").on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        setVerifyStatus(data);
-      } else {
-        setVerifyStatus({
-          emailVerify: false,
-          phoneVerify: false,
-          personalInfo: false,
-          hasAvatar: false,
-        });
-        console.log("No data available");
-      }
-    });
-  };
 
   const commentNews = async () => {
     setStatus({ loading: true, error: false });
@@ -191,6 +172,13 @@ const ViewNewsPage: React.FC = () => {
         : temp.totalLikes - 1,
     };
     setNews(temp);
+  };
+
+  const checkVerify = async () => {
+    const { value } = await Storage.get({ key: "verify" });
+    if (value === "true") {
+      setIsVerify(true);
+    } else setIsVerify(false);
   };
 
   return (
@@ -640,13 +628,7 @@ const ViewNewsPage: React.FC = () => {
           <IonItem
             lines="none"
             style={{ paddingTop: 10, paddingBottom: 10 }}
-            hidden={
-              !(
-                verifyStatus.emailVerify &&
-                verifyStatus.phoneVerify &&
-                verifyStatus.personalInfo
-              )
-            }
+            hidden={!isVerify}
           >
             <IonChip
               color="medium"
@@ -702,11 +684,7 @@ const ViewNewsPage: React.FC = () => {
             color="primary"
             style={{ height: "max-content", marginBottom: 10 }}
             className="ion-margin"
-            hidden={
-              verifyStatus.emailVerify &&
-              verifyStatus.phoneVerify &&
-              verifyStatus.personalInfo
-            }
+            hidden={isVerify}
           >
             <IonLabel text-wrap className="ion-padding">
               Bạn cần thực hiện đủ 3 bước xác minh để có thể bình luận!

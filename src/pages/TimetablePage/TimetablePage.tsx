@@ -49,6 +49,7 @@ import "./TimetablePage.scss";
 import { DatePopover, WeekPopover } from "./TimetablePopover";
 import { Storage } from "@capacitor/storage";
 import { Redirect, useHistory } from "react-router";
+import { UnAuth } from "./../../components/CommonUI/UnAuth";
 export interface WeekItem {
   key: string;
   name: string;
@@ -85,6 +86,8 @@ function findUserInfo(userId: string, list: any[]) {
 const TimetablePage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
+  const [isVerify, setIsVerify] = useState<boolean>(false);
+
   const [color, setColor] = useState([
     "lovewins1",
     "lovewins2",
@@ -142,17 +145,11 @@ const TimetablePage: React.FC = () => {
     },
   });
 
-  useIonViewWillEnter(async () => {
-    const { value } = await Storage.get({ key: "verify" });
-    if (value === "false") {
-      history.replace("/my/home");
-    }
+  useIonViewWillEnter(() => {
+    checkVerify();
   });
 
   useEffect(() => {
-    if (moment().day() === 0) slideRef.current.slideTo(6);
-    else slideRef.current.slideTo(moment().day() - 1);
-
     const readCurrentWeek = async () => {
       if (moment().day() === 0) {
         await database
@@ -245,8 +242,12 @@ const TimetablePage: React.FC = () => {
           } else readCurrentWeek();
         });
     };
-    readSetting();
-  }, []);
+    if (isVerify) {
+      if (moment().day() === 0) slideRef.current.slideTo(6);
+      else slideRef.current.slideTo(moment().day() - 1);
+      readSetting();
+    }
+  }, [isVerify]);
 
   useEffect(() => {
     console.log("chosenWeek", chosenWeek);
@@ -641,6 +642,13 @@ const TimetablePage: React.FC = () => {
     setCurrentSlide(data);
   };
 
+  const checkVerify = async () => {
+    const { value } = await Storage.get({ key: "verify" });
+    if (value === "true") {
+      setIsVerify(true);
+    } else setIsVerify(false);
+  };
+
   return (
     <IonPage id="timetable-page">
       <IonHeader>
@@ -649,131 +657,134 @@ const TimetablePage: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Thời khoá biểu</IonTitle>
-          <IonButtons
-            slot="end"
-            onClick={() => {
-              if (!weekList || weekList.length === 0) fetchWeekData();
-              setShowModal(true);
-            }}
-          >
-            <IonButton>
-              <IonIcon icon={settingsOutline} color="primary" />
-            </IonButton>
-          </IonButtons>
+          {isVerify && (
+            <IonButtons
+              slot="end"
+              onClick={() => {
+                if (!weekList || weekList.length === 0) fetchWeekData();
+                setShowModal(true);
+              }}
+            >
+              <IonButton>
+                <IonIcon icon={settingsOutline} color="primary" />
+              </IonButton>
+            </IonButtons>
+          )}
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <IonSlides
-          style={{ width: "100%", minHeight: "100%" }}
-          options={{}}
-          ref={slideRef}
-          onIonSlideDidChange={(e) => {
-            getSlideIndex();
-          }}
-        >
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "0";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Ba", 2)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "1";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Tư", 3)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "2";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Năm", 4)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "3";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Sáu", 5)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "4";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Thứ Bảy", 6)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "5";
-                })
-              )}
-          </IonSlide>
-          <IonSlide>
-            <IonToolbar>{displayDate("Chủ Nhật", 7)}</IonToolbar>
-            {lessons &&
-              lessons.length > 0 &&
-              displayList(
-                lessons.concat(userLessons).filter(function (item) {
-                  return item.day === "6";
-                })
-              )}
-          </IonSlide>
-        </IonSlides>
+      {isVerify ? (
+        <IonContent className="content">
+          <IonSlides
+            style={{ width: "100%", minHeight: "100%" }}
+            options={{}}
+            ref={slideRef}
+            onIonSlideDidChange={(e) => {
+              getSlideIndex();
+            }}
+          >
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "0";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Ba", 2)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "1";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Tư", 3)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "2";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Năm", 4)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "3";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Sáu", 5)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "4";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Thứ Bảy", 6)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "5";
+                  })
+                )}
+            </IonSlide>
+            <IonSlide>
+              <IonToolbar>{displayDate("Chủ Nhật", 7)}</IonToolbar>
+              {lessons &&
+                lessons.length > 0 &&
+                displayList(
+                  lessons.concat(userLessons).filter(function (item) {
+                    return item.day === "6";
+                  })
+                )}
+            </IonSlide>
+          </IonSlides>
 
-        <IonModal
-          isOpen={showModal}
-          cssClass="my-custom-class"
-          onDidDismiss={() => setShowModal(false)}
-        >
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Thiết lập</IonTitle>
-              <IonButtons slot="end">
-                <IonButton
-                  disabled={
-                    !chosenWeek ||
-                    !chosenClassAM ||
-                    (chosenClassAM && chosenClassAM.length === 0) ||
-                    !chosenClassPM ||
-                    (chosenClassPM && chosenClassPM.length === 0) ||
-                    !chosenColor
-                  }
-                  onClick={() => {
-                    setShowModal(false);
-                    doneSettings();
-                  }}
-                >
-                  <b>Xong</b>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            <IonList>
-              {/*
+          <IonModal
+            isOpen={showModal}
+            cssClass="my-custom-class"
+            onDidDismiss={() => setShowModal(false)}
+          >
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Thiết lập</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton
+                    disabled={
+                      !chosenWeek ||
+                      !chosenClassAM ||
+                      (chosenClassAM && chosenClassAM.length === 0) ||
+                      !chosenClassPM ||
+                      (chosenClassPM && chosenClassPM.length === 0) ||
+                      !chosenColor
+                    }
+                    onClick={() => {
+                      setShowModal(false);
+                      doneSettings();
+                    }}
+                  >
+                    <b>Xong</b>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent>
+              <IonList>
+                {/*
               <IonItem>
                 <IonLabel position="stacked">Chọn tuần học</IonLabel>
                 <IonSelect
@@ -797,364 +808,371 @@ const TimetablePage: React.FC = () => {
               </IonItem>
               */}
 
-              <IonItem>
-                <IonLabel position="stacked">Chọn lớp học buổi sáng</IonLabel>
-                <IonSelect
-                  placeholder={"Tối đa 2 lớp"}
-                  value={chosenClassAM}
-                  compareWith={function compareWeek(
-                    a: ClassItem,
-                    b: ClassItem
-                  ) {
-                    if (a && b && a.name === b.name) return true;
-                    else return false;
-                  }}
-                  onIonChange={(e) => {
-                    if (e.detail.value.length < 3)
-                      setChosenClassAM(e.detail.value);
-                    else setChosenClassAM([]);
-                  }}
-                  multiple={true}
-                >
-                  {classListAM.length > 0 &&
-                    classListAM
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((item, index) => (
-                        <IonSelectOption key={index} value={item}>
-                          {item.name}
-                        </IonSelectOption>
-                      ))}
-                </IonSelect>
-              </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked">Chọn lớp học buổi sáng</IonLabel>
+                  <IonSelect
+                    placeholder={"Tối đa 2 lớp"}
+                    value={chosenClassAM}
+                    compareWith={function compareWeek(
+                      a: ClassItem,
+                      b: ClassItem
+                    ) {
+                      if (a && b && a.name === b.name) return true;
+                      else return false;
+                    }}
+                    onIonChange={(e) => {
+                      if (e.detail.value.length < 3)
+                        setChosenClassAM(e.detail.value);
+                      else setChosenClassAM([]);
+                    }}
+                    multiple={true}
+                  >
+                    {classListAM.length > 0 &&
+                      classListAM
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((item, index) => (
+                          <IonSelectOption key={index} value={item}>
+                            {item.name}
+                          </IonSelectOption>
+                        ))}
+                  </IonSelect>
+                </IonItem>
 
-              <IonItem>
-                <IonLabel position="stacked">Chọn lớp học buổi chiều</IonLabel>
+                <IonItem>
+                  <IonLabel position="stacked">
+                    Chọn lớp học buổi chiều
+                  </IonLabel>
 
-                <IonSelect
-                  placeholder={"Tối đa 2 lớp"}
-                  value={chosenClassPM}
-                  compareWith={function compareWeek(
-                    a: ClassItem,
-                    b: ClassItem
-                  ) {
-                    if (a && b && a.name === b.name) return true;
-                    else return false;
-                  }}
-                  onIonChange={(e) => {
-                    if (e.detail.value.length < 3)
-                      setChosenClassPM(e.detail.value);
-                    else setChosenClassPM([]);
-                  }}
-                  multiple={true}
-                >
-                  {classListPM.length > 0 &&
-                    classListPM
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((item, index) => (
-                        <IonSelectOption key={index} value={item}>
-                          {item.name}
-                        </IonSelectOption>
-                      ))}
-                </IonSelect>
-              </IonItem>
-            </IonList>
-            <br />
-            <IonList>
-              <IonItem lines="none">
-                <IonLabel>Chọn bảng màu</IonLabel>
-              </IonItem>
-              <IonItem lines="none">
-                <div
-                  style={{
-                    width: 150,
-                    height: 20,
-                    borderRadius: 30,
-                    background:
-                      "linear-gradient(90deg, rgba(202,50,49,1) 0%, rgba(243,154,62,1) 20%, rgba(249,202,71,1) 40%, rgba(113,195,51,1) 60%, rgba(64,116,225,1) 80%, rgba(170,98,224,1) 100%)",
-                  }}
-                />
-                <IonNote slot="end">Love Wins</IonNote>
-                <IonCheckbox
-                  slot="end"
-                  checked={chosenColor === "lovewins"}
-                  onIonChange={(e) => {
-                    console.log(e.detail.checked);
-                    if (e.detail.checked) {
-                      setChosenColor("lovewins");
-                      setColor([
-                        "lovewins1",
-                        "lovewins2",
-                        "lovewins3",
-                        "lovewins4",
-                        "lovewins5",
-                        "lovewins6",
-                      ]);
-                    }
-                  }}
-                />
-              </IonItem>
-              <IonItem lines="none">
-                <div
-                  style={{
-                    width: 150,
-                    height: 20,
-                    borderRadius: 30,
-                    background:
-                      "linear-gradient(90deg, rgba(77,185,255,1) 0%, rgba(19,164,255,1) 20%, rgba(0,132,225,1) 40%, rgba(0,103,193,1) 60%, rgba(0,78,158,1) 80%, rgba(0,55,121,1) 100%)",
-                  }}
-                />
-                <IonNote slot="end">Ocean Breeze</IonNote>
-                <IonCheckbox
-                  slot="end"
-                  checked={chosenColor === "blue"}
-                  onIonChange={(e) => {
-                    if (e.detail.checked) {
-                      setChosenColor("blue");
-                      setColor([
-                        "blue1",
-                        "blue2",
-                        "blue3",
-                        "blue4",
-                        "blue5",
-                        "blue6",
-                      ]);
-                    }
-                  }}
-                />
-              </IonItem>
-              <IonItem lines="none">
-                <div
-                  style={{
-                    width: 150,
-                    height: 20,
-                    borderRadius: 30,
-                    background:
-                      "linear-gradient(90deg, rgba(131,214,77,1) 0%, rgba(96,202,51,1) 20%, rgba(79,171,42,1) 40%, rgba(61,136,31,1) 60%, rgba(43,99,20,1) 80%, rgba(21,56,7,1) 100%)",
-                  }}
-                />
-                <IonNote slot="end">Lime Soda</IonNote>
-                <IonCheckbox
-                  slot="end"
-                  checked={chosenColor === "green"}
-                  onIonChange={(e) => {
-                    if (e.detail.checked) {
-                      setChosenColor("green");
-                      setColor([
-                        "green1",
-                        "green2",
-                        "green3",
-                        "green4",
-                        "green5",
-                        "green6",
-                      ]);
-                    }
-                  }}
-                />
-              </IonItem>
-            </IonList>
-          </IonContent>
-        </IonModal>
+                  <IonSelect
+                    placeholder={"Tối đa 2 lớp"}
+                    value={chosenClassPM}
+                    compareWith={function compareWeek(
+                      a: ClassItem,
+                      b: ClassItem
+                    ) {
+                      if (a && b && a.name === b.name) return true;
+                      else return false;
+                    }}
+                    onIonChange={(e) => {
+                      if (e.detail.value.length < 3)
+                        setChosenClassPM(e.detail.value);
+                      else setChosenClassPM([]);
+                    }}
+                    multiple={true}
+                  >
+                    {classListPM.length > 0 &&
+                      classListPM
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((item, index) => (
+                          <IonSelectOption key={index} value={item}>
+                            {item.name}
+                          </IonSelectOption>
+                        ))}
+                  </IonSelect>
+                </IonItem>
+              </IonList>
+              <br />
+              <IonList>
+                <IonItem lines="none">
+                  <IonLabel>Chọn bảng màu</IonLabel>
+                </IonItem>
+                <IonItem lines="none">
+                  <div
+                    style={{
+                      width: 150,
+                      height: 20,
+                      borderRadius: 30,
+                      background:
+                        "linear-gradient(90deg, rgba(202,50,49,1) 0%, rgba(243,154,62,1) 20%, rgba(249,202,71,1) 40%, rgba(113,195,51,1) 60%, rgba(64,116,225,1) 80%, rgba(170,98,224,1) 100%)",
+                    }}
+                  />
+                  <IonNote slot="end">Love Wins</IonNote>
+                  <IonCheckbox
+                    slot="end"
+                    checked={chosenColor === "lovewins"}
+                    onIonChange={(e) => {
+                      console.log(e.detail.checked);
+                      if (e.detail.checked) {
+                        setChosenColor("lovewins");
+                        setColor([
+                          "lovewins1",
+                          "lovewins2",
+                          "lovewins3",
+                          "lovewins4",
+                          "lovewins5",
+                          "lovewins6",
+                        ]);
+                      }
+                    }}
+                  />
+                </IonItem>
+                <IonItem lines="none">
+                  <div
+                    style={{
+                      width: 150,
+                      height: 20,
+                      borderRadius: 30,
+                      background:
+                        "linear-gradient(90deg, rgba(77,185,255,1) 0%, rgba(19,164,255,1) 20%, rgba(0,132,225,1) 40%, rgba(0,103,193,1) 60%, rgba(0,78,158,1) 80%, rgba(0,55,121,1) 100%)",
+                    }}
+                  />
+                  <IonNote slot="end">Ocean Breeze</IonNote>
+                  <IonCheckbox
+                    slot="end"
+                    checked={chosenColor === "blue"}
+                    onIonChange={(e) => {
+                      if (e.detail.checked) {
+                        setChosenColor("blue");
+                        setColor([
+                          "blue1",
+                          "blue2",
+                          "blue3",
+                          "blue4",
+                          "blue5",
+                          "blue6",
+                        ]);
+                      }
+                    }}
+                  />
+                </IonItem>
+                <IonItem lines="none">
+                  <div
+                    style={{
+                      width: 150,
+                      height: 20,
+                      borderRadius: 30,
+                      background:
+                        "linear-gradient(90deg, rgba(131,214,77,1) 0%, rgba(96,202,51,1) 20%, rgba(79,171,42,1) 40%, rgba(61,136,31,1) 60%, rgba(43,99,20,1) 80%, rgba(21,56,7,1) 100%)",
+                    }}
+                  />
+                  <IonNote slot="end">Lime Soda</IonNote>
+                  <IonCheckbox
+                    slot="end"
+                    checked={chosenColor === "green"}
+                    onIonChange={(e) => {
+                      if (e.detail.checked) {
+                        setChosenColor("green");
+                        setColor([
+                          "green1",
+                          "green2",
+                          "green3",
+                          "green4",
+                          "green5",
+                          "green6",
+                        ]);
+                      }
+                    }}
+                  />
+                </IonItem>
+              </IonList>
+            </IonContent>
+          </IonModal>
 
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton
-            onClick={() => {
-              for (let member in newLesson) newLesson[member] = "";
-              setShowAddModal(true);
-            }}
-          >
-            <IonIcon icon={add} />
-          </IonFabButton>
-        </IonFab>
-
-        <IonModal
-          isOpen={showAddModal}
-          cssClass="my-custom-class"
-          onDidDismiss={() => setShowAddModal(false)}
-        >
-          <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton
-                  onClick={() => {
-                    let hasData = false;
-                    for (let member in newLesson) {
-                      if (newLesson[member]) hasData = true;
-                    }
-                    if (hasData) {
-                      presentAlert({
-                        header: "Huỷ?",
-                        message: "Những thay đổi của bạn sẽ không được lưu",
-                        buttons: [
-                          "Tiếp tục chỉnh sửa",
-                          {
-                            text: "Xoá thay đổi",
-                            handler: (d) => {
-                              for (let member in newLesson)
-                                newLesson[member] = "";
-                              setShowAddModal(false);
-                            },
-                          },
-                        ],
-                        onDidDismiss: (e) => console.log("did dismiss"),
-                      });
-                    } else {
-                      for (let member in newLesson) newLesson[member] = "";
-                      setShowAddModal(false);
-                    }
-                  }}
-                >
-                  Huỷ
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton
-                  disabled={
-                    !newLesson.title || !newLesson.day || !newLesson.start
-                  }
-                  onClick={() => {
-                    addNewLesson();
-                  }}
-                >
-                  <b>Lưu</b>
-                </IonButton>
-              </IonButtons>
-              <IonTitle>Tác vụ</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonButton onClick={() => console.log(chosenWeek)}>Click</IonButton>
-            <IonList>
-              <IonItem>
-                <IonLabel position="floating">
-                  Tiêu đề <span style={{ color: "red" }}>*</span>
-                </IonLabel>
-                <IonInput
-                  type="text"
-                  value={newLesson.title}
-                  onIonChange={(e) => {
-                    setNewLesson({ ...newLesson, title: e.detail.value });
-                  }}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">
-                  Ngày <span style={{ color: "red" }}>*</span>
-                </IonLabel>
-                <IonDatetime
-                  displayFormat="DD MM YYYY"
-                  value={newLesson.day}
-                  onIonChange={(e) => {
-                    setNewLesson({
-                      ...newLesson,
-                      day: e.detail.value,
-                    });
-                  }}
-                  max={moment().add(3, "months").format("YYYY-MM-DD")}
-                  min={moment().format("YYYY-MM-DD")}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">
-                  Bắt đầu <span style={{ color: "red" }}>*</span>
-                </IonLabel>
-                <IonDatetime
-                  displayFormat="HH:mm"
-                  minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
-                  value={newLesson.start}
-                  onIonChange={(e) => {
-                    setNewLesson({
-                      ...newLesson,
-                      start: e.detail.value,
-                    });
-                  }}
-                  max={moment().add(3, "months").format("YYYY-MM-DD")}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">Kết thúc</IonLabel>
-                <IonDatetime
-                  displayFormat="HH:mm"
-                  minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
-                  value={newLesson.end}
-                  onIonChange={(e) => {
-                    setNewLesson({
-                      ...newLesson,
-                      end: e.detail.value,
-                    });
-                  }}
-                  max={moment().add(3, "months").format("YYYY-MM-DD")}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">Ghi chú</IonLabel>
-                <IonInput
-                  type="text"
-                  value={newLesson.note}
-                  onIonChange={(e) => {
-                    setNewLesson({ ...newLesson, note: e.detail.value });
-                  }}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">Địa điểm</IonLabel>
-                <IonInput
-                  type="text"
-                  value={newLesson.class}
-                  onIonChange={(e) => {
-                    setNewLesson({ ...newLesson, class: e.detail.value });
-                  }}
-                />
-              </IonItem>
-            </IonList>
-          </IonContent>
-        </IonModal>
-
-        <IonLoading isOpen={status.loading} />
-
-        <IonActionSheet
-          isOpen={showNewsActionSheet}
-          onDidDismiss={() => setShowNewsActionSheet(false)}
-          cssClass="my-custom-class"
-          buttons={[
-            {
-              text: "Chỉnh sửa",
-              icon: brush,
-              handler: () => {
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton
+              onClick={() => {
+                for (let member in newLesson) newLesson[member] = "";
                 setShowAddModal(true);
+              }}
+            >
+              <IonIcon icon={add} />
+            </IonFabButton>
+          </IonFab>
+
+          <IonModal
+            isOpen={showAddModal}
+            cssClass="my-custom-class"
+            onDidDismiss={() => setShowAddModal(false)}
+          >
+            <IonHeader>
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton
+                    onClick={() => {
+                      let hasData = false;
+                      for (let member in newLesson) {
+                        if (newLesson[member]) hasData = true;
+                      }
+                      if (hasData) {
+                        presentAlert({
+                          header: "Huỷ?",
+                          message: "Những thay đổi của bạn sẽ không được lưu",
+                          buttons: [
+                            "Tiếp tục chỉnh sửa",
+                            {
+                              text: "Xoá thay đổi",
+                              handler: (d) => {
+                                for (let member in newLesson)
+                                  newLesson[member] = "";
+                                setShowAddModal(false);
+                              },
+                            },
+                          ],
+                          onDidDismiss: (e) => console.log("did dismiss"),
+                        });
+                      } else {
+                        for (let member in newLesson) newLesson[member] = "";
+                        setShowAddModal(false);
+                      }
+                    }}
+                  >
+                    Huỷ
+                  </IonButton>
+                </IonButtons>
+                <IonButtons slot="end">
+                  <IonButton
+                    disabled={
+                      !newLesson.title || !newLesson.day || !newLesson.start
+                    }
+                    onClick={() => {
+                      addNewLesson();
+                    }}
+                  >
+                    <b>Lưu</b>
+                  </IonButton>
+                </IonButtons>
+                <IonTitle>Tác vụ</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <IonButton onClick={() => console.log(chosenWeek)}>
+                Click
+              </IonButton>
+              <IonList>
+                <IonItem>
+                  <IonLabel position="floating">
+                    Tiêu đề <span style={{ color: "red" }}>*</span>
+                  </IonLabel>
+                  <IonInput
+                    type="text"
+                    value={newLesson.title}
+                    onIonChange={(e) => {
+                      setNewLesson({ ...newLesson, title: e.detail.value });
+                    }}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">
+                    Ngày <span style={{ color: "red" }}>*</span>
+                  </IonLabel>
+                  <IonDatetime
+                    displayFormat="DD MM YYYY"
+                    value={newLesson.day}
+                    onIonChange={(e) => {
+                      setNewLesson({
+                        ...newLesson,
+                        day: e.detail.value,
+                      });
+                    }}
+                    max={moment().add(3, "months").format("YYYY-MM-DD")}
+                    min={moment().format("YYYY-MM-DD")}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">
+                    Bắt đầu <span style={{ color: "red" }}>*</span>
+                  </IonLabel>
+                  <IonDatetime
+                    displayFormat="HH:mm"
+                    minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
+                    value={newLesson.start}
+                    onIonChange={(e) => {
+                      setNewLesson({
+                        ...newLesson,
+                        start: e.detail.value,
+                      });
+                    }}
+                    max={moment().add(3, "months").format("YYYY-MM-DD")}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">Kết thúc</IonLabel>
+                  <IonDatetime
+                    displayFormat="HH:mm"
+                    minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
+                    value={newLesson.end}
+                    onIonChange={(e) => {
+                      setNewLesson({
+                        ...newLesson,
+                        end: e.detail.value,
+                      });
+                    }}
+                    max={moment().add(3, "months").format("YYYY-MM-DD")}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">Ghi chú</IonLabel>
+                  <IonInput
+                    type="text"
+                    value={newLesson.note}
+                    onIonChange={(e) => {
+                      setNewLesson({ ...newLesson, note: e.detail.value });
+                    }}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">Địa điểm</IonLabel>
+                  <IonInput
+                    type="text"
+                    value={newLesson.class}
+                    onIonChange={(e) => {
+                      setNewLesson({ ...newLesson, class: e.detail.value });
+                    }}
+                  />
+                </IonItem>
+              </IonList>
+            </IonContent>
+          </IonModal>
+
+          <IonLoading isOpen={status.loading} />
+
+          <IonActionSheet
+            isOpen={showNewsActionSheet}
+            onDidDismiss={() => setShowNewsActionSheet(false)}
+            cssClass="my-custom-class"
+            buttons={[
+              {
+                text: "Chỉnh sửa",
+                icon: brush,
+                handler: () => {
+                  setShowAddModal(true);
+                },
               },
-            },
-            {
-              text: "Xoá",
-              role: "destructive",
-              icon: trash,
-              handler: () => {
-                presentAlert({
-                  header: "Xoá",
-                  message: "Bạn có chắc chắn xoá vĩnh viễn tác vụ này không?",
-                  buttons: [
-                    "Huỷ",
-                    {
-                      text: "Xoá",
-                      handler: (d) => {
-                        deleteLesson();
+              {
+                text: "Xoá",
+                role: "destructive",
+                icon: trash,
+                handler: () => {
+                  presentAlert({
+                    header: "Xoá",
+                    message: "Bạn có chắc chắn xoá vĩnh viễn tác vụ này không?",
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Xoá",
+                        handler: (d) => {
+                          deleteLesson();
+                        },
                       },
-                    },
-                  ],
-                  onDidDismiss: (e) => console.log("did dismiss"),
-                });
+                    ],
+                    onDidDismiss: (e) => console.log("did dismiss"),
+                  });
+                },
               },
-            },
-            {
-              text: "Cancel",
-              icon: close,
-              role: "cancel",
-              handler: () => {
-                console.log("Cancel clicked");
+              {
+                text: "Cancel",
+                icon: close,
+                role: "cancel",
+                handler: () => {
+                  console.log("Cancel clicked");
+                },
               },
-            },
-          ]}
-        ></IonActionSheet>
-      </IonContent>
+            ]}
+          ></IonActionSheet>
+        </IonContent>
+      ) : (
+        <UnAuth />
+      )}
     </IonPage>
   );
 };

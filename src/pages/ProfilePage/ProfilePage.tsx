@@ -106,7 +106,7 @@ const ProfilePage: React.FC = () => {
         <div className="ion-padding-horizontal">
           <IonFab
             horizontal="center"
-            style={{ paddingLeft: 45, paddingTop: 88 }}
+            style={{ paddingLeft: 48, paddingTop: 70 }}
           >
             <IonFabButton
               style={{ width: 30, height: 30 }}
@@ -127,28 +127,11 @@ const ProfilePage: React.FC = () => {
               marginRight: "auto",
             }}
           >
-            <IonSkeletonText animated hidden={avatarUrl ? true : false} />
-            <IonImg
-              hidden={avatarUrl ? false : true}
-              src={avatarUrl || "/assets/image/placeholder.png"}
-            />
+            <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
           </IonAvatar>
-          <p
-            style={{
-              marginLeft: "auto",
-              marginRight: "auto",
-              width: 150,
-              marginTop: 25,
-            }}
-            hidden={fullName ? true : false}
-          >
-            <IonSkeletonText animated style={{ width: "100%", height: 15 }} />
-          </p>
-          <p
-            style={{ textAlign: "center", fontSize: "large" }}
-            hidden={fullName ? false : true}
-          >
-            <b>{fullName}</b>
+
+          <p style={{ textAlign: "center", fontSize: "large" }}>
+            <b>{fullName || <i>Tên bạn là gì?</i>}</b>
           </p>
         </div>
         <br />

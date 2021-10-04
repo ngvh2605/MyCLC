@@ -41,6 +41,7 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
+  useIonViewWillEnter,
 } from "@ionic/react";
 
 import { auth as firebaseAuth, database, firestore } from "../../firebase";
@@ -48,6 +49,7 @@ import NewsCard from "./NewsCard";
 import { getNew } from "./services";
 import moment from "moment";
 import { useAuth } from "../../auth";
+import { Storage } from "@capacitor/storage";
 
 const LoadingNews = () => (
   <IonCard>
@@ -88,6 +90,7 @@ interface Mail {
 
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
+  const [allowCreate, setAllowCreate] = useState<boolean>(false);
   const [newsList, setNewsList] = useState<string[]>([]);
 
   const [newsCount, setNewsCount] = useState(3);
@@ -96,6 +99,10 @@ const HomePage: React.FC = () => {
   const [mailbox, setMailbox] = useState<Mail[]>([]);
   const [showMailModal, setShowMailModal] = useState(false);
   const [presentAlert] = useIonAlert();
+
+  useIonViewWillEnter(() => {
+    checkAuth();
+  });
 
   useEffect(() => {
     //read mail box
@@ -145,6 +152,13 @@ const HomePage: React.FC = () => {
   const clearMailbox = () => {
     database.ref().child("mailbox").child(userId).remove();
     setMailbox([]);
+  };
+
+  const checkAuth = async () => {
+    const { value } = await Storage.get({ key: "createNews" });
+    if (value === "true") {
+      setAllowCreate(true);
+    } else setAllowCreate(false);
   };
 
   return (
@@ -237,11 +251,13 @@ const HomePage: React.FC = () => {
           </IonLabel>
         </IonButton>
 
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton routerLink="/my/home/add">
-            <IonIcon icon={addIcon} />
-          </IonFabButton>
-        </IonFab>
+        {allowCreate && (
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton routerLink="/my/home/add">
+              <IonIcon icon={addIcon} />
+            </IonFabButton>
+          </IonFab>
+        )}
       </IonContent>
 
       <IonModal

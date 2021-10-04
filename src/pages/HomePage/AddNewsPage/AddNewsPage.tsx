@@ -24,6 +24,7 @@ import {
   IonTitle,
   IonToolbar,
   isPlatform,
+  useIonViewWillEnter,
 } from "@ionic/react";
 
 import { useAuth } from "../../../auth";
@@ -31,11 +32,14 @@ import useUploadFile from "../../../common/useUploadFile";
 import { firestore, storage } from "../../../firebase";
 import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
+import { Storage } from "@capacitor/storage";
+import NotFoundPage from "../../NotFoundPage";
 
 const AddNewsPage: React.FC = () => {
   const location = useLocation<News>();
   const { userId } = useAuth();
   const history = useHistory();
+
   const [status, setStatus] = useState({ loading: false, error: false });
   const fileInputRef = useRef<HTMLInputElement>();
   const [title, setTitle] = useState("");

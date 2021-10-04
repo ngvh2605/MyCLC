@@ -20,6 +20,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  useIonViewWillEnter,
 } from "@ionic/react";
 
 import { Events } from "../../models";
@@ -57,9 +58,9 @@ const EventPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isVerify, setIsVerify] = useState<boolean>(false);
 
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     checkVerify();
-  }, []);
+  });
 
   useEffect(() => {
     if (isVerify) fetchEvents();
@@ -104,14 +105,16 @@ const EventPage: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Sự kiện</IonTitle>
-          <IonButtons
-            slot="end"
-            onClick={() => history.push("/my/event/ticket")}
-          >
-            <IonButton>
-              <IonIcon icon={ticketOutline} color="primary" />
-            </IonButton>
-          </IonButtons>
+          {isVerify && (
+            <IonButtons
+              slot="end"
+              onClick={() => history.push("/my/event/ticket")}
+            >
+              <IonButton>
+                <IonIcon icon={ticketOutline} color="primary" />
+              </IonButton>
+            </IonButtons>
+          )}
         </IonToolbar>
       </IonHeader>
       {isVerify ? (

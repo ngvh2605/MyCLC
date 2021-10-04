@@ -1,10 +1,12 @@
 #timetable-page {
-  ion-slide.swiper-slide {
-    align-items: flex-start;
-    overflow-y: scroll;
-    display: block;
-    overflow: hidden;
-    height: initial;
+  .content {
+    ion-slide.swiper-slide {
+      align-items: flex-start;
+      overflow-y: scroll;
+      display: block;
+      overflow: hidden;
+      height: initial;
+    }
   }
 
   ion-item {

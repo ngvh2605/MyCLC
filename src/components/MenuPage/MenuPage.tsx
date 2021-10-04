@@ -48,9 +48,12 @@ const MenuPage = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [presentToast] = useIonToast();
 
+  const [allowCreateEvent, setAllowCreateEvent] = useState<boolean>(false);
+
   useEffect(() => {
     if (userId) {
       readStatus();
+      checkAuth();
     }
   }, [userId]);
 
@@ -70,6 +73,13 @@ const MenuPage = () => {
     });
   };
 
+  const checkAuth = async () => {
+    const { value: createEvent } = await Storage.get({ key: "createEvent" });
+    if (createEvent === "true") {
+      setAllowCreateEvent(true);
+    } else setAllowCreateEvent(false);
+  };
+
   const menuClose = () => {
     menuEl.current.close();
   };
@@ -87,6 +97,7 @@ const MenuPage = () => {
         onDidDismiss: () => console.log("dismissed"),
         onWillDismiss: () => console.log("will dismiss"),
       });
+      history.push(link);
       menuClose();
     }
   };
@@ -105,19 +116,12 @@ const MenuPage = () => {
             <IonRow className="ion-align-items-center">
               <IonCol size="3.5">
                 <IonAvatar className="ion-margin">
-                  <IonSkeletonText animated hidden={avatarUrl ? true : false} />
-                  <IonImg
-                    hidden={avatarUrl ? false : true}
-                    src={avatarUrl || "/assets/image/placeholder.png"}
-                  />
+                  <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
                 </IonAvatar>
               </IonCol>
               <IonCol>
-                <IonLabel hidden={fullName ? true : false}>
-                  <IonSkeletonText animated style={{ width: "70%" }} />
-                </IonLabel>
-                <IonLabel hidden={fullName ? false : true}>
-                  <b>{fullName}</b>
+                <IonLabel>
+                  <b>{fullName || <i>Tên bạn là gì?</i>}</b>
                   <p style={{ paddingTop: 3 }}>Xem trang cá nhân</p>
                 </IonLabel>
               </IonCol>
@@ -254,21 +258,23 @@ const MenuPage = () => {
             <IonItem>
               <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 1.5</IonLabel>
             </IonItem>
-            <IonItem
-              onClick={() => {
-                history.push("/my/manage");
-                menuClose();
-              }}
-              detail={false}
-              color={location.pathname === "/my/manage" ? "primary" : ""}
-            >
-              <IonIcon
-                icon={buildOutline}
-                color={location.pathname !== "/my/manage" ? "primary" : ""}
-                slot="start"
-              />
-              <IonLabel>Quản lý</IonLabel>
-            </IonItem>
+            {allowCreateEvent && (
+              <IonItem
+                onClick={() => {
+                  history.push("/my/manage");
+                  menuClose();
+                }}
+                detail={false}
+                color={location.pathname === "/my/manage" ? "primary" : ""}
+              >
+                <IonIcon
+                  icon={buildOutline}
+                  color={location.pathname !== "/my/manage" ? "primary" : ""}
+                  slot="start"
+                />
+                <IonLabel>Quản lý</IonLabel>
+              </IonItem>
+            )}
             <IonItem
               onClick={() => {
                 auth.signOut();

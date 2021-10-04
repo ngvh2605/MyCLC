@@ -1,5 +1,5 @@
-import { IonRouterOutlet } from "@ionic/react";
-import React from "react";
+import { IonRouterOutlet, useIonViewWillEnter } from "@ionic/react";
+import React, { useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { useAuth } from "./auth";
 import AboutPage from "./pages/AboutPage";
@@ -24,23 +24,48 @@ import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
+import { Storage } from "@capacitor/storage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
+  const [allowCreateNews, setAllowCreateNews] = useState<boolean>(false);
+  const [allowCreateEvent, setAllowCreateEvent] = useState<boolean>(false);
+
+  useIonViewWillEnter(() => {
+    checkAuth();
+  });
+
+  const checkAuth = async () => {
+    const { value: createEvent } = await Storage.get({ key: "createEvent" });
+    if (createEvent === "true") {
+      setAllowCreateEvent(true);
+    } else setAllowCreateEvent(false);
+    const { value: createNews } = await Storage.get({ key: "createNews" });
+    if (createNews === "true") {
+      setAllowCreateNews(true);
+    } else setAllowCreateNews(false);
+  };
+
   if (!loggedIn) {
     return <Redirect to="/index" />;
   }
   return (
-    <IonRouterOutlet>
+    <Switch>
       <Route exact path="/my/home">
         <HomePage />
       </Route>
-      <Route exact path="/my/home/add">
-        <AddNewsPage />
-      </Route>
-      <Route exact path="/my/home/add/:id">
-        <AddNewsPage />
-      </Route>
+      {allowCreateNews && (
+        <Route path="/my/home/add">
+          <Switch>
+            <Route exact path="/my/home/add">
+              <AddNewsPage />
+            </Route>
+            <Route exact path="/my/home/add/:id">
+              <AddNewsPage />
+            </Route>
+          </Switch>
+        </Route>
+      )}
       <Route exact path="/my/home/view/:id">
         <ViewNewsPage />
       </Route>
@@ -86,15 +111,22 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/about">
         <AboutPage />
       </Route>
-      <Route exact path="/my/manage">
-        <ManagePage />
-      </Route>
-      <Route exact path="/my/manage/add">
-        <AddEventPage />
-      </Route>
-      <Route exact path="/my/manage/add/:id">
-        <AddEventPage />
-      </Route>
+      {allowCreateEvent && (
+        <Route path="/my/manage">
+          <Switch>
+            <Route exact path="/my/manage">
+              <ManagePage />
+            </Route>
+            <Route exact path="/my/manage/add">
+              <AddEventPage />
+            </Route>
+            <Route exact path="/my/manage/add/:id">
+              <AddEventPage />
+            </Route>
+          </Switch>
+        </Route>
+      )}
+
       <Route exact path="/my/manage/list/:id">
         <EventRegisterList />
       </Route>
@@ -110,12 +142,10 @@ const AppTabs: React.FC = () => {
         <UserPage />
       </Route>
 
-      <Switch>
-        <Route path="*">
-          <NotFoundPage />
-        </Route>
-      </Switch>
-    </IonRouterOutlet>
+      <Route path="*">
+        <NotFoundPage />
+      </Route>
+    </Switch>
   );
 };
 

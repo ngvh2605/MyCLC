@@ -28,6 +28,7 @@ const updateEmailVerify = async (userId: string) => {
     emailVerify: true,
   });
 };
+
 const readStatus = (userId: string, emailVerified: boolean) => {
   const userData = database.ref().child("users").child(userId);
   userData.child("verify").on("value", (snapshot) => {
@@ -53,12 +54,30 @@ const readStatus = (userId: string, emailVerified: boolean) => {
   });
 };
 
+const readAuth = (userId: string) => {
+  database
+    .ref()
+    .child("auth")
+    .child(userId)
+    .once("value")
+    .then((snapshot) => {
+      const data = snapshot.val();
+      writeToStorage("createNews", data && data.createNews ? "true" : "false");
+      writeToStorage(
+        "createEvent",
+        data && data.createEvent ? "true" : "false"
+      );
+    });
+};
+
 export function useAuthInit(): AuthInit {
   const [authInit, setAuthInit] = useState<AuthInit>({ loading: true });
   useEffect(() => {
     return firebaseAuth.onAuthStateChanged((firebaseUser) => {
-      if (firebaseUser)
+      if (firebaseUser) {
         readStatus(firebaseUser.uid, firebaseUser.emailVerified);
+        readAuth(firebaseUser.uid);
+      }
       const auth = firebaseUser
         ? {
             loggedIn: true,

@@ -4,16 +4,7 @@ import React from "react";
 export const UnAuth: React.FC = () => {
   return (
     <IonContent className="ion-padding">
-      <IonChip
-        color="danger"
-        style={{ height: "max-content", marginBottom: 10 }}
-        className="ion-margin"
-      >
-        <IonLabel text-wrap className="ion-padding">
-          Bạn cần hoàn thành 3 bước xác minh để có thể sử dụng tính năng này!
-        </IonLabel>
-      </IonChip>
-      <IonSlide style={{ height: "70%" }}>
+      <IonSlide>
         <div className="ion-margin">
           <IonImg
             src="/assets/image/security.svg"
@@ -28,6 +19,19 @@ export const UnAuth: React.FC = () => {
           >
             <b>Từ chối truy cập</b>
           </IonLabel>
+          <br />
+          <br />
+          <br />
+          <IonChip
+            color="danger"
+            style={{ height: "max-content", marginBottom: 10 }}
+            className="ion-margin"
+          >
+            <IonLabel text-wrap className="ion-padding">
+              Bạn cần hoàn thành 3 bước xác minh để có thể sử dụng tính năng
+              này!
+            </IonLabel>
+          </IonChip>
         </div>
       </IonSlide>
     </IonContent>
