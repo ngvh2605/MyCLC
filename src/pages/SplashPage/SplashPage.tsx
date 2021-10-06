@@ -18,10 +18,6 @@ const SplashPage: React.FC = () => {
   const history = useHistory();
   const slidesRef = useRef<any>();
 
-  useEffect(() => {
-    slidesRef.current.startAutoplay();
-  }, []);
-
   const { loggedIn } = useAuth();
   if (loggedIn) {
     return <Redirect to="/my/home" />;
@@ -42,7 +38,7 @@ const SplashPage: React.FC = () => {
           style={{ height: "100%" }}
           pager={true}
           ref={slidesRef}
-          options={{ loop: true }}
+          options={{ loop: true, autoplay: { delay: 1800 } }}
         >
           <IonSlide>
             <div className="ion-margin" style={{}}>

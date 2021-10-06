@@ -101,7 +101,7 @@ const RegisterPage: React.FC = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/index" />
+            <IonBackButton text="Quay lại" defaultHref="/index" />
           </IonButtons>
         </IonToolbar>
       </IonHeader>

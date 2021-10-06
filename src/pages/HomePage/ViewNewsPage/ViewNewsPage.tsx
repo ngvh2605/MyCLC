@@ -255,24 +255,24 @@ const ViewNewsPage: React.FC = () => {
                       : ""}
                   </b>
                 </p>
-                <IonLabel color="medium">
-                  <IonNote color="primary">
+                <IonLabel>
+                  <IonText color="primary">
                     <IonIcon
                       icon={checkmarkCircle}
-                      style={{ verticalAlign: "text-top" }}
+                      style={{ fontSize: "small" }}
                     />
                     {news.authorInfo &&
                       news.authorInfo.title &&
                       " " + news.authorInfo.title}
-                    <IonText color="medium">
-                      {" · "}
-                      <i>
-                        {moment(news.timestamp)
-                          .locale("vi")
-                          .format("Do MMM, H:mm")}
-                      </i>
-                    </IonText>
-                  </IonNote>
+                  </IonText>
+                  <IonText color="medium">
+                    {" · "}
+                    <i>
+                      {moment(news.timestamp)
+                        .locale("vi")
+                        .format("Do MMM, H:mm")}
+                    </i>
+                  </IonText>
                 </IonLabel>
               </IonLabel>
             </IonItem>

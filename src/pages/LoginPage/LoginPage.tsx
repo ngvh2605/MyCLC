@@ -22,6 +22,8 @@ import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth } from "../../firebase";
 import "./LoginPage.scss";
+import { alertController } from "@ionic/core";
+import firebase from "firebase";
 
 const LoginPage: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -62,15 +64,62 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    getUserEmail().then((userEmail: string) => {
+      console.log(userEmail);
+      auth
+        .sendPasswordResetEmail(userEmail)
+        .then(function () {
+          setAlertHeader("Đã gửi email đặt lại mặt khẩu!");
+          setAlertMessage(
+            "Vui lòng kiểm tra hộp thư đến hoặc hộp thư rác và làm theo hướng dẫn"
+          );
+          setShowAlert(true);
+        })
+        .catch(function (error) {
+          setAlertHeader("Lỗi!");
+          setAlertMessage(error);
+          setShowAlert(true);
+        });
+    });
+  };
+
+  const getUserEmail = async () => {
+    return new Promise(async (resolve) => {
+      const confirm = await alertController.create({
+        header: "Nhập emaill của bạn",
+        backdropDismiss: false,
+        inputs: [
+          {
+            placeholder: "Email",
+            name: "text",
+            type: "email",
+          },
+        ],
+        buttons: [
+          {
+            text: "OK",
+            handler: (data) => {
+              return resolve(data.text);
+            },
+          },
+        ],
+      });
+
+      await confirm.present();
+    });
+  };
+
   if (loggedIn) {
     return <Redirect to="/my/home" />;
   }
+
   return (
     <IonPage id="login-page">
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/index" />
+            <IonBackButton text="Quay lại" defaultHref="/index" />
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -161,6 +210,9 @@ const LoginPage: React.FC = () => {
               fill="clear"
               routerLink="/login"
               style={{ marginTop: 10, marginBottom: 10 }}
+              onClick={() => {
+                handleForgotPassword();
+              }}
             >
               Quên mật khẩu?
             </IonButton>

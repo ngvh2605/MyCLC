@@ -160,22 +160,22 @@ const NewsCard: React.FC<any> = (props) => {
                       : ""}
                   </b>
                 </p>
-                <IonLabel color="medium">
-                  <IonNote color="primary">
+                <IonLabel>
+                  <IonText color="primary">
                     <IonIcon
                       icon={checkmarkCircle}
-                      style={{ verticalAlign: "text-top" }}
+                      style={{ fontSize: "small" }}
                     />
                     {authorInfo && authorInfo.title && " " + authorInfo.title}
-                    <IonText color="medium">
-                      {" · "}
-                      <i>
-                        {moment(news.timestamp)
-                          .locale("vi")
-                          .format("Do MMM, H:mm")}
-                      </i>
-                    </IonText>
-                  </IonNote>
+                  </IonText>
+                  <IonText color="medium">
+                    {" · "}
+                    <i>
+                      {moment(news.timestamp)
+                        .locale("vi")
+                        .format("Do MMM, H:mm")}
+                    </i>
+                  </IonText>
                 </IonLabel>
               </IonLabel>
             </IonItem>

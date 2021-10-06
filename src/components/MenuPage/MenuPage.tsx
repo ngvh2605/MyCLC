@@ -17,6 +17,7 @@ import {
   IonSkeletonText,
   IonToolbar,
   useIonToast,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   bookOutline,
@@ -53,7 +54,7 @@ const MenuPage = () => {
   useEffect(() => {
     if (userId) {
       readStatus();
-      checkAuth();
+      readAuth(userId);
     }
   }, [userId]);
 
@@ -73,11 +74,17 @@ const MenuPage = () => {
     });
   };
 
-  const checkAuth = async () => {
-    const { value: createEvent } = await Storage.get({ key: "createEvent" });
-    if (createEvent === "true") {
-      setAllowCreateEvent(true);
-    } else setAllowCreateEvent(false);
+  const readAuth = (userId: string) => {
+    database
+      .ref()
+      .child("auth")
+      .child(userId)
+      .once("value")
+      .then((snapshot) => {
+        const data = snapshot.val();
+        if (data && data.createEvent) setAllowCreateEvent(true);
+        else setAllowCreateEvent(false);
+      });
   };
 
   const menuClose = () => {
