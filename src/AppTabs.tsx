@@ -25,6 +25,7 @@ import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
 import { Storage } from "@capacitor/storage";
+import CLC2UniPage from "./pages/CLC2UniPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -123,13 +124,12 @@ const AppTabs: React.FC = () => {
             <Route exact path="/my/manage/add/:id">
               <AddEventPage />
             </Route>
+            <Route exact path="/my/manage/list/:id">
+              <EventRegisterList />
+            </Route>
           </Switch>
         </Route>
       )}
-
-      <Route exact path="/my/manage/list/:id">
-        <EventRegisterList />
-      </Route>
 
       <Route exact path="/my/timetable">
         <TimetablePage />
@@ -140,6 +140,10 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/user/:id">
         <UserPage />
+      </Route>
+
+      <Route exact path="/my/clc2uni">
+        <CLC2UniPage />
       </Route>
 
       <Route path="*">
