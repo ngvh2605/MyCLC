@@ -18,6 +18,7 @@ import {
   IonText,
   useIonAlert,
 } from "@ionic/react";
+import Autolinker from "autolinker";
 import {
   brush,
   chatbubbleEllipses,
@@ -198,7 +199,13 @@ const NewsCard: React.FC<any> = (props) => {
                 text-wrap
                 style={{ whiteSpace: "pre-wrap" }}
               >
-                {decodeURI(news.body)}
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: Autolinker.link(decodeURI(news.body), {
+                      truncate: { length: 50, location: "smart" },
+                    }),
+                  }}
+                ></div>
               </IonLabel>
             </IonCardContent>
             <hr

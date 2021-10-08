@@ -52,6 +52,7 @@ import { database, firestore } from "../../../firebase";
 import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
 import { Comment, News, toComment, VerifyStatus } from "./../../../models";
 import { Storage } from "@capacitor/storage";
+import Autolinker from "autolinker";
 interface stateType {
   news: News;
   authorInfo: any;
@@ -283,7 +284,13 @@ const ViewNewsPage: React.FC = () => {
                 text-wrap
                 style={{ whiteSpace: "pre-wrap" }}
               >
-                {decodeURI(news.body)}
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: Autolinker.link(decodeURI(news.body), {
+                      truncate: { length: 50, location: "smart" },
+                    }),
+                  }}
+                ></div>
               </IonLabel>
             </IonCardContent>
 
@@ -433,7 +440,13 @@ const ViewNewsPage: React.FC = () => {
                                 <b>{commentAuthors[index].fullName}</b>
                               </p>
                             )}
-                          {decodeURI(comment.body)}
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: Autolinker.link(decodeURI(comment.body), {
+                                truncate: { length: 50, location: "smart" },
+                              }),
+                            }}
+                          ></div>
                         </IonLabel>
                       </IonChip>
                       <IonNote>

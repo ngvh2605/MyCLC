@@ -37,6 +37,7 @@ import {
 import { useAuth } from "../../../auth";
 import { Events } from "../../../models";
 import { buyTicket } from "../../HomePage/services";
+import Autolinker from "autolinker";
 
 interface stateType {
   event: Events;
@@ -172,7 +173,13 @@ const ViewEventPage: React.FC = () => {
           <IonCardContent>
             <IonCardSubtitle color="primary">Chi tiết sự kiện</IonCardSubtitle>
             <IonLabel color="dark" text-wrap style={{ whiteSpace: "pre-wrap" }}>
-              {decodeURI(event.body)}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: Autolinker.link(decodeURI(event.body), {
+                    truncate: { length: 50, location: "smart" },
+                  }),
+                }}
+              ></div>
             </IonLabel>
 
             <div style={{ marginTop: 20, marginBottom: 16 }}>
