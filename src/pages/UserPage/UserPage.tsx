@@ -19,7 +19,17 @@ import {
   useIonViewDidEnter,
   useIonViewWillEnter,
 } from "@ionic/react";
-import { person, school } from "ionicons/icons";
+import {
+  call,
+  logoFacebook,
+  logoInstagram,
+  logoLinkedin,
+  logoYoutube,
+  mail,
+  person,
+  school,
+} from "ionicons/icons";
+import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { database } from "../../firebase";
@@ -47,6 +57,17 @@ interface User {
   childClass?: string;
   otherSpecify?: string;
   otherPurpose?: string;
+
+  dialCode?: string;
+  phoneNumber?: string;
+
+  showEmail?: boolean;
+  showPhoneNumber?: boolean;
+
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  youtube?: string;
 }
 
 const UserPage: React.FC = () => {
@@ -54,6 +75,8 @@ const UserPage: React.FC = () => {
 
   const [userInfo, setUserInfo] = useState<User>();
   const [badges, setBadges] = useState<String[]>([]);
+
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -164,6 +187,87 @@ const UserPage: React.FC = () => {
                     <IonLabel text-wrap>
                       Chủ nhiệm: {userInfo.teacherClass}
                     </IonLabel>
+                  </IonItem>
+                )}
+                {((userInfo.showEmail && userInfo.email) ||
+                  (userInfo.email && userInfo.showEmail === undefined)) && (
+                  <IonItem>
+                    <IonIcon icon={mail} slot="start" color="medium" />
+                    <IonLabel text-wrap>{userInfo.email}</IonLabel>
+                  </IonItem>
+                )}
+                {((userInfo.showPhoneNumber &&
+                  userInfo.phoneNumber &&
+                  userInfo.dialCode) ||
+                  (userInfo.phoneNumber &&
+                    userInfo.dialCode &&
+                    userInfo.showPhoneNumber === undefined)) && (
+                  <IonItem>
+                    <IonIcon icon={call} slot="start" color="medium" />
+                    <IonLabel text-wrap>
+                      ({userInfo.dialCode}) {userInfo.phoneNumber}
+                    </IonLabel>
+                  </IonItem>
+                )}
+                {(userInfo.facebook ||
+                  userInfo.instagram ||
+                  userInfo.linkedin ||
+                  userInfo.youtube) && (
+                  <IonItem>
+                    <div style={{ textAlign: "center" }}>
+                      {userInfo.facebook && (
+                        <a
+                          href={userInfo.facebook}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: "none" }}
+                        >
+                          <IonChip color="secondary">
+                            <IonIcon icon={logoFacebook} />
+                            <IonLabel>Facebook</IonLabel>
+                          </IonChip>
+                        </a>
+                      )}
+                      {userInfo.instagram && (
+                        <a
+                          href={userInfo.instagram}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: "none" }}
+                        >
+                          <IonChip color="secondary">
+                            <IonIcon icon={logoInstagram} />
+                            <IonLabel>Instagram</IonLabel>
+                          </IonChip>
+                        </a>
+                      )}
+                      {userInfo.youtube && (
+                        <a
+                          href={userInfo.youtube}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: "none" }}
+                        >
+                          <IonChip color="secondary">
+                            <IonIcon icon={logoYoutube} />
+                            <IonLabel>Youtube</IonLabel>
+                          </IonChip>
+                        </a>
+                      )}
+                      {userInfo.linkedin && (
+                        <a
+                          href={userInfo.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: "none" }}
+                        >
+                          <IonChip color="secondary">
+                            <IonIcon icon={logoLinkedin} />
+                            <IonLabel>LinkedIn</IonLabel>
+                          </IonChip>
+                        </a>
+                      )}
+                    </div>
                   </IonItem>
                 )}
               </IonList>

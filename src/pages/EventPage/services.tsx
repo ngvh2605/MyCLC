@@ -1,12 +1,13 @@
+import moment from "moment";
 import { firestore } from "../../firebase";
 import { toEvents } from "../../models";
 
-export const getEvent = async (limit: number) => {
+export const getEvent = async () => {
   const eventsRef = firestore.collection("events");
   const { docs } = await eventsRef
-    //.where("endDate", ">=", moment().valueOf() - 86400000 * 3)
-    .orderBy("startDate", "asc")
-    .limit(limit)
+    .where("endDate", ">=", moment().valueOf() - 86400000 * 3)
+    //.orderBy("startDate", "asc")
+    //.limit(limit)
     .get();
   return docs.map(toEvents);
 };

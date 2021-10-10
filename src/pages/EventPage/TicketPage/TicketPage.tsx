@@ -18,36 +18,11 @@ import { close, fileTray, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
+import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
 import { Events } from "../../../models";
 import { getEventTicketByUserId } from "../../HomePage/services";
 import TicketCard from "./TicketCard";
 
-const EmptyCard = () => (
-  <div style={{ marginTop: 10, marginBottom: 10 }}>
-    <IonIcon
-      icon={fileTray}
-      style={{
-        display: "block",
-        marginLeft: "auto",
-        marginRight: "auto",
-        width: 100,
-        height: 100,
-        color: "#B5B5B5",
-      }}
-    />
-    <IonLabel
-      style={{
-        display: "block",
-        marginLeft: "auto",
-        marginRight: "auto",
-        width: "max-content",
-      }}
-      color="medium"
-    >
-      <p>Trống </p>
-    </IonLabel>
-  </div>
-);
 const TicketPage: React.FC = () => {
   const { userId } = useAuth();
   var QRCode = require("qrcode.react");
@@ -113,7 +88,7 @@ const TicketPage: React.FC = () => {
                 />
               ))
             ) : (
-              <EmptyCard />
+              <EmptyUI />
             );
           })()}
           <br />
@@ -146,7 +121,7 @@ const TicketPage: React.FC = () => {
                 />
               ))
           ) : (
-            <EmptyCard />
+            <EmptyUI />
           )}
         </IonList>
         <br />

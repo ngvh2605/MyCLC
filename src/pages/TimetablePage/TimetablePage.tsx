@@ -443,7 +443,11 @@ const TimetablePage: React.FC = () => {
       .child("usersTimetable")
       .child(userId)
       .child("lessons")
-      .child(moment(newLesson.day).day(1).format("YYYY-MM-DD"))
+      .child(
+        moment(newLesson.day).day() === 0
+          ? moment(newLesson.day).add(-1, "days").day(1).format("YYYY-MM-DD")
+          : moment(newLesson.day).day(1).format("YYYY-MM-DD")
+      )
       .child(temp.key);
     dataRef
       .set({
@@ -452,7 +456,13 @@ const TimetablePage: React.FC = () => {
       .then(() => {
         setStatus({ loading: false, error: false });
         if (
-          moment(newLesson.day).day(1).format("YYYY-MM-DD") === chosenWeek.key
+          moment(newLesson.day).day(1).format("YYYY-MM-DD") ===
+            chosenWeek.key ||
+          (moment(newLesson.day).day() === 0 &&
+            moment(newLesson.day)
+              .add(-1, "days")
+              .day(1)
+              .format("YYYY-MM-DD") === chosenWeek.key)
         )
           setUserLessons((userLessons) => [
             ...userLessons.filter((item) => {
@@ -684,73 +694,59 @@ const TimetablePage: React.FC = () => {
           >
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Hai", 1)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "0";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "0";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Ba", 2)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "1";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "1";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Tư", 3)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "2";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "2";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Năm", 4)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "3";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "3";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Sáu", 5)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "4";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "4";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Thứ Bảy", 6)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "5";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "5";
+                })
+              )}
             </IonSlide>
             <IonSlide>
               <IonToolbar>{displayDate("Chủ Nhật", 7)}</IonToolbar>
-              {lessons &&
-                lessons.length > 0 &&
-                displayList(
-                  lessons.concat(userLessons).filter(function (item) {
-                    return item.day === "6";
-                  })
-                )}
+              {displayList(
+                lessons?.concat(userLessons).filter(function (item) {
+                  return item.day === "6";
+                })
+              )}
             </IonSlide>
           </IonSlides>
 

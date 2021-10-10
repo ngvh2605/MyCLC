@@ -28,6 +28,7 @@ import EventCard from "./EventCard";
 import { getEvent, getNextEvent } from "./services";
 import { Storage } from "@capacitor/storage";
 import { UnAuth } from "../../components/CommonUI/UnAuth";
+import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 
 const Skeleton = () => (
   <IonCard>
@@ -49,8 +50,7 @@ const Skeleton = () => (
 const EventPage: React.FC = () => {
   const history = useHistory();
 
-  //todo: query total event
-  const [totalEvents, setTotalEvents] = useState(0);
+  const [hasNextNews, setHasNextNews] = useState<boolean>(true);
 
   const [eventsList, setEventsList] = useState<Events[]>([]);
   const [lastKey, setLastKey] = useState<number | string>(0);
@@ -66,15 +66,9 @@ const EventPage: React.FC = () => {
     if (isVerify) fetchEvents();
   }, [isVerify]);
 
-  const fetchMore = async () => {
-    const events = await getNextEvent(lastKey, 1);
-    setLastKey(events?.slice(-1)?.pop()?.endDate || lastKey);
-    setEventsList([...eventsList, ...events]);
-  };
-
   const fetchEvents = async () => {
     setLoading((p) => !p);
-    const events = await getEvent(10);
+    const events = await getEvent();
     if (events.length > 0) {
       setLastKey(events.slice(-1).pop().endDate || 0);
       setEventsList(events);
@@ -127,54 +121,19 @@ const EventPage: React.FC = () => {
             ></IonRefresherContent>
           </IonRefresher>
 
-          <IonFab
-            hidden={
-              eventsList.length > 0 ? eventsList.length >= totalEvents : true
-            }
-            vertical="top"
-            horizontal="center"
-            slot="fixed"
-            className="fab-center"
-          >
-            <IonButton
-              shape="round"
-              onClick={() => {
-                //setEventsList([]);
-                fetchEvents();
-              }}
-            >
-              <IonIcon icon={arrowUp} slot="start" />
-              <IonLabel>Có tin mới</IonLabel>
-            </IonButton>
-          </IonFab>
-
           {!loading ? (
-            eventsList.map((item, index) => (
-              <EventCard event={item} key={index} />
-            ))
+            eventsList && eventsList.length > 0 ? (
+              eventsList
+                .sort((a, b) => a.startDate - b.startDate)
+                .map((item, index) => <EventCard event={item} key={index} />)
+            ) : (
+              <EmptyUI />
+            )
           ) : (
             <>
               <Skeleton />
             </>
           )}
-
-          {/* <SampleEvents /> */}
-          <IonButton
-            style={{
-              display: "block",
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-            fill="clear"
-            hidden={false}
-            onClick={() => fetchMore()}
-          >
-            <IonLabel>
-              Đọc thêm
-              <br />
-              <IonIcon icon={chevronDown} />
-            </IonLabel>
-          </IonButton>
         </IonContent>
       ) : (
         <UnAuth />

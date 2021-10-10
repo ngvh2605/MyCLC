@@ -1,5 +1,5 @@
-import 'moment/locale/vi';
-import './HomePage.scss';
+import "moment/locale/vi";
+import "./HomePage.scss";
 
 import {
   add as addIcon,
@@ -9,10 +9,10 @@ import {
   close,
   mailOpenOutline,
   mailOutline,
-} from 'ionicons/icons';
-import React, { useEffect, useState } from 'react';
+} from "ionicons/icons";
+import React, { useEffect, useState } from "react";
 
-import { RefresherEventDetail } from '@ionic/core';
+import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
   IonBadge,
@@ -42,43 +42,43 @@ import {
   IonToolbar,
   useIonAlert,
   useIonViewWillEnter,
-} from '@ionic/react';
+} from "@ionic/react";
 
-import { auth as firebaseAuth, database, firestore } from '../../firebase';
-import NewsCard from './NewsCard';
-import { deleteNews, getNew, getNextNews } from './services';
-import moment from 'moment';
-import { useAuth } from '../../auth';
-import { Storage } from '@capacitor/storage';
-import usePrevious from '../../common/usePrevious';
-import { News } from '../../models';
+import { auth as firebaseAuth, database, firestore } from "../../firebase";
+import NewsCard from "./NewsCard";
+import { deleteNews, getNew, getNextNews } from "./services";
+import moment from "moment";
+import { useAuth } from "../../auth";
+import { Storage } from "@capacitor/storage";
+import usePrevious from "../../common/usePrevious";
+import { News } from "../../models";
 
 const LoadingNews = () => (
   <IonCard>
-    <IonItem lines='none' style={{ marginTop: 10, marginBottom: 10 }}>
-      <IonAvatar slot='start'>
+    <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+      <IonAvatar slot="start">
         <IonSkeletonText animated />
       </IonAvatar>
       <IonLabel text-wrap>
         <p>
-          <IonSkeletonText animated style={{ width: '50%' }} />
+          <IonSkeletonText animated style={{ width: "50%" }} />
         </p>
         <IonLabel>
           <IonNote>
-            <IonSkeletonText animated style={{ width: '30%' }} />
+            <IonSkeletonText animated style={{ width: "30%" }} />
           </IonNote>
         </IonLabel>
       </IonLabel>
     </IonItem>
     <IonCardContent style={{ paddingTop: 0 }}>
       <IonCardSubtitle style={{ paddingBottom: 10 }}>
-        <IonSkeletonText animated style={{ width: '100%' }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
       </IonCardSubtitle>
       <IonLabel text-wrap>
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '100%' }} />
-        <IonSkeletonText animated style={{ width: '30%' }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "100%" }} />
+        <IonSkeletonText animated style={{ width: "30%" }} />
       </IonLabel>
     </IonCardContent>
   </IonCard>
@@ -95,15 +95,14 @@ const HomePage: React.FC = () => {
   const [allowCreate, setAllowCreate] = useState<boolean>(false);
   const [lastKey, setLastKey] = useState<string | number | null>(null);
   const [newsList, setNewsList] = useState<string[]>([]);
+  const [hasNextNews, setHasNextNews] = useState<boolean>(true);
 
-  const [totalNews, setTotalNews] = useState(0);
+  const [lastRefresh, setLastRefresh] = useState(moment().valueOf());
   const [showRefresh, setShowRefresh] = useState<boolean>(false);
 
   const [mailbox, setMailbox] = useState<Mail[]>([]);
   const [showMailModal, setShowMailModal] = useState(false);
   const [presentAlert] = useIonAlert();
-
-  const oldTotalNews = usePrevious(totalNews);
 
   const handleDelete = (id: string) => {
     setNewsList(newsList.filter((p) => p !== id));
@@ -118,9 +117,9 @@ const HomePage: React.FC = () => {
     const readMailbox = async () => {
       await database
         .ref()
-        .child('mailbox')
+        .child("mailbox")
         .child(userId)
-        .once('value')
+        .once("value")
         .then(function (snapshot) {
           let temp: Mail[] = [];
           if (snapshot !== null) {
@@ -136,17 +135,15 @@ const HomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    //read total news length
-    const snapshot = firestore.collection('news').onSnapshot(({ docs }) => {
-      setTotalNews(docs.length);
-    });
+    const snapshotNewNews = firestore
+      .collection("news")
+      .where("timestamp", ">", lastRefresh)
+      .onSnapshot(({ docs }) => {
+        if (docs.length > 0) setShowRefresh(true);
+      });
     fetchNews();
-    return snapshot;
+    return snapshotNewNews;
   }, []);
-
-  useEffect(() => {
-    totalNews > oldTotalNews && oldTotalNews > 0 && setShowRefresh(true);
-  }, [oldTotalNews, totalNews]);
 
   const fetchNews = async () => {
     const news = await getNew(3);
@@ -158,9 +155,13 @@ const HomePage: React.FC = () => {
   };
 
   const fetchMore = async () => {
-    const news = await getNextNews(lastKey, 1);
-    setLastKey(news?.slice(-1)?.pop()?.timestamp || lastKey);
-    setNewsList([...newsList, ...news.map((p) => p.id)]);
+    const news = await getNextNews(lastKey, 3);
+    if (news.length < 3) {
+      setHasNextNews(false);
+    } else {
+      setLastKey(news?.slice(-1)?.pop()?.timestamp || lastKey);
+      setNewsList([...newsList, ...news.map((p) => p.id)]);
+    }
   };
 
   const refreshNews = (event: CustomEvent<RefresherEventDetail>) => {
@@ -171,36 +172,36 @@ const HomePage: React.FC = () => {
   };
 
   const clearMailbox = () => {
-    database.ref().child('mailbox').child(userId).remove();
+    database.ref().child("mailbox").child(userId).remove();
     setMailbox([]);
   };
 
   const checkAuth = async () => {
-    const { value } = await Storage.get({ key: 'createNews' });
-    if (value === 'true') {
+    const { value } = await Storage.get({ key: "createNews" });
+    if (value === "true") {
       setAllowCreate(true);
     } else setAllowCreate(false);
   };
 
   return (
-    <IonPage id='home-page'>
+    <IonPage id="home-page">
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot='start'>
+          <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
           <IonTitle>CLC News</IonTitle>
-          <IonButtons slot='end'>
+          <IonButtons slot="end">
             <IonButton
               onClick={() => {
                 setShowMailModal(true);
               }}
-              className={mailbox && mailbox.length > 0 ? 'mail-button' : ''}
+              className={mailbox && mailbox.length > 0 ? "mail-button" : ""}
             >
-              <IonIcon icon={mailOutline} color='primary'></IonIcon>
+              <IonIcon icon={mailOutline} color="primary"></IonIcon>
               {mailbox && mailbox.length > 0 && (
                 <IonBadge
-                  color='danger'
+                  color="danger"
                   style={{
                     paddingLeft: 5,
                     paddingRight: 5,
@@ -208,7 +209,7 @@ const HomePage: React.FC = () => {
                     paddingBottom: 2,
                   }}
                 >
-                  <IonText style={{ fontSize: 'x-small' }}>
+                  <IonText style={{ fontSize: "x-small" }}>
                     {mailbox.length}
                   </IonText>
                 </IonBadge>
@@ -218,36 +219,37 @@ const HomePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className='ion-padding'>
-        <IonRefresher slot='fixed' onIonRefresh={refreshNews}>
+      <IonContent className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={refreshNews}>
           <IonRefresherContent
             style={{ marginTop: 10 }}
             pullingIcon={chevronDown}
-            pullingText='Kéo xuống để làm mới'
+            pullingText="Kéo xuống để làm mới"
           ></IonRefresherContent>
         </IonRefresher>
 
         <IonFab
           hidden={!showRefresh}
-          vertical='top'
-          horizontal='center'
-          slot='fixed'
-          className='fab-center'
+          vertical="top"
+          horizontal="center"
+          slot="fixed"
+          className="fab-center"
         >
           <IonButton
-            shape='round'
+            shape="round"
             onClick={() => {
               //setNewsList([]);
               setShowRefresh(false);
+              setLastRefresh(moment().valueOf());
               fetchNews();
             }}
           >
-            <IonIcon icon={arrowUp} slot='start' />
+            <IonIcon icon={arrowUp} slot="start" />
             <IonLabel>Có tin mới</IonLabel>
           </IonButton>
         </IonFab>
 
-        {totalNews ? (
+        {newsList && newsList.length > 0 ? (
           newsList
             //.slice(0, newsCount)
             .map((item, index) => (
@@ -261,23 +263,27 @@ const HomePage: React.FC = () => {
           </>
         )}
 
-        {/* <SampleNews /> */}
-        <IonButton
-          style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-          fill='clear'
-          hidden={totalNews <= newsList.length}
-          onClick={fetchMore}
-        >
-          <IonLabel>
-            Đọc thêm
-            <br />
-            <IonIcon icon={chevronDown} />
-          </IonLabel>
-        </IonButton>
+        {hasNextNews && (
+          <IonButton
+            style={{
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+            fill="clear"
+            onClick={fetchMore}
+          >
+            <IonLabel>
+              Đọc thêm
+              <br />
+              <IonIcon icon={chevronDown} />
+            </IonLabel>
+          </IonButton>
+        )}
 
         {allowCreate && (
-          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-            <IonFabButton routerLink='/my/home/add'>
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton routerLink="/my/home/add">
               <IonIcon icon={addIcon} />
             </IonFabButton>
           </IonFab>
@@ -286,14 +292,14 @@ const HomePage: React.FC = () => {
 
       <IonModal
         isOpen={showMailModal}
-        cssClass='my-custom-class'
+        cssClass="my-custom-class"
         onDidDismiss={() => setShowMailModal(false)}
       >
         <IonHeader>
           <IonToolbar>
-            <IonButtons slot='end' onClick={() => setShowMailModal(false)}>
+            <IonButtons slot="end" onClick={() => setShowMailModal(false)}>
               <IonButton>
-                <IonIcon icon={close} color='primary' />
+                <IonIcon icon={close} color="primary" />
               </IonButton>
             </IonButtons>
             <IonTitle>Hòm thư</IonTitle>
@@ -302,51 +308,51 @@ const HomePage: React.FC = () => {
         <IonContent>
           {mailbox && mailbox.length > 0 && (
             <IonFab
-              vertical='bottom'
-              horizontal='center'
-              slot='fixed'
-              style={{ marginInlineStart: '-100px' }}
+              vertical="bottom"
+              horizontal="center"
+              slot="fixed"
+              style={{ marginInlineStart: "-100px" }}
               onClick={() => {
                 presentAlert({
-                  header: 'Bạn có chắc?',
+                  header: "Bạn có chắc?",
                   message:
-                    'Tất cả các thư sẽ bị xoá vĩnh viễn và bạn không thể xem lại chúng',
+                    "Tất cả các thư sẽ bị xoá vĩnh viễn và bạn không thể xem lại chúng",
                   buttons: [
-                    'Huỷ',
+                    "Huỷ",
                     {
-                      text: 'Đồng ý',
+                      text: "Đồng ý",
                       handler: (d) => {
                         clearMailbox();
                       },
                     },
                   ],
-                  onDidDismiss: (e) => console.log('did dismiss'),
+                  onDidDismiss: (e) => console.log("did dismiss"),
                 });
               }}
             >
-              <IonButton shape='round' onClick={() => {}}>
-                <IonIcon icon={checkmark} slot='start' />
+              <IonButton shape="round" onClick={() => {}}>
+                <IonIcon icon={checkmark} slot="start" />
                 <IonLabel>Làm trống hòm thư</IonLabel>
               </IonButton>
             </IonFab>
           )}
 
-          <IonList lines='full'>
+          <IonList lines="full">
             {mailbox &&
               mailbox
                 .sort((a, b) => a.timestamp - b.timestamp)
                 .map((item, index) => (
-                  <IonItem color='light' key={index}>
+                  <IonItem color="light" key={index}>
                     <IonIcon
                       icon={mailOpenOutline}
-                      slot='start'
-                      color='medium'
+                      slot="start"
+                      color="medium"
                     />
-                    <div className='ion-padding-vertical'>
+                    <div className="ion-padding-vertical">
                       <IonLabel text-wrap style={{ paddingBottom: 5 }}>
                         <b>{item.sender}</b>
-                        <span className='ion-float-right'>
-                          <IonText color='medium'>
+                        <span className="ion-float-right">
+                          <IonText color="medium">
                             {moment(item.timestamp).fromNow()}
                           </IonText>
                         </span>
@@ -358,8 +364,8 @@ const HomePage: React.FC = () => {
 
             {!mailbox ||
               (mailbox && mailbox.length === 0 && (
-                <IonItem color='light'>
-                  <div className='ion-padding-vertical'>
+                <IonItem color="light">
+                  <div className="ion-padding-vertical">
                     <IonLabel text-wrap>
                       <i>Hòm thư trống</i>
                     </IonLabel>
