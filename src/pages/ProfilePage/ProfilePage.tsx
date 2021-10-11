@@ -21,7 +21,13 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { brushOutline, camera, pencil } from "ionicons/icons";
+import {
+  brushOutline,
+  camera,
+  createOutline,
+  pencil,
+  pencilOutline,
+} from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
@@ -96,7 +102,7 @@ const ProfilePage: React.FC = () => {
           </IonButtons>
           <IonButtons slot="end">
             <IonButton onClick={() => history.push("/my/profile/personal")}>
-              <IonIcon icon={brushOutline} color="primary" />
+              <IonIcon icon={createOutline} color="primary" />
             </IonButton>
           </IonButtons>
           <IonTitle>Hồ sơ</IonTitle>

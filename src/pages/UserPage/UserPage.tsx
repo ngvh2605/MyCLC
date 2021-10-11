@@ -8,19 +8,25 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
+  IonInput,
   IonItem,
   IonItemDivider,
   IonLabel,
   IonList,
+  IonModal,
   IonPage,
   IonText,
+  IonTextarea,
   IonTitle,
+  IonToggle,
   IonToolbar,
   useIonViewDidEnter,
   useIonViewWillEnter,
 } from "@ionic/react";
 import {
+  balloon,
   call,
+  createOutline,
   logoFacebook,
   logoInstagram,
   logoLinkedin,
@@ -29,9 +35,11 @@ import {
   person,
   school,
 } from "ionicons/icons";
+import moment from "moment";
 import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
 import "./UserPage.scss";
@@ -64,25 +72,66 @@ interface User {
   showEmail?: boolean;
   showPhoneNumber?: boolean;
 
+  intro?: string;
   facebook?: string;
   instagram?: string;
   linkedin?: string;
   youtube?: string;
 }
 
+interface UserCustom {
+  intro: string;
+  facebook: string;
+  instagram: string;
+  linkedin: string;
+  youtube: string;
+
+  showEmail: boolean;
+  showPhoneNumber: boolean;
+}
+
 const UserPage: React.FC = () => {
+  const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
 
   const [userInfo, setUserInfo] = useState<User>();
   const [badges, setBadges] = useState<String[]>([]);
 
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const [userCustom, setUserCustom] = useState<UserCustom>({
+    intro: "",
+    facebook: "",
+    instagram: "",
+    linkedin: "",
+    youtube: "",
+    showEmail: true,
+    showPhoneNumber: true,
+  });
 
   useEffect(() => {
     if (id) {
       fetchUserInfo();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (userInfo) {
+      setUserCustom({
+        intro: userInfo.intro || "",
+        facebook: userInfo.facebook || "",
+        instagram: userInfo.instagram || "",
+        linkedin: userInfo.linkedin || "",
+        youtube: userInfo.youtube || "",
+        showEmail: userInfo.showEmail || true,
+        showPhoneNumber: userInfo.showPhoneNumber || true,
+      });
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    console.log(userCustom);
+  }, [userCustom]);
 
   useIonViewDidEnter(() => {
     if (id) {
@@ -106,6 +155,13 @@ const UserPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/my/home" text="" />
           </IonButtons>
+          {id === userId && (
+            <IonButtons slot="end" onClick={() => setShowModal(true)}>
+              <IonButton>
+                <IonIcon icon={createOutline} />
+              </IonButton>
+            </IonButtons>
+          )}
           <IonTitle>{userInfo && userInfo.fullName}</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -134,6 +190,14 @@ const UserPage: React.FC = () => {
           </p>
         </div>
 
+        {userInfo && userInfo.intro && (
+          <div
+            className="ion-padding-bottom ion-padding-horizontal"
+            style={{ textAlign: "center" }}
+          >
+            <IonLabel text-wrap>{userInfo.intro}</IonLabel>
+          </div>
+        )}
         {userInfo && (
           <>
             <IonItemDivider
@@ -186,6 +250,16 @@ const UserPage: React.FC = () => {
                     <IonIcon icon={school} slot="start" color="medium" />
                     <IonLabel text-wrap>
                       Chủ nhiệm: {userInfo.teacherClass}
+                    </IonLabel>
+                  </IonItem>
+                )}
+                {userInfo.birth && (
+                  <IonItem>
+                    <IonIcon icon={balloon} slot="start" color="medium" />
+                    <IonLabel text-wrap>
+                      {moment(userInfo.birth).format(
+                        "[Sinh ngày] DD [tháng] MM, YYYY"
+                      )}
                     </IonLabel>
                   </IonItem>
                 )}
@@ -305,6 +379,73 @@ const UserPage: React.FC = () => {
               </IonItem>
             </IonList>
           </div>
+        )}
+
+        {id === userId && (
+          <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Trang cá nhân</IonTitle>
+                <IonButtons slot="start" onClick={() => setShowModal(false)}>
+                  <IonButton>Huỷ</IonButton>
+                </IonButtons>
+                <IonButtons slot="end" onClick={() => setShowModal(false)}>
+                  <IonButton>
+                    <b>Lưu</b>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent>
+              <IonList lines="full">
+                <IonItem>
+                  <IonLabel position="fixed">Giới thiệu</IonLabel>
+                  <IonTextarea
+                    autoGrow
+                    rows={3}
+                    placeholder="Tối đa 160 chữ cái"
+                    value={userCustom.intro}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">Facebook</IonLabel>
+                  <IonInput
+                    placeholder="https://www.facebook.com/..."
+                    value={userCustom.facebook}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">Instagram</IonLabel>
+                  <IonInput
+                    placeholder="https://www.instagram.com/..."
+                    value={userCustom.instagram}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">LinkedIn</IonLabel>
+                  <IonInput
+                    placeholder="https://www.linkedin.com/..."
+                    value={userCustom.linkedin}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">Youtube</IonLabel>
+                  <IonInput
+                    placeholder="https://www.youtube.com/..."
+                    value={userCustom.youtube}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">Ẩn Email</IonLabel>
+                  <IonToggle checked={!userCustom.showEmail} />
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="fixed">Ẩn SĐT</IonLabel>
+                  <IonToggle checked={!userCustom.showPhoneNumber} />
+                </IonItem>
+              </IonList>
+            </IonContent>
+          </IonModal>
         )}
       </IonContent>
     </IonPage>
