@@ -1,7 +1,9 @@
 import {
+  IonButtons,
   IonContent,
   IonHeader,
   IonLabel,
+  IonMenuButton,
   IonPage,
   IonRouterOutlet,
   IonTab,
@@ -9,6 +11,7 @@ import {
   IonTabButton,
   IonTabs,
   IonTitle,
+  IonToolbar,
 } from "@ionic/react";
 import React from "react";
 import { Route, Switch } from "react-router";
@@ -16,12 +19,17 @@ import EntryPage from "../../EntryPage";
 
 const TwoPage: React.FC = () => {
   return (
-    <>
+    <IonPage>
       <IonHeader>
-        <IonTitle>Two</IonTitle>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonMenuButton />
+          </IonButtons>
+          <IonTitle>Two</IonTitle>
+        </IonToolbar>
       </IonHeader>
       <IonContent></IonContent>
-    </>
+    </IonPage>
   );
 };
 

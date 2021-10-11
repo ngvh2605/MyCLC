@@ -52,6 +52,7 @@ const AppTabs: React.FC = () => {
   }
   return (
     <Switch>
+      <Route path="/my/clc2uni" component={CLC2UniPage}></Route>
       <Route exact path="/my/home">
         <HomePage />
       </Route>
@@ -140,10 +141,6 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/user/:id">
         <UserPage />
-      </Route>
-
-      <Route exact path="/my/clc2uni">
-        <CLC2UniPage />
       </Route>
 
       <Route path="*">
