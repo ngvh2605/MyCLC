@@ -318,7 +318,7 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Ngày sinh</IonLabel>
             <IonDatetime
-              displayFormat="DD MM YYYY"
+              displayFormat="DD/MM/YYYY"
               value={birth}
               onIonChange={(e) =>
                 setBirth(moment(e.detail.value).format("YYYY-MM-DD"))

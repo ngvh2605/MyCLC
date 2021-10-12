@@ -1030,13 +1030,14 @@ const TimetablePage: React.FC = () => {
                 <IonTitle>Tác vụ</IonTitle>
               </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-              <IonButton onClick={() => console.log(chosenWeek)}>
+            <IonContent>
+              <br />
+              <IonButton hidden onClick={() => console.log(chosenWeek)}>
                 Click
               </IonButton>
-              <IonList>
+              <IonList lines="full">
                 <IonItem>
-                  <IonLabel position="floating">
+                  <IonLabel position="fixed">
                     Tiêu đề <span style={{ color: "red" }}>*</span>
                   </IonLabel>
                   <IonInput
@@ -1045,14 +1046,16 @@ const TimetablePage: React.FC = () => {
                     onIonChange={(e) => {
                       setNewLesson({ ...newLesson, title: e.detail.value });
                     }}
+                    placeholder="Tối đa 80 chữ cái"
+                    maxlength={80}
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">
+                  <IonLabel position="fixed">
                     Ngày <span style={{ color: "red" }}>*</span>
                   </IonLabel>
                   <IonDatetime
-                    displayFormat="DD MM YYYY"
+                    displayFormat="DD/MM/YYYY"
                     value={newLesson.day}
                     onIonChange={(e) => {
                       setNewLesson({
@@ -1062,10 +1065,11 @@ const TimetablePage: React.FC = () => {
                     }}
                     max={moment().add(3, "months").format("YYYY-MM-DD")}
                     min={moment().format("YYYY-MM-DD")}
+                    placeholder={moment().format("DD/MM/YYYY")}
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">
+                  <IonLabel position="fixed">
                     Bắt đầu <span style={{ color: "red" }}>*</span>
                   </IonLabel>
                   <IonDatetime
@@ -1079,10 +1083,11 @@ const TimetablePage: React.FC = () => {
                       });
                     }}
                     max={moment().add(3, "months").format("YYYY-MM-DD")}
+                    placeholder="00:00"
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">Kết thúc</IonLabel>
+                  <IonLabel position="fixed">Kết thúc</IonLabel>
                   <IonDatetime
                     displayFormat="HH:mm"
                     minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
@@ -1094,26 +1099,31 @@ const TimetablePage: React.FC = () => {
                       });
                     }}
                     max={moment().add(3, "months").format("YYYY-MM-DD")}
+                    placeholder="00:00"
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">Ghi chú</IonLabel>
+                  <IonLabel position="fixed">Ghi chú</IonLabel>
                   <IonInput
                     type="text"
                     value={newLesson.note}
                     onIonChange={(e) => {
                       setNewLesson({ ...newLesson, note: e.detail.value });
                     }}
+                    clearInput={true}
+                    placeholder="Nhập ghi chú"
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">Địa điểm</IonLabel>
+                  <IonLabel position="fixed">Địa điểm</IonLabel>
                   <IonInput
                     type="text"
                     value={newLesson.class}
                     onIonChange={(e) => {
                       setNewLesson({ ...newLesson, class: e.detail.value });
                     }}
+                    clearInput={true}
+                    placeholder="Nhập địa điểm"
                   />
                 </IonItem>
               </IonList>

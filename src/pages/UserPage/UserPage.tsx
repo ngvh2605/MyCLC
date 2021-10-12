@@ -13,6 +13,7 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
+  IonLoading,
   IonModal,
   IonPage,
   IonText,
@@ -109,29 +110,13 @@ const UserPage: React.FC = () => {
     showPhoneNumber: true,
   });
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (id) {
       fetchUserInfo();
     }
   }, [id]);
-
-  useEffect(() => {
-    if (userInfo) {
-      setUserCustom({
-        intro: userInfo.intro || "",
-        facebook: userInfo.facebook || "",
-        instagram: userInfo.instagram || "",
-        linkedin: userInfo.linkedin || "",
-        youtube: userInfo.youtube || "",
-        showEmail: userInfo.showEmail || true,
-        showPhoneNumber: userInfo.showPhoneNumber || true,
-      });
-    }
-  }, [userInfo]);
-
-  useEffect(() => {
-    console.log(userCustom);
-  }, [userCustom]);
 
   useIonViewDidEnter(() => {
     if (id) {
@@ -140,12 +125,48 @@ const UserPage: React.FC = () => {
   });
 
   const fetchUserInfo = async () => {
-    setUserInfo({ ...(await getInfoByUserId(id)) });
+    const data = await getInfoByUserId(id);
+    setUserInfo({ ...data });
+    setUserCustom({
+      intro: data.intro || "",
+      facebook: data.facebook || "",
+      instagram: data.instagram || "",
+      linkedin: data.linkedin || "",
+      youtube: data.youtube || "",
+      showEmail: data.showEmail || true,
+      showPhoneNumber: data.showPhoneNumber || true,
+    });
   };
 
   const readBadge = async () => {
     const data = database.ref().child("badge").child(id).get();
     setBadges((await data).val());
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    const userData = database.ref();
+    await userData
+      .child("users")
+      .child(userId)
+      .child("personal")
+      .update({ ...userCustom });
+    setUserInfo({ ...userInfo, ...userCustom });
+    setLoading(false);
+    setShowModal(false);
+  };
+
+  const handleCancel = () => {
+    setUserCustom({
+      intro: userInfo.intro || "",
+      facebook: userInfo.facebook || "",
+      instagram: userInfo.instagram || "",
+      linkedin: userInfo.linkedin || "",
+      youtube: userInfo.youtube || "",
+      showEmail: userInfo.showEmail || true,
+      showPhoneNumber: userInfo.showPhoneNumber || true,
+    });
+    setShowModal(false);
   };
 
   return (
@@ -195,7 +216,9 @@ const UserPage: React.FC = () => {
             className="ion-padding-bottom ion-padding-horizontal"
             style={{ textAlign: "center" }}
           >
-            <IonLabel text-wrap>{userInfo.intro}</IonLabel>
+            <IonLabel text-wrap style={{ whiteSpace: "pre-wrap" }}>
+              {userInfo.intro}
+            </IonLabel>
           </div>
         )}
         {userInfo && (
@@ -349,36 +372,34 @@ const UserPage: React.FC = () => {
           </>
         )}
 
-        <IonItemDivider
-          color="primary"
-          style={{ paddingTop: 6, paddingBottom: 6 }}
-        >
-          <IonLabel className="ion-padding-horizontal">Huy hiệu</IonLabel>
-        </IonItemDivider>
+        {badges && badges.length > 0 && badges[0] !== null && (
+          <>
+            <IonItemDivider
+              color="primary"
+              style={{ paddingTop: 6, paddingBottom: 6 }}
+            >
+              <IonLabel className="ion-padding-horizontal">Huy hiệu</IonLabel>
+            </IonItemDivider>
 
-        {badges && badges.length > 0 && badges[0] !== null ? (
-          <div className="ion-padding">
-            <IonList lines="none">
-              <IonItem>
-                {badges.length > 0 &&
-                  badges.map((badge, index) => (
-                    <IonChip className="badge-chip" color="medium" key={index}>
-                      <IonText color="dark">
-                        <b>{badge}</b>
-                      </IonText>
-                    </IonChip>
-                  ))}
-              </IonItem>
-            </IonList>
-          </div>
-        ) : (
-          <div className="ion-padding">
-            <IonList lines="none">
-              <IonItem>
-                <i>Trống</i>
-              </IonItem>
-            </IonList>
-          </div>
+            <div className="ion-padding">
+              <IonList lines="none">
+                <IonItem>
+                  {badges.length > 0 &&
+                    badges.map((badge, index) => (
+                      <IonChip
+                        className="badge-chip"
+                        color="medium"
+                        key={index}
+                      >
+                        <IonText color="dark">
+                          <b>{badge}</b>
+                        </IonText>
+                      </IonChip>
+                    ))}
+                </IonItem>
+              </IonList>
+            </div>
+          </>
         )}
 
         {id === userId && (
@@ -386,10 +407,10 @@ const UserPage: React.FC = () => {
             <IonHeader>
               <IonToolbar>
                 <IonTitle>Trang cá nhân</IonTitle>
-                <IonButtons slot="start" onClick={() => setShowModal(false)}>
+                <IonButtons slot="start" onClick={() => handleCancel()}>
                   <IonButton>Huỷ</IonButton>
                 </IonButtons>
-                <IonButtons slot="end" onClick={() => setShowModal(false)}>
+                <IonButtons slot="end" onClick={() => handleSave()}>
                   <IonButton>
                     <b>Lưu</b>
                   </IonButton>
@@ -397,14 +418,21 @@ const UserPage: React.FC = () => {
               </IonToolbar>
             </IonHeader>
             <IonContent>
+              <IonButton hidden onClick={() => console.log(userCustom)}>
+                Click
+              </IonButton>
               <IonList lines="full">
                 <IonItem>
                   <IonLabel position="fixed">Giới thiệu</IonLabel>
-                  <IonTextarea
-                    autoGrow
-                    rows={3}
+                  <IonInput
                     placeholder="Tối đa 160 chữ cái"
                     value={userCustom.intro}
+                    type="text"
+                    autoCapitalize="sentences"
+                    onIonChange={(e) => {
+                      setUserCustom({ ...userCustom, intro: e.detail.value });
+                    }}
+                    maxlength={160}
                   />
                 </IonItem>
                 <IonItem>
@@ -412,6 +440,14 @@ const UserPage: React.FC = () => {
                   <IonInput
                     placeholder="https://www.facebook.com/..."
                     value={userCustom.facebook}
+                    type="url"
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        facebook: e.detail.value,
+                      });
+                    }}
+                    clearInput={true}
                   />
                 </IonItem>
                 <IonItem>
@@ -419,6 +455,14 @@ const UserPage: React.FC = () => {
                   <IonInput
                     placeholder="https://www.instagram.com/..."
                     value={userCustom.instagram}
+                    type="url"
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        instagram: e.detail.value,
+                      });
+                    }}
+                    clearInput={true}
                   />
                 </IonItem>
                 <IonItem>
@@ -426,6 +470,14 @@ const UserPage: React.FC = () => {
                   <IonInput
                     placeholder="https://www.linkedin.com/..."
                     value={userCustom.linkedin}
+                    type="url"
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        linkedin: e.detail.value,
+                      });
+                    }}
+                    clearInput={true}
                   />
                 </IonItem>
                 <IonItem>
@@ -433,20 +485,46 @@ const UserPage: React.FC = () => {
                   <IonInput
                     placeholder="https://www.youtube.com/..."
                     value={userCustom.youtube}
+                    type="url"
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        youtube: e.detail.value,
+                      });
+                    }}
+                    clearInput={true}
                   />
                 </IonItem>
                 <IonItem>
                   <IonLabel position="fixed">Ẩn Email</IonLabel>
-                  <IonToggle checked={!userCustom.showEmail} />
+                  <IonToggle
+                    checked={!userCustom.showEmail}
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        showEmail: !e.detail.checked,
+                      });
+                    }}
+                  />
                 </IonItem>
                 <IonItem>
                   <IonLabel position="fixed">Ẩn SĐT</IonLabel>
-                  <IonToggle checked={!userCustom.showPhoneNumber} />
+                  <IonToggle
+                    checked={!userCustom.showPhoneNumber}
+                    onIonChange={(e) => {
+                      setUserCustom({
+                        ...userCustom,
+                        showPhoneNumber: !e.detail.checked,
+                      });
+                    }}
+                  />
                 </IonItem>
               </IonList>
             </IonContent>
           </IonModal>
         )}
+
+        <IonLoading isOpen={loading} />
       </IonContent>
     </IonPage>
   );
