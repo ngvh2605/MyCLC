@@ -32,10 +32,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
 import { database } from "../../firebase";
 import { VerifyStatus } from "../../models";
 import "./ProfilePage.scss";
-import { Storage } from "@capacitor/storage";
 
 const ProfilePage: React.FC = () => {
   const { userId, emailVerified } = useAuth();
@@ -46,16 +46,16 @@ const ProfilePage: React.FC = () => {
     personalInfo: true,
     hasAvatar: true,
   });
-  const [fullName, setFullName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
-
-  const [avatarVerify, setAvatarVerify] = useState(false);
 
   var QRCode = require("qrcode.react");
 
-  useIonViewWillEnter(() => {
-    checkVerify();
-  });
+  const { isVerify, avatarVerify, fullName, avatarUrl } =
+    useCheckUserInfo(userId);
+
+  useEffect(() => {
+    console.log("verify", isVerify);
+    console.log("avatar", avatarVerify);
+  }, [isVerify, avatarVerify]);
 
   useEffect(() => {
     readStatus();
@@ -81,16 +81,6 @@ const ProfilePage: React.FC = () => {
         console.log("No data available");
       }
     });
-
-    userData.child("personal").on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        if (data.fullName) setFullName(data.fullName);
-        if (data.avatar) setAvatarUrl(data.avatar);
-      } else {
-        console.log("No data available");
-      }
-    });
   };
 
   const checkEmailVerify = async () => {
@@ -100,13 +90,6 @@ const ProfilePage: React.FC = () => {
         emailVerify: true,
       });
     }
-  };
-
-  const checkVerify = async () => {
-    const { value } = await Storage.get({ key: "avatarVerify" });
-    if (value === "true") {
-      setAvatarVerify(true);
-    } else setAvatarVerify(false);
   };
 
   return (

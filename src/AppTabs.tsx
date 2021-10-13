@@ -26,26 +26,11 @@ import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
 import { Storage } from "@capacitor/storage";
 import CLC2UniPage from "./pages/CLC2UniPage";
+import useCheckUserInfo from "./common/useCheckUserInfo";
 
 const AppTabs: React.FC = () => {
-  const { loggedIn } = useAuth();
-  const [allowCreateNews, setAllowCreateNews] = useState<boolean>(false);
-  const [allowCreateEvent, setAllowCreateEvent] = useState<boolean>(false);
-
-  useIonViewWillEnter(() => {
-    checkAuth();
-  });
-
-  const checkAuth = async () => {
-    const { value: createEvent } = await Storage.get({ key: "createEvent" });
-    if (createEvent === "true") {
-      setAllowCreateEvent(true);
-    } else setAllowCreateEvent(false);
-    const { value: createNews } = await Storage.get({ key: "createNews" });
-    if (createNews === "true") {
-      setAllowCreateNews(true);
-    } else setAllowCreateNews(false);
-  };
+  const { loggedIn, userId } = useAuth();
+  const { allowCreateNews, allowCreateEvent } = useCheckUserInfo(userId);
 
   if (!loggedIn) {
     return <Redirect to="/index" />;

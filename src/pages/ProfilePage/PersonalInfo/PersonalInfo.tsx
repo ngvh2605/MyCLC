@@ -153,6 +153,7 @@ const PersonalInfo: React.FC = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           setCodeList(snapshot.val());
+          console.log("clubCode", snapshot.val());
         } else {
           console.log("No data available");
         }
@@ -290,7 +291,10 @@ const PersonalInfo: React.FC = () => {
           <IonLabel color="medium">Email: {userEmail}</IonLabel>
         </IonItem>
         <IonItem detail={false} lines="none">
-          <IonLabel color="medium">Số điện thoại: {phone}</IonLabel>
+          <IonLabel color="medium">
+            Số điện thoại:{" "}
+            {phone.includes("undefined") ? <i>Chưa xác minh</i> : phone}
+          </IonLabel>
         </IonItem>
 
         <IonChip

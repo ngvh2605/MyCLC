@@ -24,6 +24,7 @@ import {
   buildOutline,
   calendarOutline,
   chatbubbleOutline,
+  checkmarkCircle,
   logoFacebook,
   logOutOutline,
   newspaperOutline,
@@ -35,6 +36,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
 import { auth, database } from "../../firebase";
 import "./MenuPage.scss";
 
@@ -45,55 +47,17 @@ const MenuPage = () => {
   const location = useLocation();
   const menuEl = useRef<HTMLIonMenuElement>(null);
 
-  const [fullName, setFullName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
   const [presentToast] = useIonToast();
 
-  const [allowCreateEvent, setAllowCreateEvent] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (userId) {
-      readStatus();
-      readAuth(userId);
-    }
-  }, [userId]);
-
-  const readStatus = () => {
-    const userData = database.ref().child("users").child(userId);
-
-    userData.child("personal").on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        if (data.fullName) setFullName(data.fullName);
-        if (data.avatar) setAvatarUrl(data.avatar);
-      } else {
-        console.log("No data available");
-        setFullName("");
-        setAvatarUrl("");
-      }
-    });
-  };
-
-  const readAuth = (userId: string) => {
-    database
-      .ref()
-      .child("auth")
-      .child(userId)
-      .once("value")
-      .then((snapshot) => {
-        const data = snapshot.val();
-        if (data && data.createEvent) setAllowCreateEvent(true);
-        else setAllowCreateEvent(false);
-      });
-  };
+  const { isVerify, avatarVerify, fullName, avatarUrl, allowCreateEvent } =
+    useCheckUserInfo(userId);
 
   const menuClose = () => {
     menuEl.current.close();
   };
 
   const onItemClick = async (link: string) => {
-    const { value } = await Storage.get({ key: "verify" });
-    if (value === "true") {
+    if (isVerify) {
       history.push(link);
       menuClose();
     } else {
@@ -122,13 +86,35 @@ const MenuPage = () => {
           >
             <IonRow className="ion-align-items-center">
               <IonCol size="3.5">
-                <IonAvatar className="ion-margin">
+                <IonAvatar
+                  className="ion-margin"
+                  style={
+                    avatarVerify
+                      ? {
+                          boxShadow: "0px 0px 0px 2px var(--ion-color-primary)",
+                        }
+                      : {}
+                  }
+                >
                   <IonImg src={avatarUrl || "/assets/image/placeholder.png"} />
                 </IonAvatar>
               </IonCol>
               <IonCol>
                 <IonLabel>
-                  <b>{fullName || <i>Tên bạn là gì?</i>}</b>
+                  <b>
+                    {fullName || <i>Tên bạn là gì?</i>}
+                    {isVerify && (
+                      <>
+                        {" "}
+                        <IonIcon
+                          icon={checkmarkCircle}
+                          color="primary"
+                          style={{ verticalAlign: "text-bottom" }}
+                        />
+                      </>
+                    )}
+                  </b>
+
                   <p style={{ paddingTop: 3 }}>Xem trang cá nhân</p>
                 </IonLabel>
               </IonCol>

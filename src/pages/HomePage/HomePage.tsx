@@ -52,6 +52,7 @@ import { useAuth } from "../../auth";
 import { Storage } from "@capacitor/storage";
 import usePrevious from "../../common/usePrevious";
 import { News } from "../../models";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
 
 const LoadingNews = () => (
   <IonCard>
@@ -92,7 +93,8 @@ interface Mail {
 
 const HomePage: React.FC = () => {
   const { userId } = useAuth();
-  const [allowCreate, setAllowCreate] = useState<boolean>(false);
+  const { allowCreateNews } = useCheckUserInfo(userId);
+
   const [lastKey, setLastKey] = useState<string | number | null>(null);
   const [newsList, setNewsList] = useState<string[]>([]);
   const [hasNextNews, setHasNextNews] = useState<boolean>(true);
@@ -107,10 +109,6 @@ const HomePage: React.FC = () => {
   const handleDelete = (id: string) => {
     setNewsList(newsList.filter((p) => p !== id));
   };
-
-  useIonViewWillEnter(() => {
-    checkAuth();
-  });
 
   useEffect(() => {
     //read mail box
@@ -174,13 +172,6 @@ const HomePage: React.FC = () => {
   const clearMailbox = () => {
     database.ref().child("mailbox").child(userId).remove();
     setMailbox([]);
-  };
-
-  const checkAuth = async () => {
-    const { value } = await Storage.get({ key: "createNews" });
-    if (value === "true") {
-      setAllowCreate(true);
-    } else setAllowCreate(false);
   };
 
   return (
@@ -281,7 +272,7 @@ const HomePage: React.FC = () => {
           </IonButton>
         )}
 
-        {allowCreate && (
+        {allowCreateNews && (
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
             <IonFabButton routerLink="/my/home/add">
               <IonIcon icon={addIcon} />

@@ -11,6 +11,7 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
+  IonImg,
   IonLabel,
   IonLoading,
   IonPage,
@@ -23,14 +24,16 @@ import { image } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
+import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useUploadFile from "../../../common/useUploadFile";
 import { database } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AvatarPage: React.FC = () => {
   const { userId } = useAuth();
+  const { avatarUrl: userAvatarUrl } = useCheckUserInfo(userId);
   const history = useHistory();
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(userAvatarUrl || "");
   const [status, setStatus] = useState({ loading: false, error: false });
   const fileInputRef = useRef<HTMLInputElement>();
 
@@ -41,10 +44,6 @@ const AvatarPage: React.FC = () => {
 
   const { handleUploadImage } = useUploadFile(userId);
 
-  useEffect(() => {
-    readData();
-  }, []);
-
   useEffect(
     () => () => {
       if (avatarUrl.startsWith("blob:")) {
@@ -53,20 +52,6 @@ const AvatarPage: React.FC = () => {
     },
     [avatarUrl]
   );
-
-  const readData = () => {
-    const userData = database.ref().child("users").child(userId);
-
-    userData.child("personal").on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        if (data.avatar) setAvatarUrl(data.avatar);
-        else setAvatarUrl("/assets/image/placeholder.png");
-      } else {
-        console.log("No data available");
-      }
-    });
-  };
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -147,11 +132,8 @@ const AvatarPage: React.FC = () => {
             marginRight: "auto",
           }}
         >
-          <IonSkeletonText animated hidden={avatarUrl ? true : false} />
-          <img
-            hidden={avatarUrl ? false : true}
+          <IonImg
             src={avatarUrl || "/assets/image/placeholder.png"}
-            alt=""
             onClick={handlePictureClick}
           />
         </IonAvatar>

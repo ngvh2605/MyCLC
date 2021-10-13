@@ -29,6 +29,8 @@ import { getEvent, getNextEvent } from "./services";
 import { Storage } from "@capacitor/storage";
 import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
+import { useAuth } from "../../auth";
 
 const Skeleton = () => (
   <IonCard>
@@ -48,19 +50,14 @@ const Skeleton = () => (
 );
 
 const EventPage: React.FC = () => {
+  const { userId } = useAuth();
+  const { isVerify } = useCheckUserInfo(userId);
   const history = useHistory();
-
-  const [hasNextNews, setHasNextNews] = useState<boolean>(true);
 
   const [eventsList, setEventsList] = useState<Events[]>([]);
   const [lastKey, setLastKey] = useState<number | string>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [isVerify, setIsVerify] = useState<boolean>(false);
-
-  useIonViewWillEnter(() => {
-    checkVerify();
-  });
 
   useEffect(() => {
     if (isVerify) fetchEvents();
@@ -82,13 +79,6 @@ const EventPage: React.FC = () => {
     setTimeout(() => {
       event.detail.complete();
     }, 2000);
-  };
-
-  const checkVerify = async () => {
-    const { value } = await Storage.get({ key: "verify" });
-    if (value === "true") {
-      setIsVerify(true);
-    } else setIsVerify(false);
   };
 
   return (

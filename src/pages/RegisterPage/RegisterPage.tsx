@@ -28,6 +28,7 @@ const RegisterPage: React.FC = () => {
   const { loggedIn } = useAuth();
   const history = useHistory();
   const [email, setEmail] = useState("");
+  const [emailRe, setEmailRe] = useState("");
   const [password, setPassword] = useState("");
   const [passwordType, setPasswordType] = useState<any>("password");
   const [passwordIcon, setPasswordIcon] = useState(eye);
@@ -50,6 +51,10 @@ const RegisterPage: React.FC = () => {
     } else if (password.length < 8 || passwordRe.length < 8) {
       setAlertHeader("Lỗi!");
       setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
+      setShowAlert(true);
+    } else if (email.toLowerCase() !== emailRe.toLowerCase()) {
+      setAlertHeader("Lỗi!");
+      setAlertMessage("Email nhập lại không khớp");
       setShowAlert(true);
     } else if (password !== passwordRe) {
       setAlertHeader("Lỗi!");
@@ -113,85 +118,102 @@ const RegisterPage: React.FC = () => {
         <br />
         <br />
 
-        <form>
-          <IonList>
-            <IonItem>
-              <IonLabel position="floating">Email</IonLabel>
-              <IonInput
-                type="email"
-                value={email}
-                autocomplete="on"
-                onIonChange={(event) => setEmail(event.detail.value)}
-              />
-              <IonIcon
-                icon={closeCircle}
-                className="ion-align-self-end"
-                slot="end"
-                size="small"
-                color="medium"
-                hidden={!email ? true : false}
-                onClick={() => setEmail("")}
-              />
-            </IonItem>
+        <IonList>
+          <IonItem>
+            <IonLabel position="stacked">Email</IonLabel>
+            <IonInput
+              type="email"
+              value={email}
+              onIonChange={(event) => setEmail(event.detail.value)}
+              placeholder="clbclcmultimedia@gmail.com"
+            />
+            <IonIcon
+              icon={closeCircle}
+              className="ion-align-self-end"
+              slot="end"
+              size="small"
+              color="medium"
+              hidden={!email ? true : false}
+              onClick={() => setEmail("")}
+            />
+          </IonItem>
 
-            <IonItem>
-              <IonLabel position="floating">Mật khẩu</IonLabel>
-              <IonInput
-                type={passwordType}
-                value={password}
-                autocomplete="on"
-                onIonChange={(event) => setPassword(event.detail.value)}
-              />
-              <IonIcon
-                icon={passwordIcon}
-                className="ion-align-self-end"
-                slot="end"
-                size="small"
-                color="medium"
-                hidden={!password ? true : false}
-                onClick={() => {
-                  if (passwordType === "password") {
-                    setPasswordType("text");
-                    setPasswordIcon(eye);
-                  } else {
-                    setPasswordType("password");
-                    setPasswordIcon(eyeOff);
-                  }
-                }}
-              />
-            </IonItem>
+          <IonItem>
+            <IonLabel position="stacked">Nhập lại Email</IonLabel>
+            <IonInput
+              type="email"
+              value={emailRe}
+              onIonChange={(event) => setEmailRe(event.detail.value)}
+              placeholder="clbclcmultimedia@gmail.com"
+            />
+            <IonIcon
+              icon={closeCircle}
+              className="ion-align-self-end"
+              slot="end"
+              size="small"
+              color="medium"
+              hidden={!emailRe ? true : false}
+              onClick={() => setEmailRe("")}
+            />
+          </IonItem>
 
-            <IonItem>
-              <IonLabel position="floating">Nhập lại mật khẩu</IonLabel>
-              <IonInput
-                type={passwordTypeRe}
-                value={passwordRe}
-                autocomplete="on"
-                onIonChange={(event) => setPasswordRe(event.detail.value)}
-                onKeyPress={(event) => {
-                  if (event.key === "Enter") handleRegister();
-                }}
-              />
-              <IonIcon
-                icon={passwordIconRe}
-                className="ion-align-self-end"
-                slot="end"
-                size="small"
-                color="medium"
-                hidden={!passwordRe ? true : false}
-                onClick={() => {
-                  if (passwordTypeRe === "password") {
-                    setPasswordTypeRe("text");
-                    setPasswordIconRe(eye);
-                  } else {
-                    setPasswordTypeRe("password");
-                    setPasswordIconRe(eyeOff);
-                  }
-                }}
-              />
-            </IonItem>
-          </IonList>
-        </form>
+          <IonItem>
+            <IonLabel position="stacked">Mật khẩu</IonLabel>
+            <IonInput
+              type={passwordType}
+              value={password}
+              onIonChange={(event) => setPassword(event.detail.value)}
+              placeholder="Tối thiểu 8 ký tự"
+            />
+            <IonIcon
+              icon={passwordIcon}
+              className="ion-align-self-end"
+              slot="end"
+              size="small"
+              color="medium"
+              hidden={!password ? true : false}
+              onClick={() => {
+                if (passwordType === "password") {
+                  setPasswordType("text");
+                  setPasswordIcon(eye);
+                } else {
+                  setPasswordType("password");
+                  setPasswordIcon(eyeOff);
+                }
+              }}
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel position="stacked">Nhập lại mật khẩu</IonLabel>
+            <IonInput
+              type={passwordTypeRe}
+              value={passwordRe}
+              onIonChange={(event) => setPasswordRe(event.detail.value)}
+              onKeyPress={(event) => {
+                if (event.key === "Enter") handleRegister();
+              }}
+              placeholder="Tối thiểu 8 ký tự"
+            />
+            <IonIcon
+              icon={passwordIconRe}
+              className="ion-align-self-end"
+              slot="end"
+              size="small"
+              color="medium"
+              hidden={!passwordRe ? true : false}
+              onClick={() => {
+                if (passwordTypeRe === "password") {
+                  setPasswordTypeRe("text");
+                  setPasswordIconRe(eye);
+                } else {
+                  setPasswordTypeRe("password");
+                  setPasswordIconRe(eyeOff);
+                }
+              }}
+            />
+          </IonItem>
+        </IonList>
 
         <IonLoading isOpen={status.loading} />
         <IonAlert
@@ -211,7 +233,7 @@ const RegisterPage: React.FC = () => {
               type="submit"
               shape="round"
               onClick={handleRegister}
-              disabled={email && password && passwordRe ? false : true}
+              disabled={!(email && emailRe && password && passwordRe)}
               style={{ marginTop: 10, marginBottom: 10 }}
             >
               Tạo tài khoản

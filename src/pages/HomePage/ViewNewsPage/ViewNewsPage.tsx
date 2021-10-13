@@ -53,6 +53,7 @@ import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
 import { Comment, News, toComment, VerifyStatus } from "./../../../models";
 import { Storage } from "@capacitor/storage";
 import Autolinker from "autolinker";
+import useCheckUserInfo from "../../../common/useCheckUserInfo";
 interface stateType {
   news: News;
   authorInfo: any;
@@ -66,12 +67,12 @@ interface RouteParams {
 const ViewNewsPage: React.FC = () => {
   const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
+  const { isVerify } = useCheckUserInfo(userId);
 
   const location = useLocation<stateType>();
 
   const history = useHistory();
   const [status, setStatus] = useState({ loading: false, error: false });
-  const [isVerify, setIsVerify] = useState<boolean>(false);
 
   const [news, setNews] = useState<News>();
 
@@ -88,10 +89,6 @@ const ViewNewsPage: React.FC = () => {
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
   const [presentAlert] = useIonAlert();
-
-  useIonViewWillEnter(() => {
-    checkVerify();
-  });
 
   useEffect(() => {
     if (location.state) {
@@ -173,13 +170,6 @@ const ViewNewsPage: React.FC = () => {
         : temp.totalLikes - 1,
     };
     setNews(temp);
-  };
-
-  const checkVerify = async () => {
-    const { value } = await Storage.get({ key: "verify" });
-    if (value === "true") {
-      setIsVerify(true);
-    } else setIsVerify(false);
   };
 
   return (

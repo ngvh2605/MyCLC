@@ -50,6 +50,7 @@ import { DatePopover, WeekPopover } from "./TimetablePopover";
 import { Storage } from "@capacitor/storage";
 import { Redirect, useHistory } from "react-router";
 import { UnAuth } from "./../../components/CommonUI/UnAuth";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
 export interface WeekItem {
   key: string;
   name: string;
@@ -86,7 +87,7 @@ function findUserInfo(userId: string, list: any[]) {
 const TimetablePage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
-  const [isVerify, setIsVerify] = useState<boolean>(false);
+  const { isVerify } = useCheckUserInfo(userId);
 
   const [color, setColor] = useState([
     "lovewins1",
@@ -143,10 +144,6 @@ const TimetablePage: React.FC = () => {
     onSelect: (slide: number) => {
       slideRef.current.slideTo(slide);
     },
-  });
-
-  useIonViewWillEnter(() => {
-    checkVerify();
   });
 
   useEffect(() => {
@@ -650,13 +647,6 @@ const TimetablePage: React.FC = () => {
     const data = await slideRef.current.getActiveIndex();
     console.log(data);
     setCurrentSlide(data);
-  };
-
-  const checkVerify = async () => {
-    const { value } = await Storage.get({ key: "verify" });
-    if (value === "true") {
-      setIsVerify(true);
-    } else setIsVerify(false);
   };
 
   return (
