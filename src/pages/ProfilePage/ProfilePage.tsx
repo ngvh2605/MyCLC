@@ -20,6 +20,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   brushOutline,
@@ -33,6 +34,8 @@ import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import { VerifyStatus } from "../../models";
+import "./ProfilePage.scss";
+import { Storage } from "@capacitor/storage";
 
 const ProfilePage: React.FC = () => {
   const { userId, emailVerified } = useAuth();
@@ -46,7 +49,13 @@ const ProfilePage: React.FC = () => {
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
 
+  const [avatarVerify, setAvatarVerify] = useState(false);
+
   var QRCode = require("qrcode.react");
+
+  useIonViewWillEnter(() => {
+    checkVerify();
+  });
 
   useEffect(() => {
     readStatus();
@@ -93,8 +102,15 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const checkVerify = async () => {
+    const { value } = await Storage.get({ key: "avatarVerify" });
+    if (value === "true") {
+      setAvatarVerify(true);
+    } else setAvatarVerify(false);
+  };
+
   return (
-    <IonPage>
+    <IonPage id="profile-page">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -125,7 +141,7 @@ const ProfilePage: React.FC = () => {
           </IonFab>
 
           <IonAvatar
-            className="ion-margin"
+            className={avatarVerify ? "ion-margin avatar-verify" : "ion-margin"}
             style={{
               width: 100,
               height: 100,

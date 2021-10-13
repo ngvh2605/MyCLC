@@ -40,6 +40,10 @@ const readStatus = (userId: string, emailVerified: boolean) => {
       "personalInfo",
       data && data.personalInfo ? "true" : "false"
     );
+    writeToStorage(
+      "avatarVerify",
+      data && data.avatarVerify ? "true" : "false"
+    );
     writeToStorage("hasAvatar", data && data.hasAvatar ? "true" : "false");
     writeToStorage(
       "verify",
