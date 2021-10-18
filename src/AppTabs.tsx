@@ -27,6 +27,7 @@ import UserPage from "./pages/UserPage";
 import { Storage } from "@capacitor/storage";
 import CLC2UniPage from "./pages/CLC2UniPage";
 import useCheckUserInfo from "./common/useCheckUserInfo";
+import AdventurePage from "./pages/AdventurePage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
@@ -38,6 +39,7 @@ const AppTabs: React.FC = () => {
   return (
     <Switch>
       <Route path="/my/clc2uni" component={CLC2UniPage}></Route>
+      <Route path="/my/adventure" component={AdventurePage}></Route>
       <Route exact path="/my/home">
         <HomePage />
       </Route>
