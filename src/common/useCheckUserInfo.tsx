@@ -1,23 +1,33 @@
-import { useEffect, useState } from "react";
-import { database } from "../firebase";
+import { useEffect, useState } from 'react';
+import { database } from '../firebase';
 
 const useCheckUserInfo = (userId?: string) => {
   const [isVerify, setIsVerify] = useState<boolean>(false);
   const [avatarVerify, setAvatarVerify] = useState<boolean>(false);
 
-  const [fullName, setFullName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const [allowCreateNews, setAllowCreateNews] = useState<boolean>(false);
   const [allowCreateEvent, setAllowCreateEvent] = useState<boolean>(false);
+
+  const [status, setStatus] = useState<{
+    isLoading: boolean;
+    allowCreateNews: boolean;
+    allowCreateEvent: boolean;
+  }>({
+    isLoading: false,
+    allowCreateNews: false,
+    allowCreateEvent: false,
+  });
 
   useEffect(() => {
     if (userId) {
       const onVerifyStatus = database
         .ref(`/users/${userId}/verify`)
-        .on("value", (snapshot) => {
+        .on('value', (snapshot) => {
           const data = snapshot.val();
-          console.log("data", data);
+          console.log('data', data);
           if (data && data.emailVerify && data.phoneVerify && data.personalInfo)
             setIsVerify(true);
           else setIsVerify(false);
@@ -25,7 +35,7 @@ const useCheckUserInfo = (userId?: string) => {
           else setAvatarVerify(false);
         });
       return () =>
-        database.ref(`/users/${userId}/verify`).off("value", onVerifyStatus);
+        database.ref(`/users/${userId}/verify`).off('value', onVerifyStatus);
     }
   }, [userId]);
 
@@ -33,23 +43,23 @@ const useCheckUserInfo = (userId?: string) => {
     if (userId) {
       const onUserFullName = database
         .ref(`/users/${userId}/personal/fullName`)
-        .on("value", (snapshot) => {
+        .on('value', (snapshot) => {
           if (snapshot.exists) setFullName(snapshot.val());
-          else setFullName("");
+          else setFullName('');
         });
       const onUserAvatar = database
         .ref(`/users/${userId}/personal/avatar`)
-        .on("value", (snapshot) => {
+        .on('value', (snapshot) => {
           if (snapshot.exists) setAvatarUrl(snapshot.val());
-          else setAvatarUrl("");
+          else setAvatarUrl('');
         });
       return () => {
         database
           .ref(`/users/${userId}/personal/fullName`)
-          .off("value", onUserFullName);
+          .off('value', onUserFullName);
         database
           .ref(`/users/${userId}/personal/avatar`)
-          .off("value", onUserAvatar);
+          .off('value', onUserAvatar);
       };
     }
   }, [userId]);
@@ -58,15 +68,17 @@ const useCheckUserInfo = (userId?: string) => {
     if (userId) {
       database
         .ref()
-        .child("auth")
+        .child('auth')
         .child(userId)
-        .once("value")
+        .once('value')
         .then((snapshot) => {
           const data = snapshot.val();
-          if (data && data.createEvent) setAllowCreateEvent(true);
-          else setAllowCreateEvent(false);
-          if (data && data.createNews) setAllowCreateNews(true);
-          else setAllowCreateNews(false);
+
+          setStatus({
+            isLoading: true,
+            allowCreateEvent: data && data.createEvent,
+            allowCreateNews: data && data.createNews,
+          });
         });
     }
   }, [userId]);
@@ -76,8 +88,10 @@ const useCheckUserInfo = (userId?: string) => {
     avatarVerify,
     fullName,
     avatarUrl,
-    allowCreateEvent,
-    allowCreateNews,
+    // allowCreateEvent: status.allowCreateEvent,
+    // allowCreateNews: status.allowCreateNews,
+    // isLoading: status.isLoading,
+    ...status,
   };
 };
 
