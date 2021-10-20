@@ -14,27 +14,35 @@ import {
   IonTabs,
   IonTitle,
   IonToolbar,
+  useIonToast,
 } from "@ionic/react";
 import React, { useState } from "react";
 import { Route, Switch } from "react-router";
 import EntryPage from "../../EntryPage";
 import { alertController } from "@ionic/core";
-import { database } from "../../../firebase";
+import { database, firestore } from "../../../firebase";
 
 const AdventureHomePage: React.FC = () => {
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [presentToast] = useIonToast();
 
   const handleJoin = () => {
     getTeamInfo().then((data: any) => {
       console.log("data", data);
-      database
-        .ref()
-        .child("adventure")
-        .child(data.code.toLowerCase())
-        .child("password")
+      firestore
+        .collection("adventure")
+        .doc(data.code)
         .get()
-        .then((snapshot) => {
-          console.log("pass", snapshot.val());
+        .then((doc) => {
+          console.log(doc.data());
+          const data = doc.data();
+          if (!data) {
+            presentToast({
+              message: "Vui lòng kiểm tra lại thông tin nhóm",
+              duration: 2000,
+              color: "danger",
+            });
+          }
         });
     });
   };
@@ -43,22 +51,20 @@ const AdventureHomePage: React.FC = () => {
     return new Promise(async (resolve) => {
       const confirm = await alertController.create({
         header: "Nhập thông tin nhóm",
-        backdropDismiss: false,
+        backdropDismiss: true,
         inputs: [
           {
             placeholder: "Mã code nhóm",
             name: "code",
-            type: "text",
           },
           {
-            placeholder: "Mật khẩu nhóm",
+            placeholder: "Mã Pin (4 chữ số)",
             name: "pass",
-            type: "password",
           },
         ],
         buttons: [
           {
-            text: "OK",
+            text: "Tham gia",
             handler: (data) => {
               return resolve(data);
             },

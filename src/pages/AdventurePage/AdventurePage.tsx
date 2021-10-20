@@ -12,37 +12,37 @@ import {
   IonTabs,
   IonTitle,
 } from "@ionic/react";
-import { homeOutline, peopleOutline } from "ionicons/icons";
+import { homeOutline, peopleOutline, trophyOutline } from "ionicons/icons";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router";
 import EntryPage from "../EntryPage";
-import OnePage from "./AdventureHomePage";
-import TwoPage from "./TwoPage";
+import AdventureHomePage from "./AdventureHomePage";
+import AdventureRankPage from "./AdventureRankPage";
 
 const AdventurePage: React.FC = () => {
   return (
     <IonTabs>
       <IonRouterOutlet>
-        <Redirect exact path="/my/adventure" to="/my/adventure/one" />
+        <Redirect exact path="/my/adventure" to="/my/adventure/home" />
         <Route
-          path="/my/adventure/one"
-          render={() => <OnePage />}
+          path="/my/adventure/home"
+          render={() => <AdventureHomePage />}
           exact={true}
         />
         <Route
-          path="/my/adventure/two"
-          render={() => <TwoPage />}
+          path="/my/adventure/rank"
+          render={() => <AdventureRankPage />}
           exact={true}
         />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
-        <IonTabButton tab="one" href="/my/adventure/one">
+        <IonTabButton tab="one" href="/my/adventure/home">
           <IonIcon icon={homeOutline} />
-          <IonLabel>One</IonLabel>
+          <IonLabel>Trang chủ</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="two" href="/my/adventure/two">
-          <IonIcon icon={peopleOutline} />
-          <IonLabel>Two</IonLabel>
+        <IonTabButton tab="two" href="/my/adventure/rank">
+          <IonIcon icon={trophyOutline} />
+          <IonLabel>Xếp hạng</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
