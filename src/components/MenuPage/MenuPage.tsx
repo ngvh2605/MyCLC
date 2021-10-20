@@ -25,6 +25,7 @@ import {
   calendarOutline,
   chatbubbleOutline,
   checkmarkCircle,
+  gameControllerOutline,
   logoFacebook,
   logOutOutline,
   newspaperOutline,
@@ -181,6 +182,22 @@ const MenuPage = () => {
               slot="start"
             />
             <IonLabel>Thời khoá biểu</IonLabel>
+          </IonItem>
+
+          <IonItem
+            onClick={() => {
+              onItemClick("/my/adventure");
+            }}
+            color={location.pathname.includes("/my/adventure") ? "primary" : ""}
+          >
+            <IonIcon
+              icon={gameControllerOutline}
+              color={
+                !location.pathname.includes("/my/adventure") ? "primary" : ""
+              }
+              slot="start"
+            />
+            <IonLabel>Adventure Hunt</IonLabel>
           </IonItem>
 
           <IonItem

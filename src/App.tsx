@@ -6,6 +6,7 @@ import AppTabs from "./AppTabs";
 import { AuthContext, useAuthInit } from "./auth";
 import MenuPage from "./components/MenuPage";
 import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
 import SplashPage from "./pages/SplashPage";
 
@@ -35,8 +36,11 @@ const App: React.FC = () => {
               <Route exact path="/register">
                 <RegisterPage />
               </Route>
-              <Route path="*">
+              <Route path="/my">
                 <AppTabs />
+              </Route>
+              <Route>
+                <NotFoundPage />
               </Route>
             </Switch>
           </IonRouterOutlet>

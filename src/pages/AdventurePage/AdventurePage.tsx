@@ -12,12 +12,18 @@ import {
   IonTabs,
   IonTitle,
 } from "@ionic/react";
-import { homeOutline, peopleOutline, trophyOutline } from "ionicons/icons";
+import {
+  flagOutline,
+  homeOutline,
+  peopleOutline,
+  trophyOutline,
+} from "ionicons/icons";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router";
 import EntryPage from "../EntryPage";
 import AdventureHomePage from "./AdventureHomePage";
 import AdventureRankPage from "./AdventureRankPage";
+import AdventureTeamPage from "./AdventureTeamPage";
 
 const AdventurePage: React.FC = () => {
   return (
@@ -34,6 +40,11 @@ const AdventurePage: React.FC = () => {
           render={() => <AdventureRankPage />}
           exact={true}
         />
+        <Route
+          path="/my/adventure/team"
+          render={() => <AdventureTeamPage />}
+          exact={true}
+        />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="one" href="/my/adventure/home">
@@ -43,6 +54,10 @@ const AdventurePage: React.FC = () => {
         <IonTabButton tab="two" href="/my/adventure/rank">
           <IonIcon icon={trophyOutline} />
           <IonLabel>Xếp hạng</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="three" href="/my/adventure/team">
+          <IonIcon icon={flagOutline} />
+          <IonLabel>Nhiệm vụ</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>

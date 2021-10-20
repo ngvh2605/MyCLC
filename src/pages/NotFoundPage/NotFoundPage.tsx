@@ -33,7 +33,11 @@ const NotFoundPage: React.FC = () => {
             <br />
             <br />
             <br />
-            <IonButton shape="round" expand="block" routerLink="/my/home">
+            <IonButton
+              shape="round"
+              expand="block"
+              onClick={() => history.replace("/my/home")}
+            >
               Quay lại trang chủ
             </IonButton>
           </div>
