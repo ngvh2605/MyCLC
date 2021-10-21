@@ -96,7 +96,14 @@ const AdventureHomePage: React.FC = () => {
     firestore.collection("adventure").doc(teamId).update({
       player: temp,
       total: temp.length,
+      score: 0,
       isStarted: false,
+    });
+
+    presentToast({
+      message: "Bạn đã tham gia Adventure Hunt thành công",
+      duration: 2000,
+      color: "success",
     });
   };
 
@@ -136,7 +143,7 @@ const AdventureHomePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>One</IonTitle>
+          <IonTitle>Adventure Hunt</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

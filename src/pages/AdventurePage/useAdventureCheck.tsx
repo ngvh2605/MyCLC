@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { database } from "../../firebase";
+import { database, firestore } from "../../firebase";
 
 const useAdventureCheck = (userId: string) => {
   const [teamId, setTeamId] = useState("");
+  const [teamInfo, setTeamInfo] = useState<any>();
 
   useEffect(() => {
     const onCheckUserTeam = database
@@ -16,7 +17,19 @@ const useAdventureCheck = (userId: string) => {
       database.ref(`/adventure/${userId}/teamId`).off("value", onCheckUserTeam);
   }, [userId]);
 
-  return { teamId };
+  useEffect(() => {
+    if (teamId) {
+      const onTeamInfo = firestore
+        .collection("adventure")
+        .doc(teamId)
+        .onSnapshot((doc) => {
+          setTeamInfo(doc.data());
+        });
+      return () => onTeamInfo();
+    }
+  }, [teamId]);
+
+  return { teamId, teamInfo };
 };
 
 export default useAdventureCheck;

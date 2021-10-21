@@ -25,7 +25,7 @@ const AdventureRankPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Two</IonTitle>
+          <IonTitle>Adventure Hunt</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent></IonContent>
