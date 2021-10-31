@@ -215,7 +215,7 @@ const HomePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding">
+      <IonContent className="">
         <IonRefresher slot="fixed" onIonRefresh={refreshNews}>
           <IonRefresherContent
             style={{ marginTop: 10 }}

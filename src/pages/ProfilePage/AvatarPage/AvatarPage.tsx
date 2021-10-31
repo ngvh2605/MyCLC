@@ -33,7 +33,7 @@ const AvatarPage: React.FC = () => {
   const { userId } = useAuth();
   const { avatarUrl: userAvatarUrl } = useCheckUserInfo(userId);
   const history = useHistory();
-  const [avatarUrl, setAvatarUrl] = useState(userAvatarUrl || "");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [status, setStatus] = useState({ loading: false, error: false });
   const fileInputRef = useRef<HTMLInputElement>();
 
@@ -52,6 +52,10 @@ const AvatarPage: React.FC = () => {
     },
     [avatarUrl]
   );
+
+  useEffect(() => {
+    if (userAvatarUrl) setAvatarUrl(userAvatarUrl);
+  }, [userAvatarUrl]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>

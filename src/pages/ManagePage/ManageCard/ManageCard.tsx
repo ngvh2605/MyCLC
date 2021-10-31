@@ -51,7 +51,7 @@ interface Props {
 }
 
 function calImgScale() {
-  const width = window.screen.width - 64;
+  const width = window.screen.width - 32;
   const height = (width * 9) / 16;
   return { width: width, height: height };
 }

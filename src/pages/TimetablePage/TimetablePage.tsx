@@ -159,7 +159,7 @@ const TimetablePage: React.FC = () => {
               const data = snapshot.val();
               setChosenWeek({
                 key: moment().add(-1, "days").day(1).format("YYYY-MM-DD"),
-                name: data.name,
+                name: data && data.name ? data.name : "Tuần ... Kì ...",
               });
             }
           });
@@ -174,7 +174,7 @@ const TimetablePage: React.FC = () => {
               const data = snapshot.val();
               setChosenWeek({
                 key: moment().day(1).format("YYYY-MM-DD"),
-                name: data.name,
+                name: data && data.name ? data.name : "Tuần ... Kì ...",
               });
             }
           });

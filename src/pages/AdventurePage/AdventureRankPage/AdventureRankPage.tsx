@@ -7,7 +7,9 @@ import {
   IonCardContent,
   IonCardSubtitle,
   IonChip,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
@@ -19,6 +21,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonRouterOutlet,
+  IonRow,
   IonTab,
   IonTabBar,
   IonTabButton,
@@ -59,17 +62,14 @@ const AdventureRankPage: React.FC = () => {
         let tempPlayers: any[] = [];
         for (let player of data.player) {
           await getInfoByUserId(player).then((playerInfo) => {
-            console.log(playerInfo);
             tempPlayers.push({
               id: player,
               ...playerInfo,
             });
           });
         }
-        console.log("temp player", tempPlayers);
 
         temp.push({ id: doc.id, playerInfo: tempPlayers, ...data });
-        console.log("temp data", temp);
       }
     });
 
@@ -94,7 +94,7 @@ const AdventureRankPage: React.FC = () => {
           <IonTitle>Adventure Hunt</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
+      <IonContent className="">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent
             style={{ marginTop: 10 }}
@@ -103,53 +103,67 @@ const AdventureRankPage: React.FC = () => {
           ></IonRefresherContent>
         </IonRefresher>
 
-        {teams.map((team, index) => (
-          <IonCard key={index}>
-            <IonCardSubtitle>
-              <IonItem lines="none">
-                <IonNote slot="start">
-                  <div className="number-circle">
-                    <p>{55}</p>
-                  </div>
-                </IonNote>
-                <IonText color="dark" style={{ fontSize: "x-large" }}>
-                  {team.id}
-                </IonText>
-                <IonNote slot="end">
-                  <IonLabel>
-                    <IonText color="warning">{99999}</IonText>{" "}
-                    <IonIcon
-                      icon={trophy}
-                      color="warning"
-                      style={{ fontSize: 17 }}
-                    />
-                  </IonLabel>
-                </IonNote>
-              </IonItem>
-            </IonCardSubtitle>
-            <IonCardContent>
-              {team.playerInfo &&
-                team.playerInfo.length > 0 &&
-                team.playerInfo.map((player, index) => (
-                  <IonChip
-                    key={index}
-                    className="ion-no-margin"
-                    style={{ marginTop: 8 }}
-                    onClick={() => {
-                      history.push(`/my/user/${player.id}`);
-                    }}
-                  >
-                    <IonAvatar>
-                      <IonImg
-                        src={player.avatar || "/assets/image/placeholder.png"}
-                      />
-                    </IonAvatar>
-                    <IonLabel>{player.fullName || ""}</IonLabel>
-                  </IonChip>
-                ))}
-            </IonCardContent>
-          </IonCard>
-        ))}
+        {teams
+          .sort((a, b) => {
+            return b.score - a.score;
+          })
+          .map((team, index) => (
+            <IonCard key={index}>
+              <IonCardSubtitle style={{ marginTop: 8 }}>
+                <IonItem lines="none">
+                  <IonNote slot="start">
+                    <div className="number-circle">
+                      <p>{index + 1}</p>
+                    </div>
+                  </IonNote>
+                  <IonText color="dark" style={{ fontSize: "x-large" }}>
+                    {team.id}
+                  </IonText>
+                  <IonNote slot="end">
+                    <IonLabel color="warning" style={{}}>
+                      {team.score}{" "}
+                      <IonIcon icon={trophy} style={{ fontSize: 12 }} />
+                    </IonLabel>
+                  </IonNote>
+                </IonItem>
+              </IonCardSubtitle>
+              <IonCardContent
+                className="ion-no-padding ion-padding-horizontal"
+                style={{ paddingBottom: 8 }}
+              >
+                <IonGrid className="ion-no-padding">
+                  <IonRow>
+                    {team.playerInfo &&
+                      team.playerInfo.length > 0 &&
+                      team.playerInfo.map((player, index) => (
+                        <IonCol size="6" key={index}>
+                          <IonItem lines="none" className="ion-no-padding">
+                            <IonChip
+                              className="ion-no-margin"
+                              onClick={() => {
+                                history.push(`/my/user/${player.id}`);
+                              }}
+                              style={{ width: "100%" }}
+                            >
+                              <IonAvatar>
+                                <IonImg
+                                  style={{ width: 24, height: 24 }}
+                                  src={
+                                    player.avatar ||
+                                    "/assets/image/placeholder.png"
+                                  }
+                                />
+                              </IonAvatar>
+                              <IonLabel>{player.fullName || ""}</IonLabel>
+                            </IonChip>
+                          </IonItem>
+                        </IonCol>
+                      ))}
+                  </IonRow>
+                </IonGrid>
+              </IonCardContent>
+            </IonCard>
+          ))}
       </IonContent>
     </IonPage>
   );

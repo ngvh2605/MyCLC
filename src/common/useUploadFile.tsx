@@ -7,7 +7,7 @@ const useUploadFile = (userId?: string) => {
 
   const handleUploadImage = async (
     blobUrl: any,
-    type?: "avatar" | "news" | "events"
+    type?: "avatar" | "news" | "events" | "adventure"
   ) => {
     const imgName = `${Date.now()}`;
     const rootFolder = `/${userId ? `users/${userId}` : "public"}`;

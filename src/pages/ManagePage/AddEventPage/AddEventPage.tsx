@@ -365,8 +365,8 @@ const AddEventPage: React.FC = () => {
           <IonImg
             src={pictureUrl}
             style={{
-              width: window.screen.width - 64,
-              height: ((window.screen.width - 64) * 9) / 16,
+              width: window.screen.width - 32,
+              height: ((window.screen.width - 32) * 9) / 16,
               margin: 0,
               objectFit: "cover",
             }}

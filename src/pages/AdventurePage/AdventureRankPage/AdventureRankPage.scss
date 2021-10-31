@@ -1,14 +1,15 @@
 #adventure-rank {
   .number-circle {
-    width: 35px;
-    line-height: 35px;
+    width: 30px;
+    line-height: 30px;
     border-radius: 50%;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     background-color: var(--ion-color-primary);
     p {
-      font-weight: normal;
+      font-weight: bold;
       color: white;
+      margin: 0px;
     }
   }
 }

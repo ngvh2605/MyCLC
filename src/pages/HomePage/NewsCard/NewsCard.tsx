@@ -97,8 +97,8 @@ const NewsCard: React.FC<any> = (props) => {
                 <IonSkeletonText
                   animated
                   style={{
-                    width: window.screen.width - 64,
-                    height: (window.screen.width - 64) / news.pictureRatio,
+                    width: window.screen.width - 32,
+                    height: (window.screen.width - 32) / news.pictureRatio,
                     margin: 0,
                   }}
                 />
@@ -119,7 +119,11 @@ const NewsCard: React.FC<any> = (props) => {
                     },
                   });
                 }}
-                style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
+                style={
+                  !imgLoaded
+                    ? { opacity: 0, width: 0, height: 0 }
+                    : { opacity: 1 }
+                }
               />
             </>
           )}

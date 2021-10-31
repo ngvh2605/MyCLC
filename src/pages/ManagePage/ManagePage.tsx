@@ -73,7 +73,7 @@ const ManagePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding">
+      <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={fetchEvent}>
           <IonRefresherContent
             style={{ marginTop: 10 }}

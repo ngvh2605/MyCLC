@@ -102,7 +102,7 @@ const EventPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       {isVerify ? (
-        <IonContent className="ion-padding">
+        <IonContent>
           <IonRefresher slot="fixed" onIonRefresh={refreshEvents}>
             <IonRefresherContent
               style={{ marginTop: 10 }}

@@ -22,9 +22,11 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import { SplashScreen } from "@capacitor/splash-screen";
+import { defineCustomElements } from "@ionic/pwa-elements/loader";
 
 ReactDOM.render(<App />, document.getElementById("root"));
 SplashScreen.hide();
+defineCustomElements(window);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

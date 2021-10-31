@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { database, firestore } from "../../firebase";
+import { Answer, toAnswer } from "./model";
 
 const useAdventureCheck = (userId: string) => {
   const [teamId, setTeamId] = useState("");
   const [teamInfo, setTeamInfo] = useState<any>();
+  const [teamAnswers, setTeamAnswers] = useState<Answer[]>();
 
   useEffect(() => {
     const onCheckUserTeam = database
@@ -29,7 +31,21 @@ const useAdventureCheck = (userId: string) => {
     }
   }, [teamId]);
 
-  return { teamId, teamInfo };
+  useEffect(() => {
+    if (teamId && teamInfo && teamInfo.isStarted) {
+      const onTeamAnswers = firestore
+        .collection("adventureAnswer")
+        .where("teamId", "==", teamId)
+        .onSnapshot(({ docs }) => {
+          if (docs && docs.length > 0) {
+            setTeamAnswers(docs.map(toAnswer));
+          }
+        });
+      return () => onTeamAnswers();
+    }
+  }, [teamInfo]);
+
+  return { teamId, teamInfo, teamAnswers };
 };
 
 export default useAdventureCheck;

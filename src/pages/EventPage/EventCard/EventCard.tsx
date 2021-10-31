@@ -50,7 +50,7 @@ interface Props {
 }
 
 function calImgScale() {
-  const width = window.screen.width - 64;
+  const width = window.screen.width - 32;
   const height = (width * 9) / 16;
   return { width: width, height: height };
 }
@@ -146,41 +146,42 @@ const EventCard: React.FC<Props> = (props) => {
                 </p>
               </IonLabel>
             </IonItem>
-            <IonCardContent
-              style={{ paddingTop: 0, paddingBottom: 0 }}
-              onClick={() => {
-                history.push({
-                  pathname: `/my/event/view/${event.id}`,
-                  state: {
-                    event: event,
-                    authorInfo: authorInfo,
-                    isBuy: isBuy,
-                  },
-                });
-              }}
-            >
-              <IonCardSubtitle color="primary">
-                {moment(event.startDate)
-                  .locale("vi")
-                  .format("dddd, Do MMMM, H:mm")}
-                {moment(event.startDate).isSame(moment(event.endDate), "day")
-                  ? moment(event.endDate).locale("vi").format(" - H:mm")
-                  : moment(event.endDate)
-                      .locale("vi")
-                      .format(" - dddd, Do MMMM, H:mm")}
-              </IonCardSubtitle>
+            <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
+              <div
+                onClick={() => {
+                  history.push({
+                    pathname: `/my/event/view/${event.id}`,
+                    state: {
+                      event: event,
+                      authorInfo: authorInfo,
+                      isBuy: isBuy,
+                    },
+                  });
+                }}
+              >
+                <IonCardSubtitle color="primary">
+                  {moment(event.startDate)
+                    .locale("vi")
+                    .format("dddd, Do MMMM, H:mm")}
+                  {moment(event.startDate).isSame(moment(event.endDate), "day")
+                    ? moment(event.endDate).locale("vi").format(" - H:mm")
+                    : moment(event.endDate)
+                        .locale("vi")
+                        .format(" - dddd, Do MMMM, H:mm")}
+                </IonCardSubtitle>
 
-              <IonLabel color="dark" text-wrap>
-                <b style={{ fontSize: "large" }}>{event.title}</b>
-              </IonLabel>
-              <IonLabel color="medium" text-wrap>
-                <p>
-                  <IonIcon icon={location} slot="start" /> {event.location}
-                </p>
-              </IonLabel>
-              <IonLabel text-wrap color="dark">
-                {event.description}
-              </IonLabel>
+                <IonLabel color="dark" text-wrap>
+                  <b style={{ fontSize: "large" }}>{event.title}</b>
+                </IonLabel>
+                <IonLabel color="medium" text-wrap>
+                  <p>
+                    <IonIcon icon={location} slot="start" /> {event.location}
+                  </p>
+                </IonLabel>
+                <IonLabel text-wrap color="dark">
+                  {event.description}
+                </IonLabel>
+              </div>
 
               <div style={{ marginTop: 16, marginBottom: 16 }}>
                 {event && event.sellTicket && event.sellInApp && (
