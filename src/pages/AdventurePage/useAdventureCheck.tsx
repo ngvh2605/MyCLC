@@ -7,6 +7,8 @@ const useAdventureCheck = (userId: string) => {
   const [teamInfo, setTeamInfo] = useState<any>();
   const [teamAnswers, setTeamAnswers] = useState<Answer[]>();
 
+  const [allowMark, setAllowMark] = useState(false);
+
   useEffect(() => {
     const onCheckUserTeam = database
       .ref(`/adventure/${userId}/teamId`)
@@ -17,6 +19,17 @@ const useAdventureCheck = (userId: string) => {
       });
     return () =>
       database.ref(`/adventure/${userId}/teamId`).off("value", onCheckUserTeam);
+  }, [userId]);
+
+  useEffect(() => {
+    database
+      .ref(`/adventure/${userId}/allowMark`)
+      .get()
+      .then((snapshot) => {
+        const data = snapshot.val();
+        if (data) setAllowMark(true);
+        else setAllowMark(false);
+      });
   }, [userId]);
 
   useEffect(() => {
@@ -45,7 +58,7 @@ const useAdventureCheck = (userId: string) => {
     }
   }, [teamInfo]);
 
-  return { teamId, teamInfo, teamAnswers };
+  return { teamId, teamInfo, teamAnswers, allowMark };
 };
 
 export default useAdventureCheck;

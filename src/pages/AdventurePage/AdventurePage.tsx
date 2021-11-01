@@ -16,7 +16,9 @@ import {
   flagOutline,
   homeOutline,
   peopleOutline,
+  ribbonOutline,
   trophyOutline,
+  walletOutline,
 } from "ionicons/icons";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router";
@@ -24,13 +26,14 @@ import { useAuth } from "../../auth";
 import EntryPage from "../EntryPage";
 import NotFoundPage from "../NotFoundPage";
 import AdventureHomePage from "./AdventureHomePage";
+import AdventureMarkPage from "./AdventureMarkPage";
 import AdventureRankPage from "./AdventureRankPage";
 import AdventureTeamPage from "./AdventureTeamPage";
 import useAdventureCheck from "./useAdventureCheck";
 
 const AdventurePage: React.FC = () => {
   const { userId } = useAuth();
-  const { teamId } = useAdventureCheck(userId);
+  const { teamId, allowMark } = useAdventureCheck(userId);
 
   return (
     <IonTabs>
@@ -51,6 +54,11 @@ const AdventurePage: React.FC = () => {
           render={() => (teamId ? <AdventureTeamPage /> : <NotFoundPage />)}
           exact={true}
         />
+        <Route
+          path="/my/adventure/mark"
+          render={() => (allowMark ? <AdventureMarkPage /> : <NotFoundPage />)}
+          exact={true}
+        />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="one" href="/my/adventure/home">
@@ -65,6 +73,12 @@ const AdventurePage: React.FC = () => {
           <IonTabButton tab="three" href="/my/adventure/team">
             <IonIcon icon={flagOutline} />
             <IonLabel>Nhiệm vụ</IonLabel>
+          </IonTabButton>
+        )}
+        {allowMark && (
+          <IonTabButton tab="four" href="/my/adventure/mark">
+            <IonIcon icon={ribbonOutline} />
+            <IonLabel>Chấm điểm</IonLabel>
           </IonTabButton>
         )}
       </IonTabBar>
