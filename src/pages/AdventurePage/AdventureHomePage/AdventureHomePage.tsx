@@ -185,6 +185,12 @@ const AdventureHomePage: React.FC = () => {
         <IonCard>
           <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BAdventure%5D%20Rule.png?alt=media&token=6c0ef3ce-656d-4f0a-887a-9fc9774ea809" />
         </IonCard>
+        <IonCard>
+          <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BAdventure%5D%20Prize.jpg?alt=media&token=2f6634a1-15e9-4bb5-840e-b5657eedd0f9" />
+        </IonCard>
+        <IonCard>
+          <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BAdventure%5D%20Mission.jpg?alt=media&token=44817e73-3eb6-4c27-863b-93ac6a7d191f" />
+        </IonCard>
       </IonContent>
     </IonPage>
   );

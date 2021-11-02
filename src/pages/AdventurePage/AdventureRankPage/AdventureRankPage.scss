@@ -12,4 +12,25 @@
       margin: 0px;
     }
   }
+
+  .toolbar-prize {
+    --border-width: 0px;
+    --background: transparent;
+    div {
+      background-color: var(--ion-color-warning);
+      border-radius: 0 0 10px 10px;
+      width: 100%;
+      height: 44px;
+      text-align: center;
+      ion-label {
+        color: black;
+      }
+      ion-note {
+        color: black;
+      }
+      ion-icon {
+        color: black;
+      }
+    }
+  }
 }

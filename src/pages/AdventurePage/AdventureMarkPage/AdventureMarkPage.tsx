@@ -33,6 +33,7 @@ import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
 import { firestore } from "../../../firebase";
 import { Answer, toAnswer } from "../model";
 import useAdventureCheck from "../useAdventureCheck";
+import "./AdventureMarkPage.scss";
 
 const AdventureMarkPage: React.FC = () => {
   const { userId } = useAuth();
@@ -105,7 +106,7 @@ const AdventureMarkPage: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage id="adventure-mark">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -165,7 +166,7 @@ const AdventureMarkPage: React.FC = () => {
                     placeholder="Nhập số điểm"
                     type="number"
                     min="100"
-                    value={answer.score}
+                    value={answer.score === 0 ? undefined : answer.score}
                     onIonChange={(e) => {
                       let temp = [...answers];
                       temp[index] = {
@@ -178,6 +179,12 @@ const AdventureMarkPage: React.FC = () => {
                   <IonNote slot="end" className="ion-no-margin">
                     <IonButton
                       shape="round"
+                      disabled={
+                        !answer.score ||
+                        typeof answer.score !== "number" ||
+                        answer.score < 100 ||
+                        answer.score > 1000
+                      }
                       onClick={() => {
                         if (
                           !answer.score ||

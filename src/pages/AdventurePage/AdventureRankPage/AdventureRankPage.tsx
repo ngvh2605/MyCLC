@@ -94,6 +94,21 @@ const AdventureRankPage: React.FC = () => {
           <IonTitle>Adventure Hunt</IonTitle>
         </IonToolbar>
       </IonHeader>
+      <IonHeader>
+        <IonToolbar className="toolbar-prize ion-no-padding ion-no-margin">
+          <div>
+            <IonItem lines="none">
+              <IonIcon slot="start" icon={trophy} />
+              <IonLabel>
+                <b>Giải thưởng</b>
+              </IonLabel>
+              <IonNote slot="end">
+                <b>600,000 VNĐ</b>
+              </IonNote>
+            </IonItem>
+          </div>
+        </IonToolbar>
+      </IonHeader>
       <IonContent className="">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent
