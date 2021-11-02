@@ -129,7 +129,7 @@ const AdventureMarkPage: React.FC = () => {
           return !answer.isMarked;
         }).length > 0 ? (
           answers.map((answer, index) => (
-            <IonCard key={index}>
+            <IonCard key={index} hidden={answer.isMarked}>
               <IonCardContent>
                 <IonLabel text-wrap color="dark">
                   Đội chơi:{" "}
@@ -166,7 +166,7 @@ const AdventureMarkPage: React.FC = () => {
                     placeholder="Nhập số điểm"
                     type="number"
                     min="100"
-                    value={answer.score === 0 ? undefined : answer.score}
+                    value={answer.score}
                     onIonChange={(e) => {
                       let temp = [...answers];
                       temp[index] = {
