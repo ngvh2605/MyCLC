@@ -29,8 +29,8 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
-  useIonViewWillEnter,
 } from "@ionic/react";
+import Autolinker from "autolinker";
 import {
   brush,
   chatbubbleEllipses,
@@ -41,19 +41,16 @@ import {
   heart,
   heartOutline,
   send,
-  star,
   trash,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
-import { database, firestore } from "../../../firebase";
-import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
-import { Comment, News, toComment, VerifyStatus } from "./../../../models";
-import { Storage } from "@capacitor/storage";
-import Autolinker from "autolinker";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
+import { firestore } from "../../../firebase";
+import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
+import { Comment, News, toComment } from "./../../../models";
 interface stateType {
   news: News;
   authorInfo: any;

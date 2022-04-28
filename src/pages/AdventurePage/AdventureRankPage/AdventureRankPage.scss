@@ -31,6 +31,9 @@
       ion-icon {
         color: black;
       }
+      ion-item {
+        --background: transparent;
+      }
     }
   }
 }

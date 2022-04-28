@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Storage } from "@capacitor/storage";
 import {
   IonAvatar,
   IonCol,
@@ -14,10 +13,8 @@ import {
   IonList,
   IonMenu,
   IonRow,
-  IonSkeletonText,
   IonToolbar,
   useIonToast,
-  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   bookOutline,
@@ -34,11 +31,11 @@ import {
   settingsOutline,
   sparklesOutline,
 } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
-import { auth, database } from "../../firebase";
+import { auth } from "../../firebase";
 import "./MenuPage.scss";
 
 const MenuPage = () => {
@@ -170,7 +167,7 @@ const MenuPage = () => {
             <IonLabel>Sự kiện</IonLabel>
           </IonItem>
 
-          <IonItem
+          {/* <IonItem
             onClick={() => {
               onItemClick("/my/timetable");
             }}
@@ -182,9 +179,9 @@ const MenuPage = () => {
               slot="start"
             />
             <IonLabel>Thời khoá biểu</IonLabel>
-          </IonItem>
+          </IonItem> */}
 
-          <IonItem
+          {/* <IonItem
             onClick={() => {
               onItemClick("/my/adventure");
             }}
@@ -198,6 +195,20 @@ const MenuPage = () => {
               slot="start"
             />
             <IonLabel>Adventure Hunt</IonLabel>
+          </IonItem> */}
+
+          <IonItem
+            onClick={() => {
+              onItemClick("/my/in2clc");
+            }}
+            color={location.pathname === "/my/in2clc" ? "primary" : ""}
+          >
+            <IonIcon
+              icon={bookOutline}
+              color={location.pathname !== "/my/in2clc" ? "primary" : ""}
+              slot="start"
+            />
+            <IonLabel>In2CLC</IonLabel>
           </IonItem>
 
           <IonItem

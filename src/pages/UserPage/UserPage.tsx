@@ -17,12 +17,10 @@ import {
   IonModal,
   IonPage,
   IonText,
-  IonTextarea,
   IonTitle,
   IonToggle,
   IonToolbar,
   useIonViewDidEnter,
-  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   balloon,
@@ -37,7 +35,6 @@ import {
   school,
 } from "ionicons/icons";
 import moment from "moment";
-import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useAuth } from "../../auth";

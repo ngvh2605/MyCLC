@@ -20,44 +20,35 @@ import {
   IonLoading,
   IonMenuButton,
   IonModal,
-  IonNote,
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonRouterOutlet,
   IonSegment,
   IonSegmentButton,
-  IonSlide,
-  IonTab,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonText,
-  IonThumbnail,
   IonTitle,
   IonToolbar,
   useIonAlert,
   useIonToast,
 } from "@ionic/react";
 import {
-  trophy,
-  warning,
-  close,
-  chevronDown,
   checkmarkCircle,
+  chevronDown,
+  close,
   closeCircle,
   time,
+  trophy,
+  warning,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useHistory } from "react-router";
+import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useUploadFile from "../../../common/useUploadFile";
 import { UnAuth } from "../../../components/CommonUI/UnAuth";
 import { firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
-import EntryPage from "../../EntryPage";
 import { getInfoByUserId } from "../../HomePage/services";
 import { Answer, Mission } from "../model";
 import useAdventureCheck from "../useAdventureCheck";

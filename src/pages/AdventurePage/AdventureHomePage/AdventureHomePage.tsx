@@ -1,3 +1,4 @@
+import { alertController } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
@@ -6,27 +7,17 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
-  IonLabel,
   IonMenuButton,
-  IonModal,
   IonPage,
-  IonRouterOutlet,
-  IonTab,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonTitle,
   IonToolbar,
   useIonToast,
 } from "@ionic/react";
-import React, { useState } from "react";
-import { Route, Switch } from "react-router";
-import EntryPage from "../../EntryPage";
-import { alertController } from "@ionic/core";
-import { database, firestore } from "../../../firebase";
-import { useAuth } from "../../../auth";
-import useAdventureCheck from "../useAdventureCheck";
 import { gameController, ticketOutline } from "ionicons/icons";
+import React, { useState } from "react";
+import { useAuth } from "../../../auth";
+import { database, firestore } from "../../../firebase";
+import useAdventureCheck from "../useAdventureCheck";
 
 const AdventureHomePage: React.FC = () => {
   const { userId } = useAuth();

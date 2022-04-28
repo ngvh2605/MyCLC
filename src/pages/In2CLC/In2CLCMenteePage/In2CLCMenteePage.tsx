@@ -9,7 +9,7 @@ import {
 } from "@ionic/react";
 import React from "react";
 
-const TwoPage: React.FC = () => {
+const In2CLCMenteePage: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
@@ -17,7 +17,7 @@ const TwoPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Two</IonTitle>
+          <IonTitle>In2CLC</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent></IonContent>
@@ -25,4 +25,4 @@ const TwoPage: React.FC = () => {
   );
 };
 
-export default TwoPage;
+export default In2CLCMenteePage;

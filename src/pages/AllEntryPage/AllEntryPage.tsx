@@ -1,24 +1,22 @@
 import {
+  IonButtons,
   IonContent,
   IonFab,
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
   IonList,
+  IonMenuButton,
   IonPage,
+  IonThumbnail,
   IonTitle,
   IonToolbar,
-  IonThumbnail,
-  IonImg,
-  IonButtons,
-  IonMenuButton,
-  IonMenu,
-  IonButton,
 } from "@ionic/react";
 import { add as addIcon } from "ionicons/icons";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
 import { formatDate } from "../../date";
 import { firestore } from "../../firebase";

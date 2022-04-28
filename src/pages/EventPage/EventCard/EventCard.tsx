@@ -4,15 +4,11 @@ import {
   IonCard,
   IonCardContent,
   IonCardSubtitle,
-  IonCol,
-  IonGrid,
   IonIcon,
   IonImg,
   IonItem,
   IonLabel,
-  IonRow,
   IonSkeletonText,
-  IonText,
   IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
@@ -24,7 +20,7 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
 import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
-import { cancelTicket, getInfoByUserId } from "../../HomePage/services";
+import { getInfoByUserId } from "../../HomePage/services";
 import { buyTicket } from "./../../HomePage/services";
 import "./EventCard.scss";
 

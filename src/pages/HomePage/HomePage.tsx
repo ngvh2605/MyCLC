@@ -1,17 +1,3 @@
-import "moment/locale/vi";
-import "./HomePage.scss";
-
-import {
-  add as addIcon,
-  arrowUp,
-  checkmark,
-  chevronDown,
-  close,
-  mailOpenOutline,
-  mailOutline,
-} from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-
 import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
@@ -21,7 +7,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardSubtitle,
-  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
@@ -41,18 +26,25 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
-  useIonViewWillEnter,
 } from "@ionic/react";
-
-import { auth as firebaseAuth, database, firestore } from "../../firebase";
-import NewsCard from "./NewsCard";
-import { deleteNews, getNew, getNextNews } from "./services";
+import {
+  add as addIcon,
+  arrowUp,
+  checkmark,
+  chevronDown,
+  close,
+  mailOpenOutline,
+  mailOutline,
+} from "ionicons/icons";
 import moment from "moment";
+import "moment/locale/vi";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
-import { Storage } from "@capacitor/storage";
-import usePrevious from "../../common/usePrevious";
-import { News } from "../../models";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
+import { auth as firebaseAuth, database, firestore } from "../../firebase";
+import "./HomePage.scss";
+import NewsCard from "./NewsCard";
+import { getNew, getNextNews } from "./services";
 
 const LoadingNews = () => (
   <IonCard>

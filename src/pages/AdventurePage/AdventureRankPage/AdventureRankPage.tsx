@@ -1,7 +1,6 @@
 import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
-  IonBadge,
   IonButtons,
   IonCard,
   IonCardContent,
@@ -20,21 +19,15 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonRouterOutlet,
   IonRow,
-  IonTab,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { chevronDown, trophy } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useHistory } from "react-router";
-import { database, firestore } from "../../../firebase";
-import EntryPage from "../../EntryPage";
+import { useHistory } from "react-router";
+import { firestore } from "../../../firebase";
 import { getInfoByUserId } from "../../HomePage/services";
 import { Player, Team } from "../model";
 import "./AdventureRankPage.scss";

@@ -13,6 +13,7 @@ import {
   IonLabel,
   IonMenuButton,
   IonPage,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -24,10 +25,11 @@ import {
   logoYoutube,
 } from "ionicons/icons";
 import React from "react";
+import "./AboutPage.scss";
 
 const AboutPage: React.FC = () => {
   return (
-    <IonPage>
+    <IonPage id="about-page">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -48,9 +50,11 @@ const AboutPage: React.FC = () => {
               </IonLabel>
             </IonChip>
             <IonLabel text-wrap color="dark">
-              <p>
-                <b>MyCLC</b>
-              </p>
+              <IonText color="dark">
+                <p>
+                  <b>MyCLC</b>
+                </p>
+              </IonText>
               <IonLabel color="medium">Mạng xã hội Cộng đồng</IonLabel>
             </IonLabel>
           </IonItem>
@@ -82,9 +86,11 @@ const AboutPage: React.FC = () => {
               </IonLabel>
             </IonChip>
             <IonLabel text-wrap color="dark">
-              <p>
-                <b>CLC Multimedia</b>
-              </p>
+              <IonText color="dark">
+                <p>
+                  <b>CLC Multimedia</b>
+                </p>
+              </IonText>
               <IonLabel color="medium">Câu lạc bộ Truyền thông</IonLabel>
             </IonLabel>
           </IonItem>
@@ -188,9 +194,11 @@ const AboutPage: React.FC = () => {
               </IonLabel>
             </IonChip>
             <IonLabel text-wrap color="dark">
-              <p>
-                <b>Nguyễn Việt Hoàng</b>
-              </p>
+              <IonText color="dark">
+                <p>
+                  <b>Nguyễn Việt Hoàng</b>
+                </p>
+              </IonText>
               <IonLabel color="medium">Trưởng nhóm dự án</IonLabel>
             </IonLabel>
           </IonItem>
@@ -268,9 +276,11 @@ const AboutPage: React.FC = () => {
               </IonLabel>
             </IonChip>
             <IonLabel text-wrap color="dark">
-              <p>
-                <b>Bùi Vũ Anh</b>
-              </p>
+              <IonText color="dark">
+                <p>
+                  <b>Bùi Vũ Anh</b>
+                </p>
+              </IonText>
               <IonLabel color="medium">Thành viên dự án</IonLabel>
             </IonLabel>
           </IonItem>

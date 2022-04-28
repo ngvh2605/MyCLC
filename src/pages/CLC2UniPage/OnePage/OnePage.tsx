@@ -2,20 +2,12 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonLabel,
   IonMenuButton,
   IonPage,
-  IonRouterOutlet,
-  IonTab,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import React from "react";
-import { Route, Switch } from "react-router";
-import EntryPage from "../../EntryPage";
 
 const OnePage: React.FC = () => {
   return (

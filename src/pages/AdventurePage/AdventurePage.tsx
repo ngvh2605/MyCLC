@@ -1,29 +1,20 @@
 import {
-  IonApp,
-  IonContent,
-  IonHeader,
   IonIcon,
   IonLabel,
-  IonPage,
   IonRouterOutlet,
-  IonTab,
   IonTabBar,
   IonTabButton,
   IonTabs,
-  IonTitle,
 } from "@ionic/react";
 import {
   flagOutline,
   homeOutline,
-  peopleOutline,
   ribbonOutline,
   trophyOutline,
-  walletOutline,
 } from "ionicons/icons";
 import React from "react";
-import { Redirect, Route, Switch } from "react-router";
+import { Redirect, Route } from "react-router";
 import { useAuth } from "../../auth";
-import EntryPage from "../EntryPage";
 import NotFoundPage from "../NotFoundPage";
 import AdventureHomePage from "./AdventureHomePage";
 import AdventureMarkPage from "./AdventureMarkPage";

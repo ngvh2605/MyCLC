@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { auth as firebaseAuth, database } from "./firebase";
-import { Storage } from "@capacitor/storage";
+import { auth as firebaseAuth } from "./firebase";
 interface Auth {
   loggedIn: boolean;
   userId?: string;

@@ -17,18 +17,10 @@ import {
   IonList,
   IonMenuButton,
   IonPage,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
-  useIonViewWillEnter,
 } from "@ionic/react";
-import {
-  brushOutline,
-  camera,
-  createOutline,
-  pencil,
-  pencilOutline,
-} from "ionicons/icons";
+import { camera, createOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
