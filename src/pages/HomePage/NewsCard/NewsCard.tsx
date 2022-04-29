@@ -153,15 +153,19 @@ const NewsCard: React.FC<any> = (props) => {
                 hidden={news.author !== userId}
                 style={{ fontSize: "large", paddingLeft: 8 }}
               />
-              <p
-                onClick={() => {
-                  history.push(`/my/user/${news.author}`);
-                }}
-              >
-                <b>
-                  {authorInfo && authorInfo.fullName ? authorInfo.fullName : ""}
-                </b>
-              </p>
+              <IonText color="dark">
+                <p
+                  onClick={() => {
+                    history.push(`/my/user/${news.author}`);
+                  }}
+                >
+                  <b>
+                    {authorInfo && authorInfo.fullName
+                      ? authorInfo.fullName
+                      : ""}
+                  </b>
+                </p>
+              </IonText>
               <IonLabel>
                 <IonText color="primary">
                   <IonIcon

@@ -6,11 +6,11 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import { homeOutline, peopleOutline } from "ionicons/icons";
+import { flagOutline, homeOutline, peopleOutline } from "ionicons/icons";
 import React from "react";
 import { Redirect, Route } from "react-router";
 import In2CLCHomePage from "./In2CLCHomePage";
-import In2CLCMenteePage from "./In2CLCMenteePage";
+import In2CLCMissionPage from "./In2CLCMissionPage";
 
 const In2CLCPage: React.FC = () => {
   return (
@@ -23,8 +23,8 @@ const In2CLCPage: React.FC = () => {
           exact={true}
         />
         <Route
-          path="/my/in2clc/mentee"
-          render={() => <In2CLCMenteePage />}
+          path="/my/in2clc/mission"
+          render={() => <In2CLCMissionPage />}
           exact={true}
         />
       </IonRouterOutlet>
@@ -33,9 +33,9 @@ const In2CLCPage: React.FC = () => {
           <IonIcon icon={homeOutline} />
           <IonLabel>Trang chủ</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="mentee" href="/my/in2clc/mentee">
-          <IonIcon icon={peopleOutline} />
-          <IonLabel>Mentee</IonLabel>
+        <IonTabButton tab="Misson" href="/my/in2clc/mission">
+          <IonIcon icon={flagOutline} />
+          <IonLabel>Nhiệm vụ</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
