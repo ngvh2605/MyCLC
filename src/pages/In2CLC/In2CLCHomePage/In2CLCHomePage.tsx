@@ -32,11 +32,12 @@ const In2CLCHomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { userId, userEmail } = useAuth();
   const { isVerify } = useCheckUserInfo(userId);
-  const { matchInfo } = useIn2CLCCheck(userId);
+  const { matchInfo, updateMatchInfo } = useIn2CLCCheck(userId, userEmail);
 
   const [presentToast] = useIonToast();
 
   const searchMentee = async () => {
+    console.log("Runing search mentee");
     setIsLoading(true);
     const data: Match[] = JSON.parse(
       (await firestore.collection("in2clc").doc("match").get()).data().match
@@ -54,6 +55,7 @@ const In2CLCHomePage: React.FC = () => {
         .child("in2clc")
         .child(userId)
         .update({ ...search });
+      updateMatchInfo({ ...search });
     }
     setIsLoading(false);
   };

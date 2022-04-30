@@ -1,3 +1,5 @@
+import firebase from "firebase/app";
+
 export interface Match {
   mentor_mail: string;
   mentor_name: string;
@@ -15,11 +17,18 @@ export interface Mission {
   title: string;
   body: string;
   deadline?: string;
+  answer?: Answer;
 }
 
 export interface Answer {
-  userId?: string;
+  email?: string;
   code?: string;
   text: string;
   image: string;
+  isMarked?: boolean;
+  score?: number;
+}
+
+export function toAnswer(doc: firebase.firestore.DocumentSnapshot): Answer {
+  return { ...doc.data() } as Answer;
 }

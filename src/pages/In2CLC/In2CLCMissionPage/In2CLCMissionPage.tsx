@@ -16,6 +16,7 @@ import {
   IonLabel,
   IonList,
   IonListHeader,
+  IonLoading,
   IonMenuButton,
   IonModal,
   IonPage,
@@ -25,22 +26,31 @@ import {
   IonTitle,
   IonToolbar,
   useIonAlert,
+  useIonToast,
 } from "@ionic/react";
 import Autolinker from "autolinker";
-import { chevronDown, time, close } from "ionicons/icons";
+import { chevronDown, time, close, checkmarkCircle } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { firestore } from "../../../firebase";
+import { useAuth } from "../../../auth";
+import useUploadFile from "../../../common/useUploadFile";
+import { database, firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 import { Answer, Mission } from "../model";
+import useIn2CLCCheck from "../useIn2CLCCheck";
 
 const In2CLCMissionPage: React.FC = () => {
+  const { userId, userEmail } = useAuth();
+  const { handleUploadImage } = useUploadFile();
+  const { userSubmission, addSubmission } = useIn2CLCCheck(userId, userEmail);
+
   const [chosen, setChosen] = useState<Mission>({
     code: "",
     title: "",
     body: "",
     deadline: "",
   });
+  const [data, setData] = useState<Mission[]>();
   const [missions, setMissions] = useState<Mission[]>();
   const [missionModal, setMissionModal] = useState(false);
 
@@ -50,10 +60,28 @@ const In2CLCMissionPage: React.FC = () => {
   });
 
   const [presentAlert] = useIonAlert();
+  const [presentToast] = useIonToast();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchMissions();
   }, []);
+
+  useEffect(() => {
+    try {
+      if (data && userSubmission && userSubmission.length > 0) {
+        let temp = [...data];
+        userSubmission.forEach((answer) => {
+          temp.forEach((mission) => {
+            if (answer.code === mission.code) {
+              mission.answer = answer;
+            }
+          });
+        });
+        setMissions(temp.reverse());
+      } else setMissions(data.reverse());
+    } catch (error) {}
+  }, [data, userSubmission]);
 
   const fetchMissions = () => {
     firestore
@@ -61,7 +89,7 @@ const In2CLCMissionPage: React.FC = () => {
       .doc("mission")
       .get()
       .then((doc) => {
-        setMissions(JSON.parse(doc.data().mission));
+        setData(JSON.parse(doc.data().mission));
         // console.log(doc.data().mission);
       });
   };
@@ -88,6 +116,50 @@ const In2CLCMissionPage: React.FC = () => {
     }, 2000);
   };
 
+  const submitAnswer = async () => {
+    try {
+      let image = "";
+      if (answer.image) {
+        image = await handleUploadImage(
+          answer.image,
+          "in2clc",
+          `${chosen.code}_${userEmail}`
+        );
+      }
+      await firestore.doc(`in2clc/${chosen.code}_${userEmail}`).set({
+        code: chosen.code,
+        email: userEmail,
+        text: answer.text,
+        image,
+        isMarked: false,
+        score: 0,
+      });
+
+      addSubmission({
+        code: chosen.code,
+        email: userEmail,
+        text: answer.text,
+        image,
+        isMarked: false,
+        score: 0,
+      });
+
+      presentToast({
+        message: "Nộp câu trả lời thành công",
+        duration: 2000,
+        color: "success",
+      });
+    } catch (error) {
+      presentToast({
+        message: error,
+        duration: 2000,
+        color: "danger",
+      });
+    }
+    setMissionModal(false);
+    setLoading(false);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -107,6 +179,7 @@ const In2CLCMissionPage: React.FC = () => {
           ></IonRefresherContent>
         </IonRefresher>
         <IonButton
+          hidden
           onClick={() => {
             console.log(missions);
           }}
@@ -131,12 +204,14 @@ const In2CLCMissionPage: React.FC = () => {
                         "HH:mm DD/MM/YYYY"
                       ).fromNow()}{" "}
                       <IonText color="dark">
-                        (
-                        {moment(
-                          mission.deadline.toString(),
-                          "HH:mm DD/MM/YYYY"
-                        ).format("H:mm, DD/MM/YYYY")}
-                        )
+                        <i>
+                          (
+                          {moment(
+                            mission.deadline.toString(),
+                            "HH:mm DD/MM/YYYY"
+                          ).format("H:mm, D/M/YYYY")}
+                          )
+                        </i>
                       </IonText>
                       <br />
                     </IonLabel>
@@ -152,10 +227,17 @@ const In2CLCMissionPage: React.FC = () => {
                   </IonLabel>
 
                   {mission.deadline ? (
-                    moment(
-                      mission.deadline.toString(),
-                      "HH:mm DD/MM/YYYY"
-                    ).isSameOrAfter(moment().format()) ? (
+                    mission.answer ? (
+                      <IonCardSubtitle
+                        color="success"
+                        className="ion-no-margin ion-margin-top"
+                      >
+                        Đã nộp
+                      </IonCardSubtitle>
+                    ) : moment(
+                        mission.deadline.toString(),
+                        "HH:mm DD/MM/YYYY"
+                      ).isSameOrAfter(moment().format()) ? (
                       <IonButton
                         expand="block"
                         className="ion-margin-top"
@@ -167,27 +249,16 @@ const In2CLCMissionPage: React.FC = () => {
                         Báo cáo
                       </IonButton>
                     ) : (
-                      <IonButton
-                        expand="block"
-                        className="ion-margin-top"
-                        disabled
+                      <IonCardSubtitle
                         color="danger"
+                        className="ion-no-margin ion-margin-top"
                       >
                         Đã đóng
-                      </IonButton>
+                      </IonCardSubtitle>
                     )
                   ) : (
                     <></>
                   )}
-
-                  <IonButton
-                    expand="block"
-                    className="ion-margin-top"
-                    disabled
-                    color="success"
-                  >
-                    Đã nộp
-                  </IonButton>
                 </IonCardContent>
               </IonCard>
             ))}
@@ -215,8 +286,8 @@ const In2CLCMissionPage: React.FC = () => {
                         {
                           text: "Đồng ý",
                           handler: () => {
-                            //  setLoading(true);
-                            //  submitAnswer();
+                            setLoading(true);
+                            submitAnswer();
                           },
                         },
                       ],
@@ -288,6 +359,8 @@ const In2CLCMissionPage: React.FC = () => {
             </IonList>
           </IonContent>
         </IonModal>
+
+        <IonLoading isOpen={loading} />
       </IonContent>
     </IonPage>
   );
