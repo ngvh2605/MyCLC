@@ -67,6 +67,13 @@ const In2CLCHomePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+          <IonButton
+            onClick={() => {
+              console.log(matchInfo);
+            }}
+          >
+            Test
+          </IonButton>
           <IonTitle>In2CLC</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -128,7 +135,13 @@ const In2CLCHomePage: React.FC = () => {
               expand="block"
               shape="round"
               onClick={() => {
-                searchMentee();
+                if (isVerify) searchMentee();
+                else
+                  presentToast({
+                    message: "Bạn cần hoàn thành 3 bước xác minh trước!",
+                    duration: 2000,
+                    color: "danger",
+                  });
               }}
             >
               <IonIcon icon={searchOutline} slot="start" />
