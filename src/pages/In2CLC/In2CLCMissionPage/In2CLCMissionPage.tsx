@@ -19,7 +19,9 @@ import {
   IonLoading,
   IonMenuButton,
   IonModal,
+  IonNote,
   IonPage,
+  IonProgressBar,
   IonRefresher,
   IonRefresherContent,
   IonSlide,
@@ -30,7 +32,14 @@ import {
   useIonToast,
 } from "@ionic/react";
 import Autolinker from "autolinker";
-import { chevronDown, time, close, checkmarkCircle } from "ionicons/icons";
+import {
+  chevronDown,
+  time,
+  close,
+  checkmarkCircle,
+  trophy,
+  school,
+} from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
@@ -39,6 +48,7 @@ import { database, firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 import { Answer, Mission } from "../model";
 import useIn2CLCCheck from "../useIn2CLCCheck";
+import "./In2CLCMissionPage.scss";
 
 const In2CLCMissionPage: React.FC = () => {
   const { userId, userEmail } = useAuth();
@@ -82,8 +92,8 @@ const In2CLCMissionPage: React.FC = () => {
             }
           });
         });
-        setMissions(temp.reverse());
-      } else setMissions(data.reverse());
+        setMissions(temp);
+      } else setMissions(data);
     } catch (error) {}
   }, [data, userSubmission]);
 
@@ -93,7 +103,7 @@ const In2CLCMissionPage: React.FC = () => {
       .doc("mission")
       .get()
       .then((doc) => {
-        setData(JSON.parse(doc.data().mission));
+        setData(JSON.parse(doc.data().mission).reverse());
         // console.log(doc.data().mission);
       });
   };
@@ -136,7 +146,7 @@ const In2CLCMissionPage: React.FC = () => {
         text: answer.text,
         image,
         isMarked: false,
-        score: 0,
+        isApproved: true,
       });
 
       addSubmission({
@@ -145,7 +155,7 @@ const In2CLCMissionPage: React.FC = () => {
         text: answer.text,
         image,
         isMarked: false,
-        score: 0,
+        isApproved: true,
       });
 
       presentToast({
@@ -164,8 +174,28 @@ const In2CLCMissionPage: React.FC = () => {
     setLoading(false);
   };
 
+  const calProgress = () => {
+    let progress = 0;
+    if (missions && missions.length > 0) {
+      let answer = 0;
+      missions.forEach((mission) => {
+        if (
+          mission.answer &&
+          mission.answer.isMarked &&
+          mission.answer.isApproved
+        )
+          answer++;
+      });
+      progress = (answer / missions.length) * 100;
+    }
+    return Intl.NumberFormat("en", {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+    }).format(progress);
+  };
+
   return (
-    <IonPage>
+    <IonPage id="in2clc-mission-page">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -182,194 +212,244 @@ const In2CLCMissionPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       {matchInfo ? (
-        <IonContent>
-          <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-            <IonRefresherContent
-              style={{ marginTop: 10 }}
-              pullingIcon={chevronDown}
-              pullingText="Kéo xuống để làm mới"
-            ></IonRefresherContent>
-          </IonRefresher>
+        <>
+          <IonHeader>
+            <IonToolbar className="toolbar-prize ion-no-padding ion-no-margin">
+              <div>
+                <IonItem lines="none">
+                  <IonIcon slot="start" icon={school} />
+                  <IonLabel>
+                    <b>Tiến độ</b>
+                  </IonLabel>
+                  <IonNote slot="end">
+                    <b>{calProgress()}%</b>
+                  </IonNote>
+                </IonItem>
+              </div>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+              <IonRefresherContent
+                style={{ marginTop: 10 }}
+                pullingIcon={chevronDown}
+                pullingText="Kéo xuống để làm mới"
+              ></IonRefresherContent>
+            </IonRefresher>
 
-          <IonList>
-            {missions &&
-              missions.length > 0 &&
-              missions.map((mission, index) => (
-                <IonCard key={index}>
-                  <IonCardContent>
-                    <IonCardSubtitle color="primary">
-                      {mission.title}
-                    </IonCardSubtitle>
-                    {mission.deadline && (
-                      <IonLabel text-wrap color="danger">
-                        <IonIcon
-                          icon={time}
-                          style={{ verticalAlign: "-2px" }}
-                        />{" "}
-                        Hạn nộp:{" "}
-                        {moment(
-                          mission.deadline.toString(),
-                          "HH:mm DD/MM/YYYY"
-                        ).fromNow()}{" "}
-                        <IonText color="dark">
-                          <i>
-                            (
-                            {moment(
-                              mission.deadline.toString(),
-                              "HH:mm DD/MM/YYYY"
-                            ).format("H:mm, D/M/YYYY")}
-                            )
-                          </i>
-                        </IonText>
-                        <br />
+            <IonList>
+              {missions &&
+                missions.length > 0 &&
+                missions.map((mission, index) => (
+                  <IonCard key={index}>
+                    <IonCardContent>
+                      <IonCardSubtitle color="primary">
+                        {mission.title}
+                      </IonCardSubtitle>
+                      {mission.deadline && (
+                        <IonLabel text-wrap color="danger">
+                          <IonIcon
+                            icon={time}
+                            style={{ verticalAlign: "-2px" }}
+                          />{" "}
+                          Hạn nộp:{" "}
+                          {moment(
+                            mission.deadline.toString(),
+                            "HH:mm DD/MM/YYYY"
+                          ).fromNow()}{" "}
+                          <IonText color="dark">
+                            <i>
+                              (
+                              {moment(
+                                mission.deadline.toString(),
+                                "HH:mm DD/MM/YYYY"
+                              ).format("H:mm, D/M/YYYY")}
+                              )
+                            </i>
+                          </IonText>
+                          <br />
+                        </IonLabel>
+                      )}
+                      <IonLabel text-wrap color="dark">
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: Autolinker.link(mission.body.toString(), {
+                              truncate: { length: 50, location: "smart" },
+                            }),
+                          }}
+                        ></span>
                       </IonLabel>
-                    )}
-                    <IonLabel text-wrap color="dark">
+
+                      {mission.deadline ? (
+                        mission.answer ? (
+                          mission.answer.isMarked ? (
+                            <IonCardSubtitle
+                              color="success"
+                              className="ion-no-margin ion-margin-top"
+                            >
+                              Đã nộp
+                              {mission.answer.isApproved ? (
+                                <IonText
+                                  color="success"
+                                  className="ion-float-right"
+                                >
+                                  Đã duyệt
+                                </IonText>
+                              ) : (
+                                <IonText
+                                  color="danger"
+                                  className="ion-float-right"
+                                >
+                                  Không duyệt
+                                </IonText>
+                              )}
+                            </IonCardSubtitle>
+                          ) : (
+                            <IonCardSubtitle className="ion-no-margin ion-margin-top">
+                              <IonText color="success">Đã nộp</IonText>
+                              <IonText
+                                color="warning"
+                                className="ion-float-right"
+                              >
+                                Chưa xét duyệt
+                              </IonText>
+                            </IonCardSubtitle>
+                          )
+                        ) : moment(
+                            mission.deadline.toString(),
+                            "HH:mm DD/MM/YYYY"
+                          ).isSameOrAfter(moment().format()) ? (
+                          <IonButton
+                            expand="block"
+                            className="ion-margin-top"
+                            onClick={() => {
+                              setChosen(mission);
+                              setMissionModal(true);
+                            }}
+                          >
+                            Báo cáo
+                          </IonButton>
+                        ) : (
+                          <IonCardSubtitle
+                            color="danger"
+                            className="ion-no-margin ion-margin-top"
+                          >
+                            Đã đóng
+                            <IonText className="ion-float-right">
+                              Chưa nộp
+                            </IonText>
+                          </IonCardSubtitle>
+                        )
+                      ) : (
+                        <></>
+                      )}
+                    </IonCardContent>
+                  </IonCard>
+                ))}
+            </IonList>
+
+            <IonModal isOpen={missionModal}>
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Nhiệm vụ</IonTitle>
+                  <IonButtons
+                    slot="start"
+                    onClick={() => setMissionModal(false)}
+                  >
+                    <IonButton>
+                      <IonIcon icon={close} color="primary" />
+                    </IonButton>
+                  </IonButtons>
+                  <IonButtons slot="end">
+                    <IonButton
+                      disabled={!answer.image && !answer.text}
+                      onClick={() => {
+                        presentAlert({
+                          header: "Nộp?",
+                          message:
+                            "Sau khi nộp thì bạn không thể sửa câu trả lời được nữa",
+                          buttons: [
+                            "Huỷ",
+                            {
+                              text: "Đồng ý",
+                              handler: () => {
+                                setLoading(true);
+                                submitAnswer();
+                              },
+                            },
+                          ],
+                        });
+                      }}
+                    >
+                      <b>Nộp</b>
+                    </IonButton>
+                  </IonButtons>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent className="ion-padding">
+                <IonList lines="none">
+                  <IonListHeader>
+                    <IonText color="primary">{chosen.title}</IonText>
+                  </IonListHeader>
+                  <br />
+                  <IonItem>
+                    <IonLabel text-wrap color="dark" style={{ fontSize: 17 }}>
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: Autolinker.link(mission.body.toString(), {
+                          __html: Autolinker.link(chosen.body.toString(), {
                             truncate: { length: 50, location: "smart" },
                           }),
                         }}
                       ></span>
                     </IonLabel>
+                  </IonItem>
+                  <br />
+                  <IonItem>
+                    <IonChip
+                      color="warning"
+                      style={{ height: "max-content", marginBottom: 10 }}
+                    >
+                      <IonLabel text-wrap className="ion-padding">
+                        Lưu ý: Sau khi ấn nộp thì bạn không thể sửa câu trả lời
+                        được nữa
+                      </IonLabel>
+                    </IonChip>
+                  </IonItem>
 
-                    {mission.deadline ? (
-                      mission.answer ? (
-                        <IonCardSubtitle
-                          color="success"
-                          className="ion-no-margin ion-margin-top"
-                        >
-                          Đã nộp
-                        </IonCardSubtitle>
-                      ) : moment(
-                          mission.deadline.toString(),
-                          "HH:mm DD/MM/YYYY"
-                        ).isSameOrAfter(moment().format()) ? (
-                        <IonButton
-                          expand="block"
-                          className="ion-margin-top"
-                          onClick={() => {
-                            setChosen(mission);
-                            setMissionModal(true);
-                          }}
-                        >
-                          Báo cáo
-                        </IonButton>
-                      ) : (
-                        <IonCardSubtitle
-                          color="danger"
-                          className="ion-no-margin ion-margin-top"
-                        >
-                          Đã đóng
-                        </IonCardSubtitle>
-                      )
-                    ) : (
-                      <></>
-                    )}
-                  </IonCardContent>
-                </IonCard>
-              ))}
-          </IonList>
+                  <br />
+                  <IonItem>
+                    <IonLabel position="fixed">Trả lời</IonLabel>
+                    <IonInput
+                      placeholder="Nhập câu trả lời"
+                      value={answer.text}
+                      onIonChange={(e) =>
+                        setAnswer({ ...answer, text: e.detail.value })
+                      }
+                    />
+                  </IonItem>
 
-          <IonModal isOpen={missionModal}>
-            <IonHeader>
-              <IonToolbar>
-                <IonTitle>Nhiệm vụ</IonTitle>
-                <IonButtons slot="start" onClick={() => setMissionModal(false)}>
-                  <IonButton>
-                    <IonIcon icon={close} color="primary" />
-                  </IonButton>
-                </IonButtons>
-                <IonButtons slot="end">
+                  <br />
                   <IonButton
-                    disabled={!answer.image && !answer.text}
-                    onClick={() => {
-                      presentAlert({
-                        header: "Nộp?",
-                        message:
-                          "Sau khi nộp thì bạn không thể sửa câu trả lời được nữa",
-                        buttons: [
-                          "Huỷ",
-                          {
-                            text: "Đồng ý",
-                            handler: () => {
-                              setLoading(true);
-                              submitAnswer();
-                            },
-                          },
-                        ],
-                      });
-                    }}
+                    shape="round"
+                    expand="full"
+                    className="ion-margin-horizontal"
+                    onClick={handleAddImage}
                   >
-                    <b>Nộp</b>
+                    {!answer.image ? "Thêm hình ảnh" : "Đổi hình ảnh"}
                   </IonButton>
-                </IonButtons>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent className="ion-padding">
-              <IonList lines="none">
-                <IonListHeader>
-                  <IonText color="primary">{chosen.title}</IonText>
-                </IonListHeader>
-                <br />
-                <IonItem>
-                  <IonLabel text-wrap color="dark" style={{ fontSize: 17 }}>
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: Autolinker.link(chosen.body.toString(), {
-                          truncate: { length: 50, location: "smart" },
-                        }),
-                      }}
-                    ></span>
-                  </IonLabel>
-                </IonItem>
-                <br />
-                <IonItem>
-                  <IonChip
-                    color="warning"
-                    style={{ height: "max-content", marginBottom: 10 }}
-                  >
-                    <IonLabel text-wrap className="ion-padding">
-                      Lưu ý: Sau khi ấn nộp thì bạn không thể sửa câu trả lời
-                      được nữa
-                    </IonLabel>
-                  </IonChip>
-                </IonItem>
 
-                <br />
-                <IonItem>
-                  <IonLabel position="fixed">Trả lời</IonLabel>
-                  <IonInput
-                    placeholder="Nhập câu trả lời"
-                    value={answer.text}
-                    onIonChange={(e) =>
-                      setAnswer({ ...answer, text: e.detail.value })
-                    }
-                  />
-                </IonItem>
+                  {answer.image && (
+                    <IonCard>
+                      <IonImg src={answer.image} />
+                    </IonCard>
+                  )}
+                </IonList>
+              </IonContent>
+            </IonModal>
 
-                <br />
-                <IonButton
-                  shape="round"
-                  expand="full"
-                  className="ion-margin-horizontal"
-                  onClick={handleAddImage}
-                >
-                  {!answer.image ? "Thêm hình ảnh" : "Đổi hình ảnh"}
-                </IonButton>
-
-                {answer.image && (
-                  <IonCard>
-                    <IonImg src={answer.image} />
-                  </IonCard>
-                )}
-              </IonList>
-            </IonContent>
-          </IonModal>
-
-          <IonLoading isOpen={loading} />
-        </IonContent>
+            <IonLoading isOpen={loading} />
+          </IonContent>
+        </>
       ) : (
         <IonContent className="ion-padding">
           <IonSlide>

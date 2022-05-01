@@ -26,7 +26,7 @@ export interface Answer {
   text: string;
   image: string;
   isMarked?: boolean;
-  score?: number;
+  isApproved?: boolean;
 }
 
 export function toAnswer(doc: firebase.firestore.DocumentSnapshot): Answer {
