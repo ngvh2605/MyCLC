@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { database } from "../firebase";
+import { auth, database } from "../firebase";
 
 const useCheckUserInfo = (userId: string) => {
   const [isVerify, setIsVerify] = useState<boolean>(false);
@@ -41,14 +41,30 @@ const useCheckUserInfo = (userId: string) => {
       const onUserFullName = database
         .ref(`/users/${userId}/personal/fullName`)
         .on("value", (snapshot) => {
-          if (snapshot.exists) setFullName(snapshot.val());
-          else setFullName("");
+          if (snapshot.exists) {
+            setFullName(snapshot.val());
+            try {
+              if (
+                !auth.currentUser.displayName ||
+                auth.currentUser.displayName !== snapshot.val()
+              )
+                auth.currentUser.updateProfile({ displayName: snapshot.val() });
+            } catch (error) {}
+          } else setFullName("");
         });
       const onUserAvatar = database
         .ref(`/users/${userId}/personal/avatar`)
         .on("value", (snapshot) => {
-          if (snapshot.exists) setAvatarUrl(snapshot.val());
-          else setAvatarUrl("");
+          if (snapshot.exists) {
+            setAvatarUrl(snapshot.val());
+            try {
+              if (
+                !auth.currentUser.photoURL ||
+                auth.currentUser.photoURL !== snapshot.val()
+              )
+                auth.currentUser.updateProfile({ photoURL: snapshot.val() });
+            } catch (error) {}
+          } else setAvatarUrl("");
         });
       return () => {
         database

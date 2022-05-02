@@ -23,6 +23,7 @@
     "firebase": "^8.2.10",
     "ionicons": "^5.5.0",
     "jimp": "^0.16.1",
+    "logrocket": "^3.0.0",
     "moment": "^2.29.1",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.1",

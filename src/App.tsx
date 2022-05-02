@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
 import SplashPage from "./pages/SplashPage";
+import LogRocket from "logrocket";
 
 const App: React.FC = () => {
   const { loading, auth } = useAuthInit();
@@ -18,6 +19,8 @@ const App: React.FC = () => {
     return <IonLoading isOpen />;
   }
   console.log(`rendering App with auth:`, auth);
+
+  LogRocket.init("clc-multimedia/myclc");
 
   return (
     <IonApp>

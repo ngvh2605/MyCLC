@@ -1,3 +1,4 @@
+import LogRocket from "logrocket";
 import React, { useContext, useEffect, useState } from "react";
 import { auth as firebaseAuth } from "./firebase";
 interface Auth {
@@ -31,6 +32,12 @@ export function useAuthInit(): AuthInit {
           }
         : { loggedIn: false };
       setAuthInit({ loading: false, auth });
+      if (!!firebaseUser) {
+        LogRocket.identify(firebaseUser.uid, {
+          email: firebaseUser.email,
+          name: firebaseUser.displayName,
+        });
+      }
     });
   }, []);
   return authInit;
