@@ -6,10 +6,17 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import { flagOutline, homeOutline, peopleOutline } from "ionicons/icons";
+import {
+  flagOutline,
+  homeOutline,
+  peopleOutline,
+  ribbonOutline,
+} from "ionicons/icons";
 import React from "react";
 import { Redirect, Route } from "react-router";
+import { auth } from "../../firebase";
 import In2CLCHomePage from "./In2CLCHomePage";
+import In2CLCMarkPage from "./In2CLCMarkPage";
 import In2CLCMissionPage from "./In2CLCMissionPage";
 
 const In2CLCPage: React.FC = () => {
@@ -27,16 +34,28 @@ const In2CLCPage: React.FC = () => {
           render={() => <In2CLCMissionPage />}
           exact={true}
         />
+        <Route
+          path="/my/in2clc/mark"
+          render={() => <In2CLCMarkPage />}
+          exact={true}
+        />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="home" href="/my/in2clc/home">
           <IonIcon icon={homeOutline} />
           <IonLabel>Trang chủ</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="Misson" href="/my/in2clc/mission">
+        <IonTabButton tab="mission" href="/my/in2clc/mission">
           <IonIcon icon={flagOutline} />
           <IonLabel>Nhiệm vụ</IonLabel>
         </IonTabButton>
+        {(auth.currentUser.email === "ngvh2605@gmail.com" ||
+          auth.currentUser.email === "clbclcmultimedia@gmail.com") && (
+          <IonTabButton tab="mark" href="/my/in2clc/mark">
+            <IonIcon icon={ribbonOutline} />
+            <IonLabel>Xét duyệt</IonLabel>
+          </IonTabButton>
+        )}
       </IonTabBar>
     </IonTabs>
   );

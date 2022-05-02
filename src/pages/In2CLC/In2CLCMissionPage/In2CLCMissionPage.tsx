@@ -11,7 +11,6 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
-  IonInput,
   IonItem,
   IonLabel,
   IonList,
@@ -21,7 +20,6 @@ import {
   IonModal,
   IonNote,
   IonPage,
-  IonProgressBar,
   IonRefresher,
   IonRefresherContent,
   IonSlide,
@@ -33,19 +31,12 @@ import {
   useIonToast,
 } from "@ionic/react";
 import Autolinker from "autolinker";
-import {
-  chevronDown,
-  time,
-  close,
-  checkmarkCircle,
-  trophy,
-  school,
-} from "ionicons/icons";
+import { chevronDown, close, school, time } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
-import { database, firestore } from "../../../firebase";
+import { firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 import { Answer, Mission } from "../model";
 import useIn2CLCCheck from "../useIn2CLCCheck";
@@ -144,6 +135,7 @@ const In2CLCMissionPage: React.FC = () => {
       await firestore.doc(`in2clc/${chosen.code}_${userEmail}`).set({
         code: chosen.code,
         email: userEmail,
+        userId: userId,
         text: encodeURI(answer.text),
         image,
         isMarked: false,
@@ -153,6 +145,7 @@ const In2CLCMissionPage: React.FC = () => {
       addSubmission({
         code: chosen.code,
         email: userEmail,
+        userId: userId,
         text: encodeURI(answer.text),
         image,
         isMarked: false,

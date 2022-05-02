@@ -22,6 +22,7 @@ export interface Mission {
 
 export interface Answer {
   email?: string;
+  userId?: string;
   code?: string;
   text: string;
   image: string;
