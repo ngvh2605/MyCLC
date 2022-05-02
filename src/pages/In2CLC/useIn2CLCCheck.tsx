@@ -3,10 +3,10 @@ import { database, firestore } from "../../firebase";
 import { Answer, Match, toAnswer } from "./model";
 
 const useIn2CLCCheck = (userId: string, userEmail: string) => {
-  const [matchInfo, setMatchInfo] = useState<Match>();
+  const [matchInfo, setMatchInfo] = useState<Match[]>();
   const [userSubmission, setUserSubmission] = useState<Answer[]>();
 
-  const updateMatchInfo = (match: Match) => {
+  const updateMatchInfo = (match: Match[]) => {
     setMatchInfo(match);
   };
 
@@ -30,8 +30,10 @@ const useIn2CLCCheck = (userId: string, userEmail: string) => {
 
   useEffect(() => {
     const fetchInfo = async () => {
-      const data = (await database.ref(`/in2clc/${userId}`).get()).val();
-      if (data) setMatchInfo(data);
+      const data = (
+        await database.ref(`/in2clc/${userId}/matchInfo`).get()
+      ).val();
+      if (data) setMatchInfo(JSON.parse(data));
       else setMatchInfo(undefined);
     };
     fetchInfo();

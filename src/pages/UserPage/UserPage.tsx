@@ -136,8 +136,17 @@ const UserPage: React.FC = () => {
   };
 
   const readBadge = async () => {
-    const data = database.ref().child("badge").child(id).get();
-    setBadges((await data).val());
+    const data = (await database.ref().child("badge").child(id).get()).val();
+    let temp: string[] = [];
+    if (data) {
+      for (var prop in data) {
+        if (data.hasOwnProperty(prop)) {
+          temp.push(data[prop]);
+        }
+      }
+    }
+
+    setBadges(temp);
   };
 
   const handleSave = async () => {
@@ -380,20 +389,14 @@ const UserPage: React.FC = () => {
 
             <div className="ion-padding">
               <IonList lines="none">
-                <IonItem>
-                  {badges.length > 0 &&
-                    badges.map((badge, index) => (
-                      <IonChip
-                        className="badge-chip"
-                        color="medium"
-                        key={index}
-                      >
-                        <IonText color="dark">
-                          <b>{badge}</b>
-                        </IonText>
-                      </IonChip>
-                    ))}
-                </IonItem>
+                {badges.length > 0 &&
+                  badges.map((badge, index) => (
+                    <IonChip className="badge-chip" color="medium" key={index}>
+                      <IonText color="dark">
+                        <b>{badge}</b>
+                      </IonText>
+                    </IonChip>
+                  ))}
               </IonList>
             </div>
           </>

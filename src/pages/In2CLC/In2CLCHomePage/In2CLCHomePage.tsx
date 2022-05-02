@@ -6,6 +6,7 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -14,10 +15,9 @@ import {
   IonLoading,
   IonMenuButton,
   IonPage,
-  IonText,
   IonTitle,
   IonToolbar,
-  useIonToast,
+  useIonAlert,
 } from "@ionic/react";
 import Autolinker from "autolinker";
 import { heart, searchOutline } from "ionicons/icons";
@@ -34,7 +34,7 @@ const In2CLCHomePage: React.FC = () => {
   const { isVerify } = useCheckUserInfo(userId);
   const { matchInfo, updateMatchInfo } = useIn2CLCCheck(userId, userEmail);
 
-  const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
 
   const searchMentee = async () => {
     console.log("Runing search mentee");
@@ -42,20 +42,34 @@ const In2CLCHomePage: React.FC = () => {
     const data: Match[] = JSON.parse(
       (await firestore.collection("in2clc").doc("match").get()).data().match
     );
-    const search = data.find((a) => {
+    const search = data.filter((a) => {
       return (
         a.mentor_mail.toLowerCase().replace(/ /g, "") ===
         userEmail.toLowerCase().replace(/ /g, "")
       );
     });
 
-    if (!!search) {
+    console.log("Search", search);
+
+    if (!!search && search.length > 0) {
       database
         .ref()
         .child("in2clc")
         .child(userId)
-        .update({ ...search });
-      updateMatchInfo({ ...search });
+        .update({ matchInfo: JSON.stringify(search) });
+      database
+        .ref()
+        .child("badge")
+        .child(userId)
+        .update({ in2clcMentor2022: "💛 In2CLC Mentor 2022" });
+      updateMatchInfo([...search]);
+    } else {
+      presentAlert({
+        header: "Không tìm thấy Mentee!",
+        message:
+          "Vui lòng liên hệ với facebook page CLC Multimedia để được hỗ trợ",
+        buttons: [{ text: "OK" }],
+      });
     }
     setIsLoading(false);
   };
@@ -68,6 +82,7 @@ const In2CLCHomePage: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonButton
+            hidden
             onClick={() => {
               console.log(matchInfo);
             }}
@@ -83,64 +98,80 @@ const In2CLCHomePage: React.FC = () => {
         </IonCard>
 
         {!!matchInfo ? (
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle color="danger" style={{ textAlign: "center" }}>
-                <IonIcon icon={heart} style={{ verticalAlign: "-4px" }} /> It's
-                a Match!
-              </IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonCardSubtitle color="primary">MENTOR</IonCardSubtitle>
-              <IonLabel color="dark">
-                <b>{matchInfo.mentor_name}</b>
-              </IonLabel>
-              <br />
-              <br />
-              <IonCardSubtitle color="primary">MENTEE</IonCardSubtitle>
+          matchInfo.map((match, index) => (
+            <IonCard key={index}>
+              <IonCardHeader>
+                <IonCardTitle color="danger" style={{ textAlign: "center" }}>
+                  <IonIcon icon={heart} style={{ verticalAlign: "-4px" }} />{" "}
+                  It's a Match!
+                </IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <IonCardSubtitle color="primary">MENTOR</IonCardSubtitle>
+                <IonLabel color="dark">
+                  <b>{match.mentor_name}</b>
+                </IonLabel>
+                <br />
+                <br />
+                <IonCardSubtitle color="primary">MENTEE</IonCardSubtitle>
 
-              <IonLabel color="dark">
-                <b>{matchInfo.mentee_name}</b>
-              </IonLabel>
-              <br />
-              <br />
-              <IonCardSubtitle color="primary">THÔNG TIN</IonCardSubtitle>
-              <IonLabel color="dark">
-                <div>
-                  <b>Email:</b> {matchInfo.mentee_mail}
-                  <br />
-                  <b>SĐT:</b> {matchInfo.mentee_phone}
-                  <br />
-                  <b>Facebook:</b>{" "}
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: Autolinker.link(matchInfo.mentee_fb.toString(), {
-                        truncate: { length: 50, location: "smart" },
-                      }),
-                    }}
-                  ></span>
-                  <br />
-                  <b>Lớp:</b> {matchInfo.mentee_class}
-                  <br />
-                  <b>Trường:</b> {matchInfo.mentee_school}
-                  <br />
-                  <b>Môn chuyên NV1:</b> {matchInfo.mentee_subject}
-                </div>
-              </IonLabel>
-            </IonCardContent>
-          </IonCard>
+                <IonLabel color="dark">
+                  <b>{match.mentee_name}</b>
+                </IonLabel>
+                <br />
+                <br />
+                <IonCardSubtitle color="primary">THÔNG TIN</IonCardSubtitle>
+                <IonLabel color="dark">
+                  <div>
+                    <b>Email:</b> {match.mentee_mail}
+                    <br />
+                    <b>SĐT:</b> {match.mentee_phone}
+                    <br />
+                    <b>Facebook:</b>{" "}
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: Autolinker.link(match.mentee_fb.toString(), {
+                          truncate: { length: 50, location: "smart" },
+                        }),
+                      }}
+                    ></span>
+                    <br />
+                    <b>Lớp:</b> {match.mentee_class}
+                    <br />
+                    <b>Trường:</b> {match.mentee_school}
+                    <br />
+                    <b>Môn chuyên NV1:</b> {match.mentee_subject}
+                  </div>
+                </IonLabel>
+              </IonCardContent>
+            </IonCard>
+          ))
         ) : (
           <div className="ion-padding">
+            <IonChip
+              color="warning"
+              style={{ height: "max-content", marginBottom: 10 }}
+            >
+              <IonLabel text-wrap className="ion-padding">
+                Lưu ý: Bạn cần đăng nhập vào email trùng với email bạn đăng ký
+                Mentor. Nếu bạn thay đổi email, vui lòng liên hệ facebook page
+                CLC Multimedia để được hỗ trợ
+              </IonLabel>
+            </IonChip>
+            <br />
+            <br />
+
             <IonButton
               expand="block"
               shape="round"
               onClick={() => {
                 if (isVerify) searchMentee();
                 else
-                  presentToast({
-                    message: "Bạn cần hoàn thành 3 bước xác minh trước!",
-                    duration: 2000,
-                    color: "danger",
+                  presentAlert({
+                    header: "Lỗi!",
+                    message:
+                      "Vui lòng vào Hồ sơ và hoàn thành 3 bước xác minh trước",
+                    buttons: [{ text: "OK" }],
                   });
               }}
             >

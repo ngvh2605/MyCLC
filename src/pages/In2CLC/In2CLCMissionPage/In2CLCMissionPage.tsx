@@ -201,6 +201,7 @@ const In2CLCMissionPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
             <IonButton
+              hidden
               onClick={() => {
                 console.log(matchInfo);
               }}
@@ -476,7 +477,8 @@ const In2CLCMissionPage: React.FC = () => {
                 className="ion-margin"
               >
                 <IonLabel text-wrap className="ion-padding">
-                  Bạn cần vào tab Trang chủ và ấn Tìm Mentee trước!
+                  Bạn cần vào tab Trang chủ và ấn Tìm thông tin Mentee của mình
+                  trước!
                 </IonLabel>
               </IonChip>
             </div>
