@@ -26,6 +26,7 @@ import {
   IonRefresherContent,
   IonSlide,
   IonText,
+  IonTextarea,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -143,7 +144,7 @@ const In2CLCMissionPage: React.FC = () => {
       await firestore.doc(`in2clc/${chosen.code}_${userEmail}`).set({
         code: chosen.code,
         email: userEmail,
-        text: answer.text,
+        text: encodeURI(answer.text),
         image,
         isMarked: false,
         isApproved: true,
@@ -152,7 +153,7 @@ const In2CLCMissionPage: React.FC = () => {
       addSubmission({
         code: chosen.code,
         email: userEmail,
-        text: answer.text,
+        text: encodeURI(answer.text),
         image,
         isMarked: false,
         isApproved: true,
@@ -349,7 +350,13 @@ const In2CLCMissionPage: React.FC = () => {
                 ))}
             </IonList>
 
-            <IonModal isOpen={missionModal}>
+            <IonModal
+              isOpen={missionModal}
+              onDidDismiss={() => {
+                setMissionModal(false);
+                setAnswer({ text: "", image: "" });
+              }}
+            >
               <IonHeader>
                 <IonToolbar>
                   <IonTitle>Nhiệm vụ</IonTitle>
@@ -363,7 +370,10 @@ const In2CLCMissionPage: React.FC = () => {
                   </IonButtons>
                   <IonButtons slot="end">
                     <IonButton
-                      disabled={!answer.image && !answer.text}
+                      disabled={
+                        (!answer.image && !answer.text) ||
+                        (answer.text && answer.text.length < 100)
+                      }
                       onClick={() => {
                         presentAlert({
                           header: "Nộp?",
@@ -419,16 +429,20 @@ const In2CLCMissionPage: React.FC = () => {
 
                   <br />
                   <IonItem>
-                    <IonLabel position="fixed">Trả lời</IonLabel>
-                    <IonInput
-                      placeholder="Nhập câu trả lời"
+                    <IonLabel>Trả lời</IonLabel>
+                  </IonItem>
+                  <IonItem lines="inset">
+                    <IonTextarea
+                      placeholder="Nhập câu trả lời (tối thiểu 100 chữ cái)"
                       value={answer.text}
                       onIonChange={(e) =>
                         setAnswer({ ...answer, text: e.detail.value })
                       }
+                      autoGrow={true}
                     />
                   </IonItem>
 
+                  <br />
                   <br />
                   <IonButton
                     shape="round"
