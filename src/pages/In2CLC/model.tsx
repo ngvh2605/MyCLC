@@ -10,6 +10,7 @@ export interface Match {
   mentee_class: string;
   mentee_school: string;
   mentee_subject: string;
+  mentee_wish: string;
 }
 
 export interface Mission {

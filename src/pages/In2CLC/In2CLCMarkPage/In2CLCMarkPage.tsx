@@ -25,11 +25,13 @@ import {
 } from "@ionic/react";
 import { chevronDown } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import { database, firestore } from "../../../firebase";
+import { auth, database, firestore } from "../../../firebase";
 import { Answer, toAnswer } from "../model";
 import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
+import { useHistory } from "react-router";
 
 const In2CLCMarkPage: React.FC = () => {
+  const history = useHistory();
   const [answers, setAnswers] = useState<Answer[]>();
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +39,12 @@ const In2CLCMarkPage: React.FC = () => {
   const [presentAlert] = useIonAlert();
 
   useEffect(() => {
-    fetchAnswers();
+    if (
+      auth.currentUser.email === "clbclcmultimedia@gmail.com" ||
+      auth.currentUser.email === "ngvh2605@gmail.com"
+    )
+      fetchAnswers();
+    else history.push("/my/in2clc");
   }, []);
 
   useEffect(() => {
@@ -120,6 +127,7 @@ const In2CLCMarkPage: React.FC = () => {
           <IonTitle>In2CLC</IonTitle>
         </IonToolbar>
       </IonHeader>
+
       <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent

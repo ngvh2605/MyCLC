@@ -34,14 +34,12 @@ const In2CLCPage: React.FC = () => {
           render={() => <In2CLCMissionPage />}
           exact={true}
         />
-        {(auth.currentUser.email === "clbclcmultimedia@gmail.com" ||
-          auth.currentUser.email === "ngvh2605@gmail.com") && (
-          <Route
-            path="/my/in2clc/mark"
-            render={() => <In2CLCMarkPage />}
-            exact={true}
-          />
-        )}
+
+        <Route
+          path="/my/in2clc/mark"
+          render={() => <In2CLCMarkPage />}
+          exact={true}
+        />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="home" href="/my/in2clc/home">

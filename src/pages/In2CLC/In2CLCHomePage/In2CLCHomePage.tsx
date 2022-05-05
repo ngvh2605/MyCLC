@@ -144,6 +144,8 @@ const In2CLCHomePage: React.FC = () => {
                     <b>Trường:</b> {match.mentee_school}
                     <br />
                     <b>Môn chuyên NV1:</b> {match.mentee_subject}
+                    <br />
+                    <b>Mong muốn:</b> {match.mentee_wish}
                   </div>
                 </IonLabel>
               </IonCardContent>
