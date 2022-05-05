@@ -1,3 +1,4 @@
+import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
 import LogRocket from "logrocket";
 import React, { useContext, useEffect, useState } from "react";
 import { auth as firebaseAuth } from "./firebase";
@@ -36,6 +37,10 @@ export function useAuthInit(): AuthInit {
         LogRocket.identify(firebaseUser.uid, {
           email: firebaseUser.email,
           name: firebaseUser.displayName,
+        });
+
+        FirebaseAnalytics.setUserId({
+          userId: firebaseUser.uid,
         });
       }
     });

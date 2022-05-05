@@ -1,3 +1,4 @@
+import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
 import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
@@ -122,6 +123,9 @@ const HomePage: React.FC = () => {
     };
     readMailbox();
     console.log(firebaseAuth.currentUser.metadata.lastSignInTime);
+
+    //firebase analytics
+    FirebaseAnalytics.setScreenName({ screenName: "HomePage" });
   }, []);
 
   useEffect(() => {

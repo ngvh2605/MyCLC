@@ -8,6 +8,7 @@
     "build": "ionic build"
   },
   "dependencies": {
+    "@capacitor-community/firebase-analytics": "^1.0.1",
     "@capacitor/android": "^3.0.0-rc.0",
     "@capacitor/camera": "^1.0.4",
     "@capacitor/core": "^3.2.0",
