@@ -21,6 +21,7 @@ import {
 } from "@ionic/react";
 import Autolinker from "autolinker";
 import { heart, searchOutline } from "ionicons/icons";
+import LogRocket from "logrocket";
 import React, { useState } from "react";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
@@ -63,6 +64,8 @@ const In2CLCHomePage: React.FC = () => {
         .child(userId)
         .update({ in2clcMentor2022: "💛 In2CLC Mentor 2022" });
       updateMatchInfo([...search]);
+
+      LogRocket.track("MenteeFound", { menteeCount: search.length });
     } else {
       presentAlert({
         header: "Không tìm thấy Mentee!",

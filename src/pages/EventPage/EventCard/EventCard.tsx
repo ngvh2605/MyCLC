@@ -113,6 +113,16 @@ const EventCard: React.FC<Props> = (props) => {
                   src={event.pictureUrl}
                   style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
                   onIonImgDidLoad={() => setImgLoaded(true)}
+                  onClick={() => {
+                    history.push({
+                      pathname: `/my/event/view/${event.id}`,
+                      state: {
+                        event: event,
+                        authorInfo: authorInfo,
+                        isBuy: isBuy,
+                      },
+                    });
+                  }}
                 />
               </IonThumbnail>
             )}
@@ -133,13 +143,9 @@ const EventCard: React.FC<Props> = (props) => {
                 />
               </IonAvatar>
               <IonLabel color="dark" text-wrap>
-                <p>
-                  <b>
-                    {authorInfo && authorInfo.fullName
-                      ? authorInfo.fullName
-                      : ""}
-                  </b>
-                </p>
+                <b>
+                  {authorInfo && authorInfo.fullName ? authorInfo.fullName : ""}
+                </b>
               </IonLabel>
             </IonItem>
             <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>

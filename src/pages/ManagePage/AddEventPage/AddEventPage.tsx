@@ -48,8 +48,8 @@ const AddEventPage: React.FC = () => {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [body, setBody] = useState("");
-  const [sellTicket, setSellTicket] = useState<boolean>(true);
-  const [sellInApp, setSellInApp] = useState<boolean>(true);
+  const [sellTicket, setSellTicket] = useState<boolean>();
+  const [sellInApp, setSellInApp] = useState<boolean>();
   const [totalTicket, setTotalTicket] = useState<number>();
   const [externalLink, setExternalLink] = useState("");
   const [pictureUrl, setPictureUrl] = useState("");
@@ -157,8 +157,8 @@ const AddEventPage: React.FC = () => {
         location,
         description,
         body: encodeURI(body),
-        sellTicket,
-        sellInApp,
+        sellTicket: !!sellTicket,
+        sellInApp: !!sellInApp,
         totalTicket,
         externalLink,
         pictureUrl:
@@ -197,6 +197,14 @@ const AddEventPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonButton
+          hidden
+          onClick={() => {
+            console.log(sellTicket);
+          }}
+        >
+          Debug
+        </IonButton>
         <IonList>
           <IonItem>
             <IonLabel position="floating">
@@ -290,7 +298,7 @@ const AddEventPage: React.FC = () => {
                 if (e.detail.value === "Yes") setSellTicket(true);
                 else setSellTicket(false);
               }}
-              value={sellTicket ? "Yes" : "No"}
+              value={!!sellTicket ? "Yes" : "No"}
             >
               <IonSelectOption value="Yes">Có</IonSelectOption>
               <IonSelectOption value="No">Không</IonSelectOption>
@@ -388,10 +396,7 @@ const AddEventPage: React.FC = () => {
               }}
             >
               <IonIcon icon={image} slot="start" />
-              <IonText>
-                {pictureUrl ? "Đổi ảnh bìa " : "Thêm ảnh bìa "}
-                <span style={{ color: "red" }}>{" *"}</span>
-              </IonText>
+              <IonText>{pictureUrl ? "Đổi ảnh bìa " : "Thêm ảnh bìa "}</IonText>
             </IonButton>
           </div>
         </IonToolbar>

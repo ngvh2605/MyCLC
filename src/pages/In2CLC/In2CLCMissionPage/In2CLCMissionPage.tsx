@@ -363,10 +363,7 @@ const In2CLCMissionPage: React.FC = () => {
                   </IonButtons>
                   <IonButtons slot="end">
                     <IonButton
-                      disabled={
-                        (!answer.image && !answer.text) ||
-                        (answer.text && answer.text.length < 100)
-                      }
+                      disabled={!answer.image && !answer.text}
                       onClick={() => {
                         presentAlert({
                           header: "Nộp?",
@@ -426,7 +423,7 @@ const In2CLCMissionPage: React.FC = () => {
                   </IonItem>
                   <IonItem lines="inset">
                     <IonTextarea
-                      placeholder="Nhập câu trả lời (tối thiểu 100 chữ cái)"
+                      placeholder="Nhập câu trả lời"
                       value={answer.text}
                       onIonChange={(e) =>
                         setAnswer({ ...answer, text: e.detail.value })

@@ -110,8 +110,8 @@ const AboutPage: React.FC = () => {
             <IonLabel color="dark">
               • Email: CLBCLCMultimedia@gmail.com
               <br />• GV phụ trách: Cô Bùi Thị Thanh Hoa 0988.669.331
-              <br />• Chủ nhiệm: Trần Quang Huy TK17 0865.505.899
-              <br />• Phó chủ nhiệm: Vũ Thuỳ Linh EK17 0362.073.327
+              <br />• Chủ nhiệm: Nguyễn Mai Anh VK18 0916.287.699
+              <br />• Phó chủ nhiệm: Nguyễn Linh Đan A1K18 0913.337.829
             </IonLabel>
             <br />
             <a
@@ -209,14 +209,14 @@ const AboutPage: React.FC = () => {
               • Cựu học sinh Chuyên Lý K12
               <br />• Founder & 1st President CLC Multimedia
               <br />• Tốt nghiệp Cử nhân CNTT tại Đại học Wollongong, Úc
-              <br />• Hiện đang làm Front End Developer tại công ty 152HQ Pty
-              Ltd, Úc
+              <br />• Hiện đang làm System Reporting and Analytics Officer tại
+              University of Wollongong, Úc
             </IonLabel>
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
             <IonLabel color="dark">
-              Email: viet@152hq.com
+              Email: vhnguyen@uow.edu.au
               <a
                 href="https://www.linkedin.com/in/vithong/"
                 target="_blank"
