@@ -96,60 +96,64 @@ const In2CLCHomePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonCard>
-          <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BIn2CLC%202022%5D%20Avatar.jpeg?alt=media&token=8c539497-05e7-4a0d-a78b-b57df7fd1f2a" />
-        </IonCard>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <IonCard>
+            <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BIn2CLC%202022%5D%20Avatar.jpeg?alt=media&token=8c539497-05e7-4a0d-a78b-b57df7fd1f2a" />
+          </IonCard>
+        </div>
 
         {!!matchInfo ? (
           matchInfo.map((match, index) => (
-            <IonCard key={index}>
-              <IonCardHeader>
-                <IonCardTitle color="danger" style={{ textAlign: "center" }}>
-                  <IonIcon icon={heart} style={{ verticalAlign: "-4px" }} />{" "}
-                  It's a Match!
-                </IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <IonCardSubtitle color="primary">MENTOR</IonCardSubtitle>
-                <IonLabel color="dark">
-                  <b>{match.mentor_name}</b>
-                </IonLabel>
-                <br />
-                <br />
-                <IonCardSubtitle color="primary">MENTEE</IonCardSubtitle>
+            <div style={{ maxWidth: 680, margin: "0 auto" }}>
+              <IonCard key={index}>
+                <IonCardHeader>
+                  <IonCardTitle color="danger" style={{ textAlign: "center" }}>
+                    <IonIcon icon={heart} style={{ verticalAlign: "-4px" }} />{" "}
+                    It's a Match!
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <IonCardSubtitle color="primary">MENTOR</IonCardSubtitle>
+                  <IonLabel color="dark">
+                    <b>{match.mentor_name}</b>
+                  </IonLabel>
+                  <br />
+                  <br />
+                  <IonCardSubtitle color="primary">MENTEE</IonCardSubtitle>
 
-                <IonLabel color="dark">
-                  <b>{match.mentee_name}</b>
-                </IonLabel>
-                <br />
-                <br />
-                <IonCardSubtitle color="primary">THÔNG TIN</IonCardSubtitle>
-                <IonLabel color="dark">
-                  <div>
-                    <b>Email:</b> {match.mentee_mail}
-                    <br />
-                    <b>SĐT:</b> {match.mentee_phone}
-                    <br />
-                    <b>Facebook:</b>{" "}
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: Autolinker.link(match.mentee_fb.toString(), {
-                          truncate: { length: 50, location: "smart" },
-                        }),
-                      }}
-                    ></span>
-                    <br />
-                    <b>Lớp:</b> {match.mentee_class}
-                    <br />
-                    <b>Trường:</b> {match.mentee_school}
-                    <br />
-                    <b>Môn chuyên NV1:</b> {match.mentee_subject}
-                    <br />
-                    <b>Mong muốn:</b> {match.mentee_wish}
-                  </div>
-                </IonLabel>
-              </IonCardContent>
-            </IonCard>
+                  <IonLabel color="dark">
+                    <b>{match.mentee_name}</b>
+                  </IonLabel>
+                  <br />
+                  <br />
+                  <IonCardSubtitle color="primary">THÔNG TIN</IonCardSubtitle>
+                  <IonLabel color="dark">
+                    <div>
+                      <b>Email:</b> {match.mentee_mail}
+                      <br />
+                      <b>SĐT:</b> {match.mentee_phone}
+                      <br />
+                      <b>Facebook:</b>{" "}
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: Autolinker.link(match.mentee_fb.toString(), {
+                            truncate: { length: 50, location: "smart" },
+                          }),
+                        }}
+                      ></span>
+                      <br />
+                      <b>Lớp:</b> {match.mentee_class}
+                      <br />
+                      <b>Trường:</b> {match.mentee_school}
+                      <br />
+                      <b>Môn chuyên NV1:</b> {match.mentee_subject}
+                      <br />
+                      <b>Mong muốn:</b> {match.mentee_wish}
+                    </div>
+                  </IonLabel>
+                </IonCardContent>
+              </IonCard>
+            </div>
           ))
         ) : (
           <div className="ion-padding">

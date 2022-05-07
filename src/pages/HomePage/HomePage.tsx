@@ -8,11 +8,14 @@ import {
   IonCard,
   IonCardContent,
   IonCardSubtitle,
+  IonCol,
   IonContent,
   IonFab,
   IonFabButton,
+  IonGrid,
   IonHeader,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
   IonList,
@@ -22,6 +25,7 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonRow,
   IonSkeletonText,
   IonText,
   IonTitle,
@@ -48,40 +52,68 @@ import NewsCard from "./NewsCard";
 import { getNew, getNextNews } from "./services";
 
 const LoadingNews = () => (
-  <IonCard>
-    <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-      <IonAvatar slot="start">
-        <IonSkeletonText animated />
-      </IonAvatar>
-      <IonLabel text-wrap>
-        <p>
-          <IonSkeletonText animated style={{ width: "50%" }} />
-        </p>
-        <IonLabel>
-          <IonNote>
-            <IonSkeletonText animated style={{ width: "30%" }} />
-          </IonNote>
+  <div style={{ maxWidth: 680, margin: "0 auto" }}>
+    <IonCard>
+      <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+        <IonAvatar slot="start">
+          <IonSkeletonText animated />
+        </IonAvatar>
+        <IonLabel text-wrap>
+          <p>
+            <IonSkeletonText animated style={{ width: "50%" }} />
+          </p>
+          <IonLabel>
+            <IonNote>
+              <IonSkeletonText animated style={{ width: "30%" }} />
+            </IonNote>
+          </IonLabel>
         </IonLabel>
-      </IonLabel>
-    </IonItem>
-    <IonCardContent style={{ paddingTop: 0 }}>
-      <IonCardSubtitle style={{ paddingBottom: 10 }}>
-        <IonSkeletonText animated style={{ width: "100%" }} />
-      </IonCardSubtitle>
-      <IonLabel text-wrap>
-        <IonSkeletonText animated style={{ width: "100%" }} />
-        <IonSkeletonText animated style={{ width: "100%" }} />
-        <IonSkeletonText animated style={{ width: "100%" }} />
-        <IonSkeletonText animated style={{ width: "30%" }} />
-      </IonLabel>
-    </IonCardContent>
-  </IonCard>
+      </IonItem>
+      <IonCardContent style={{ paddingTop: 0 }}>
+        <IonCardSubtitle style={{ paddingBottom: 10 }}>
+          <IonSkeletonText animated style={{ width: "100%" }} />
+        </IonCardSubtitle>
+        <IonLabel text-wrap>
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "30%" }} />
+        </IonLabel>
+      </IonCardContent>
+    </IonCard>
+  </div>
 );
 
 interface Mail {
   sender: string;
   message: string;
   timestamp: number;
+}
+
+interface Weather {
+  realTemp: number;
+  likeTemp: number;
+  humidity: number;
+  uv: number;
+  sunset: string;
+  sunrise: string;
+  airQuality: number;
+  chanceRain: number;
+  icon: string;
+  code: number;
+}
+
+function getWeatherDescription(code: number): string {
+  let temp = "";
+  switch (code) {
+    case 801:
+      temp = "Ít mây";
+      break;
+    default:
+      temp = "Không biết";
+      break;
+  }
+  return temp;
 }
 
 const HomePage: React.FC = () => {
@@ -99,9 +131,45 @@ const HomePage: React.FC = () => {
   const [showMailModal, setShowMailModal] = useState(false);
   const [presentAlert] = useIonAlert();
 
-  const handleDelete = (id: string) => {
-    setNewsList(newsList.filter((p) => p !== id));
-  };
+  //weather
+  const [weatherData, setWeatherData] = useState<Weather>();
+
+  useEffect(() => {
+    //fetch weather data
+    const axios = require("axios");
+
+    const options = {
+      method: "GET",
+      url: "https://weatherbit-v1-mashape.p.rapidapi.com/current",
+      params: { lon: "103.9882049", lat: "22.457386", lang: "en" },
+      headers: {
+        "X-RapidAPI-Host": "weatherbit-v1-mashape.p.rapidapi.com",
+        "X-RapidAPI-Key": "215481281amsh1c8a8021452f9ecp149b18jsn2e71712e8c32",
+      },
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        const data = response.data.data[0];
+        console.log("weather", data);
+        setWeatherData({
+          realTemp: data.temp,
+          likeTemp: data.app_temp,
+          humidity: data.rh,
+          uv: data.uv,
+          sunset: data.sunset,
+          sunrise: data.sunrise,
+          airQuality: data.api,
+          chanceRain: data.precip,
+          icon: data.weather.icon,
+          code: data.weather.code,
+        });
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  }, []);
 
   useEffect(() => {
     //read mail box
@@ -161,6 +229,10 @@ const HomePage: React.FC = () => {
       setLastKey(news?.slice(-1)?.pop()?.timestamp || lastKey);
       setNewsList([...newsList, ...news.map((p) => p.id)]);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setNewsList(newsList.filter((p) => p !== id));
   };
 
   const refreshNews = (event: CustomEvent<RefresherEventDetail>) => {
@@ -240,6 +312,41 @@ const HomePage: React.FC = () => {
             <IonLabel>Có tin mới</IonLabel>
           </IonButton>
         </IonFab>
+
+        {weatherData && (
+          <div style={{ maxWidth: 680, margin: "0 auto" }}>
+            <IonCard>
+              <IonCardContent>
+                <IonCardSubtitle color="primary">CLC Weather</IonCardSubtitle>
+                <IonGrid>
+                  <IonRow>
+                    <IonCol>
+                      <IonLabel>
+                        Nhiệt độ: {weatherData.realTemp}
+                        <br />
+                        Cảm thấy như: {weatherData.likeTemp}
+                      </IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonImg
+                        style={{ width: 50, height: 50 }}
+                        src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
+                      />
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+
+                <IonLabel>
+                  <IonImg
+                    style={{ width: 50, height: 50, margin: 0 }}
+                    src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
+                  />
+                  {weatherData.realTemp}
+                </IonLabel>
+              </IonCardContent>
+            </IonCard>
+          </div>
+        )}
 
         {newsList && newsList.length > 0 ? (
           newsList

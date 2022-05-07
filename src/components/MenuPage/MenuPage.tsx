@@ -277,7 +277,7 @@ const MenuPage = () => {
         <IonToolbar className="ion-no-padding">
           <IonList lines="none">
             <IonItem>
-              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 2.0</IonLabel>
+              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 2.1</IonLabel>
             </IonItem>
             {allowCreateEvent && (
               <IonItem

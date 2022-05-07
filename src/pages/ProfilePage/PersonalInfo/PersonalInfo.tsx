@@ -332,7 +332,7 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Giới tính</IonLabel>
             <IonSelect
-              interface="popover"
+              interface="action-sheet"
               value={gender}
               onIonChange={(e) => {
                 setGender(e.detail.value);
@@ -425,7 +425,7 @@ const PersonalInfo: React.FC = () => {
           <IonItem>
             <IonLabel position="floating">Khối chuyên</IonLabel>
             <IonSelect
-              interface="popover"
+              interface="action-sheet"
               value={grade}
               onIonChange={(e) => {
                 setGrade(e.detail.value);

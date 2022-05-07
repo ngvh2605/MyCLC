@@ -123,11 +123,9 @@ const ViewEventPage: React.FC = () => {
               />
             </IonAvatar>
             <IonLabel color="dark" text-wrap>
-              <p>
-                <b>
-                  {authorInfo && authorInfo.fullName ? authorInfo.fullName : ""}
-                </b>
-              </p>
+              <b>
+                {authorInfo && authorInfo.fullName ? authorInfo.fullName : ""}
+              </b>
             </IonLabel>
           </IonItem>
           <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>

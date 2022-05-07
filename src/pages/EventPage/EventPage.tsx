@@ -31,23 +31,7 @@ import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
 import { useAuth } from "../../auth";
-
-const Skeleton = () => (
-  <IonCard>
-    <div>
-      <IonSkeletonText
-        animated
-        style={{ height: 200, width: "100%", margin: 0 }}
-      />
-    </div>
-    <IonCardContent>
-      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
-      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
-      <IonSkeletonText animated style={{ width: "100%", height: 16 }} />
-      <IonSkeletonText animated style={{ width: "30%", height: 16 }} />
-    </IonCardContent>
-  </IonCard>
-);
+import { EventSkeleton } from "./EventCard/EventCard";
 
 const EventPage: React.FC = () => {
   const { userId } = useAuth();
@@ -121,7 +105,7 @@ const EventPage: React.FC = () => {
             )
           ) : (
             <>
-              <Skeleton />
+              <EventSkeleton />
             </>
           )}
         </IonContent>
