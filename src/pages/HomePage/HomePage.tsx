@@ -106,14 +106,22 @@ interface Weather {
 function getWeatherDescription(code: number): string {
   let temp = "";
   switch (code) {
-    case 801:
-      temp = "Ít mây";
+    case 200:
+      temp = "Có giông và mưa nhẹ";
       break;
     default:
       temp = "Không biết";
       break;
   }
   return temp;
+}
+
+function getUVdiv(uv: number) {
+  if (uv >= 11) return <IonText color="danger">Nguy hiểm</IonText>;
+  else if (uv >= 8) return <IonText color="danger">Rất cao</IonText>;
+  else if (uv >= 6) return <IonText color="warning">Cao</IonText>;
+  else if (uv >= 3) return <IonText color="warning">Trung bình</IonText>;
+  else return <IonText color="success">Thấp</IonText>;
 }
 
 const HomePage: React.FC = () => {
@@ -137,7 +145,6 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     //fetch weather data
     const axios = require("axios");
-
     const options = {
       method: "GET",
       url: "https://weatherbit-v1-mashape.p.rapidapi.com/current",
@@ -147,7 +154,6 @@ const HomePage: React.FC = () => {
         "X-RapidAPI-Key": "215481281amsh1c8a8021452f9ecp149b18jsn2e71712e8c32",
       },
     };
-
     axios
       .request(options)
       .then(function (response) {
@@ -160,7 +166,7 @@ const HomePage: React.FC = () => {
           uv: data.uv,
           sunset: data.sunset,
           sunrise: data.sunrise,
-          airQuality: data.api,
+          airQuality: data.aqi,
           chanceRain: data.precip,
           icon: data.weather.icon,
           code: data.weather.code,
@@ -318,31 +324,43 @@ const HomePage: React.FC = () => {
             <IonCard>
               <IonCardContent>
                 <IonCardSubtitle color="primary">CLC Weather</IonCardSubtitle>
-                <IonGrid>
+
+                <IonGrid className="ion-no-padding">
                   <IonRow>
-                    <IonCol>
-                      <IonLabel>
-                        Nhiệt độ: {weatherData.realTemp}
-                        <br />
-                        Cảm thấy như: {weatherData.likeTemp}
-                      </IonLabel>
-                    </IonCol>
-                    <IonCol>
+                    <IonCol size={"5"}>
                       <IonImg
-                        style={{ width: 50, height: 50 }}
+                        style={{
+                          width: 50,
+                          height: 50,
+                        }}
                         src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
                       />
+                      <IonText color="dark" style={{ fontSize: "x-large" }}>
+                        {weatherData.realTemp}℃
+                      </IonText>
+                      <br />
+                      <IonLabel text-wrap>Có giông và mưa nhẹ</IonLabel>
+                    </IonCol>
+
+                    <IonCol>
+                      <IonLabel color="dark" text-wrap>
+                        Cảm thấy như: {weatherData.likeTemp}℃<br />
+                        Độ ẩm: {weatherData.humidity}%<br />
+                        Tỉ lệ mưa: {weatherData.chanceRain}
+                        <br />
+                        UV: <b>{getUVdiv(weatherData.uv)}</b> (
+                        {Intl.NumberFormat("en", {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0,
+                        }).format(weatherData.uv)}
+                        )
+                        <br />
+                        Chất lượng KK: {weatherData.airQuality}
+                        <br />
+                      </IonLabel>
                     </IonCol>
                   </IonRow>
                 </IonGrid>
-
-                <IonLabel>
-                  <IonImg
-                    style={{ width: 50, height: 50, margin: 0 }}
-                    src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
-                  />
-                  {weatherData.realTemp}
-                </IonLabel>
               </IonCardContent>
             </IonCard>
           </div>
