@@ -232,7 +232,7 @@ const ViewNewsPage: React.FC = () => {
                   hidden={news && news.author !== userId}
                   style={{ fontSize: "large", paddingLeft: 8 }}
                 />
-                <p
+                <IonText
                   onClick={() => {
                     history.push(`/my/user/${news.author}`);
                   }}
@@ -242,7 +242,7 @@ const ViewNewsPage: React.FC = () => {
                       ? news.authorInfo.fullName
                       : ""}
                   </b>
-                </p>
+                </IonText>
                 <IonLabel>
                   <IonText color="primary">
                     <IonIcon
@@ -416,7 +416,7 @@ const ViewNewsPage: React.FC = () => {
                           />
                           {commentAuthors[index] &&
                             commentAuthors[index].fullName && (
-                              <p
+                              <IonText
                                 style={{ paddingBottom: 5 }}
                                 onClick={() => {
                                   history.push(
@@ -425,7 +425,7 @@ const ViewNewsPage: React.FC = () => {
                                 }}
                               >
                                 <b>{commentAuthors[index].fullName}</b>
-                              </p>
+                              </IonText>
                             )}
                           <div
                             dangerouslySetInnerHTML={{

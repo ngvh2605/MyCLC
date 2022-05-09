@@ -104,8 +104,8 @@ const In2CLCHomePage: React.FC = () => {
 
         {!!matchInfo ? (
           matchInfo.map((match, index) => (
-            <div style={{ maxWidth: 680, margin: "0 auto" }}>
-              <IonCard key={index}>
+            <div style={{ maxWidth: 680, margin: "0 auto" }} key={index}>
+              <IonCard>
                 <IonCardHeader>
                   <IonCardTitle color="danger" style={{ textAlign: "center" }}>
                     <IonIcon icon={heart} style={{ verticalAlign: "-4px" }} />{" "}

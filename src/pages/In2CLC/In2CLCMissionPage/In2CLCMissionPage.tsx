@@ -180,7 +180,12 @@ const In2CLCMissionPage: React.FC = () => {
         )
           answer++;
       });
-      progress = (answer / missions.length) * 100;
+      progress =
+        (answer /
+          missions.filter((item) => {
+            return !!item.deadline;
+          }).length) *
+        100;
     }
     return Intl.NumberFormat("en", {
       maximumFractionDigits: 2,

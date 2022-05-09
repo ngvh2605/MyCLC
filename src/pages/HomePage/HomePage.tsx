@@ -95,25 +95,12 @@ interface Weather {
   likeTemp: number;
   humidity: number;
   uv: number;
-  sunset: string;
-  sunrise: string;
-  airQuality: number;
   chanceRain: number;
+  windSpeed: number;
+  visibility: number;
   icon: string;
   code: number;
-}
-
-function getWeatherDescription(code: number): string {
-  let temp = "";
-  switch (code) {
-    case 200:
-      temp = "Có giông và mưa nhẹ";
-      break;
-    default:
-      temp = "Không biết";
-      break;
-  }
-  return temp;
+  description: string;
 }
 
 function getUVdiv(uv: number) {
@@ -144,36 +131,57 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     //fetch weather data
-    const axios = require("axios");
-    const options = {
-      method: "GET",
-      url: "https://weatherbit-v1-mashape.p.rapidapi.com/current",
-      params: { lon: "103.9882049", lat: "22.457386", lang: "en" },
-      headers: {
-        "X-RapidAPI-Host": "weatherbit-v1-mashape.p.rapidapi.com",
-        "X-RapidAPI-Key": "215481281amsh1c8a8021452f9ecp149b18jsn2e71712e8c32",
-      },
-    };
-    axios
-      .request(options)
-      .then(function (response) {
-        const data = response.data.data[0];
-        console.log("weather", data);
-        setWeatherData({
-          realTemp: data.temp,
-          likeTemp: data.app_temp,
-          humidity: data.rh,
-          uv: data.uv,
-          sunset: data.sunset,
-          sunrise: data.sunrise,
-          airQuality: data.aqi,
-          chanceRain: data.precip,
-          icon: data.weather.icon,
-          code: data.weather.code,
-        });
-      })
-      .catch(function (error) {
-        console.error(error);
+    database
+      .ref()
+      .child("public")
+      .child("weather")
+      .once("value")
+      .then(function (snapshot) {
+        const firebaseData = snapshot.val();
+        if (
+          moment().diff(moment(firebaseData.timestamp), "minutes") >= 30 ||
+          !firebaseData.timestamp
+        ) {
+          const axios = require("axios");
+          const options = {
+            method: "GET",
+            url: "https://weatherbit-v1-mashape.p.rapidapi.com/forecast/3hourly",
+            params: { lat: "22.457386", lon: "103.9882049" },
+            headers: {
+              "X-RapidAPI-Host": "weatherbit-v1-mashape.p.rapidapi.com",
+              "X-RapidAPI-Key":
+                "215481281amsh1c8a8021452f9ecp149b18jsn2e71712e8c32",
+            },
+          };
+          axios
+            .request(options)
+            .then(function (response) {
+              const data = response.data.data[0];
+              console.log("weather", data);
+              const temp: Weather = {
+                realTemp: data.temp,
+                likeTemp: data.app_temp,
+                humidity: data.rh,
+                uv: data.uv,
+                chanceRain: data.pop,
+                windSpeed: data.wind_spd,
+                visibility: data.vis,
+                icon: data.weather.icon,
+                code: data.weather.code,
+                description: data.weather.description,
+              };
+              setWeatherData(temp);
+              database.ref().child("public").child("weather").update({
+                weatherData: temp,
+                timestamp: moment().format(),
+              });
+            })
+            .catch(function (error) {
+              console.error(error);
+            });
+        } else {
+          setWeatherData(firebaseData.weatherData);
+        }
       });
   }, []);
 
@@ -327,36 +335,58 @@ const HomePage: React.FC = () => {
 
                 <IonGrid className="ion-no-padding">
                   <IonRow>
-                    <IonCol size={"5"}>
+                    <IonCol size="2.5">
                       <IonImg
                         style={{
-                          width: 50,
-                          height: 50,
+                          width: 54,
+                          height: 54,
                         }}
                         src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
                       />
-                      <IonText color="dark" style={{ fontSize: "x-large" }}>
-                        {weatherData.realTemp}℃
-                      </IonText>
-                      <br />
-                      <IonLabel text-wrap>Có giông và mưa nhẹ</IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonLabel text-wrap color="medium">
+                        <IonText color="dark" style={{ fontSize: "large" }}>
+                          <b>{weatherData.realTemp}℃</b>
+                        </IonText>
+
+                        <p>{weatherData.description}</p>
+                      </IonLabel>
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol>
+                      <IonLabel color="dark" text-wrap>
+                        Cảm giác: <b>{weatherData.likeTemp}℃</b>
+                        <br />
+                        Độ ẩm: <b>{weatherData.humidity}%</b>
+                        <br />
+                        Tỉ lệ mưa: <b>{weatherData.chanceRain}%</b>
+                        <br />
+                      </IonLabel>
                     </IonCol>
 
                     <IonCol>
                       <IonLabel color="dark" text-wrap>
-                        Cảm thấy như: {weatherData.likeTemp}℃<br />
-                        Độ ẩm: {weatherData.humidity}%<br />
-                        Tỉ lệ mưa: {weatherData.chanceRain}
+                        UV: <b>{getUVdiv(weatherData.uv)}</b>
                         <br />
-                        UV: <b>{getUVdiv(weatherData.uv)}</b> (
-                        {Intl.NumberFormat("en", {
-                          maximumFractionDigits: 2,
-                          minimumFractionDigits: 0,
-                        }).format(weatherData.uv)}
-                        )
+                        Tốc độ gió:{" "}
+                        <b>
+                          {Intl.NumberFormat("en", {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 0,
+                          }).format(weatherData.windSpeed * 3.6)}{" "}
+                          km/s
+                        </b>
                         <br />
-                        Chất lượng KK: {weatherData.airQuality}
-                        <br />
+                        Tầm nhìn xa:{" "}
+                        <b>
+                          {Intl.NumberFormat("en", {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 0,
+                          }).format(weatherData.visibility)}{" "}
+                          km
+                        </b>
                       </IonLabel>
                     </IonCol>
                   </IonRow>
