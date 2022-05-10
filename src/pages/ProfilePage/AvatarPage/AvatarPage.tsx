@@ -15,7 +15,6 @@ import {
   IonLabel,
   IonLoading,
   IonPage,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   isPlatform,

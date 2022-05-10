@@ -6,12 +6,7 @@ import {
   IonTabButton,
   IonTabs,
 } from "@ionic/react";
-import {
-  flagOutline,
-  homeOutline,
-  peopleOutline,
-  ribbonOutline,
-} from "ionicons/icons";
+import { flagOutline, homeOutline, ribbonOutline } from "ionicons/icons";
 import React from "react";
 import { Redirect, Route } from "react-router";
 import { auth } from "../../firebase";

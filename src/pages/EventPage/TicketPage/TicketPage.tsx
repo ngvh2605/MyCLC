@@ -14,7 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { close, fileTray, qrCodeOutline } from "ionicons/icons";
+import { close, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";

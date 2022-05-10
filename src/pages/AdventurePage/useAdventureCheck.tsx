@@ -56,7 +56,7 @@ const useAdventureCheck = (userId: string) => {
         });
       return () => onTeamAnswers();
     }
-  }, [teamInfo]);
+  }, [teamId, teamInfo]);
 
   return { teamId, teamInfo, teamAnswers, allowMark };
 };

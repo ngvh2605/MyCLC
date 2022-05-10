@@ -22,7 +22,6 @@ import useAdventureCheck from "../useAdventureCheck";
 const AdventureHomePage: React.FC = () => {
   const { userId } = useAuth();
   const { teamId } = useAdventureCheck(userId);
-  const [showJoinModal, setShowJoinModal] = useState(false);
   const [presentToast] = useIonToast();
 
   const handleJoin = () => {

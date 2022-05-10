@@ -1,21 +1,14 @@
 import {
-  IonApp,
-  IonContent,
-  IonHeader,
   IonIcon,
   IonLabel,
-  IonPage,
   IonRouterOutlet,
-  IonTab,
   IonTabBar,
   IonTabButton,
   IonTabs,
-  IonTitle,
 } from "@ionic/react";
 import { homeOutline, peopleOutline } from "ionicons/icons";
 import React from "react";
-import { Redirect, Route, Switch } from "react-router";
-import EntryPage from "../EntryPage";
+import { Redirect, Route } from "react-router";
 import OnePage from "./OnePage";
 import TwoPage from "./TwoPage";
 

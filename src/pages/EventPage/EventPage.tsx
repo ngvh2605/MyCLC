@@ -1,37 +1,28 @@
-import { arrowUp, chevronDown, ticketOutline } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-
 import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
   IonContent,
-  IonFab,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonMenuButton,
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
-  useIonViewWillEnter,
 } from "@ionic/react";
-
+import { chevronDown, ticketOutline } from "ionicons/icons";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useAuth } from "../../auth";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
+import { EmptyUI } from "../../components/CommonUI/EmptyUI";
+import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { Events } from "../../models";
 import EventCard from "./EventCard";
-import { getEvent, getNextEvent } from "./services";
-import { Storage } from "@capacitor/storage";
-import { UnAuth } from "../../components/CommonUI/UnAuth";
-import { EmptyUI } from "../../components/CommonUI/EmptyUI";
-import useCheckUserInfo from "../../common/useCheckUserInfo";
-import { useAuth } from "../../auth";
 import { EventSkeleton } from "./EventCard/EventCard";
+import { getEvent } from "./services";
 
 const EventPage: React.FC = () => {
   const { userId } = useAuth();

@@ -36,7 +36,6 @@ const AdventureRankPage: React.FC = () => {
   const history = useHistory();
 
   const [teams, setTeams] = useState<Team[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     fetchTeams();

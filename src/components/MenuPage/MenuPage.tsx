@@ -22,7 +22,6 @@ import {
   calendarOutline,
   chatbubbleOutline,
   checkmarkCircle,
-  gameControllerOutline,
   logoFacebook,
   logOutOutline,
   newspaperOutline,

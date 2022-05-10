@@ -1,8 +1,3 @@
-import { image } from "ionicons/icons";
-import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
-import { useHistory, useLocation } from "react-router";
-
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
   IonBackButton,
@@ -24,16 +19,16 @@ import {
   IonTitle,
   IonToolbar,
   isPlatform,
-  useIonViewWillEnter,
 } from "@ionic/react";
-
+import { image } from "ionicons/icons";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
 import { firestore, storage } from "../../../firebase";
 import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
-import { Storage } from "@capacitor/storage";
-import NotFoundPage from "../../NotFoundPage";
 
 const AddNewsPage: React.FC = () => {
   const location = useLocation<News>();

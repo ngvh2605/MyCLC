@@ -27,7 +27,6 @@ import {
   ellipsisHorizontal,
   heart,
   heartOutline,
-  star,
   trash,
 } from "ionicons/icons";
 import moment from "moment";

@@ -1,6 +1,5 @@
 import {
   IonButton,
-  IonChip,
   IonContent,
   IonImg,
   IonLabel,

@@ -1,3 +1,4 @@
+import { alertController } from "@ionic/core";
 import {
   IonAlert,
   IonBackButton,
@@ -22,8 +23,6 @@ import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth } from "../../firebase";
 import "./LoginPage.scss";
-import { alertController } from "@ionic/core";
-import firebase from "firebase";
 
 const LoginPage: React.FC = () => {
   const { loggedIn } = useAuth();

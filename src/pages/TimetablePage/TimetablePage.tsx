@@ -30,27 +30,25 @@ import {
   IonToolbar,
   useIonAlert,
   useIonPopover,
-  useIonViewWillEnter,
 } from "@ionic/react";
 import {
   add,
   brush,
+  close,
   ellipsisHorizontal,
   settingsOutline,
   trash,
-  close,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
+import useCheckUserInfo from "../../common/useCheckUserInfo";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
+import { UnAuth } from "./../../components/CommonUI/UnAuth";
 import "./TimetablePage.scss";
 import { DatePopover, WeekPopover } from "./TimetablePopover";
-import { Storage } from "@capacitor/storage";
-import { Redirect, useHistory } from "react-router";
-import { UnAuth } from "./../../components/CommonUI/UnAuth";
-import useCheckUserInfo from "../../common/useCheckUserInfo";
 export interface WeekItem {
   key: string;
   name: string;

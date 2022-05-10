@@ -66,7 +66,6 @@ const EventCard: React.FC<Props> = (props) => {
   const [authorInfo, setAuthorInfo] = useState<any>({});
   const [isBuy, setIsBuy] = useState(false);
 
-  const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
 
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);

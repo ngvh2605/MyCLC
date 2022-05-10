@@ -10,7 +10,7 @@ import {
   IonSlides,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
 

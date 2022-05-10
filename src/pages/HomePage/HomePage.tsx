@@ -104,11 +104,11 @@ interface Weather {
 }
 
 function getUVdiv(uv: number) {
-  if (uv >= 11) return <IonText color="danger">Nguy hiểm</IonText>;
-  else if (uv >= 8) return <IonText color="danger">Rất cao</IonText>;
-  else if (uv >= 6) return <IonText color="warning">Cao</IonText>;
-  else if (uv >= 3) return <IonText color="warning">Trung bình</IonText>;
-  else return <IonText color="success">Thấp</IonText>;
+  if (uv >= 11) return <IonText color="danger">[Nguy hiểm]</IonText>;
+  else if (uv >= 8) return <IonText color="danger">[Rất cao]</IonText>;
+  else if (uv >= 6) return <IonText color="warning">[Cao]</IonText>;
+  else if (uv >= 3) return <IonText color="warning">[Trung bình]</IonText>;
+  else return <IonText color="success">[Thấp]</IonText>;
 }
 
 const HomePage: React.FC = () => {
@@ -138,6 +138,11 @@ const HomePage: React.FC = () => {
       .once("value")
       .then(function (snapshot) {
         const firebaseData = snapshot.val();
+        if (firebaseData)
+          console.log(
+            "last updated weather",
+            moment().diff(moment(firebaseData.timestamp), "minutes")
+          );
         if (
           moment().diff(moment(firebaseData.timestamp), "minutes") >= 30 ||
           !firebaseData.timestamp
@@ -173,7 +178,8 @@ const HomePage: React.FC = () => {
               setWeatherData(temp);
               database.ref().child("public").child("weather").update({
                 weatherData: temp,
-                timestamp: moment().format(),
+                timestamp: moment().valueOf(),
+                user: userId,
               });
             })
             .catch(function (error) {
@@ -183,7 +189,7 @@ const HomePage: React.FC = () => {
           setWeatherData(firebaseData.weatherData);
         }
       });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     //read mail box
@@ -208,7 +214,7 @@ const HomePage: React.FC = () => {
 
     //firebase analytics
     FirebaseAnalytics.setScreenName({ screenName: "HomePage" });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     console.log("news mounted");
@@ -335,11 +341,13 @@ const HomePage: React.FC = () => {
 
                 <IonGrid className="ion-no-padding">
                   <IonRow>
-                    <IonCol size="2.5">
+                    <IonCol size="auto">
                       <IonImg
                         style={{
                           width: 54,
                           height: 54,
+                          paddingTop: 2,
+                          marginRight: 8,
                         }}
                         src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
                       />
@@ -347,9 +355,8 @@ const HomePage: React.FC = () => {
                     <IonCol>
                       <IonLabel text-wrap color="medium">
                         <IonText color="dark" style={{ fontSize: "large" }}>
-                          <b>{weatherData.realTemp}℃</b>
+                          <b>{weatherData.realTemp}°C</b>
                         </IonText>
-
                         <p>{weatherData.description}</p>
                       </IonLabel>
                     </IonCol>
@@ -357,7 +364,7 @@ const HomePage: React.FC = () => {
                   <IonRow>
                     <IonCol>
                       <IonLabel color="dark" text-wrap>
-                        Cảm giác: <b>{weatherData.likeTemp}℃</b>
+                        Cảm giác: <b>{weatherData.likeTemp}°C</b>
                         <br />
                         Độ ẩm: <b>{weatherData.humidity}%</b>
                         <br />
@@ -368,9 +375,16 @@ const HomePage: React.FC = () => {
 
                     <IonCol>
                       <IonLabel color="dark" text-wrap>
-                        UV: <b>{getUVdiv(weatherData.uv)}</b>
+                        UV:{" "}
+                        <b>
+                          {Intl.NumberFormat("en", {
+                            maximumFractionDigits: 1,
+                            minimumFractionDigits: 0,
+                          }).format(weatherData.uv)}{" "}
+                          {getUVdiv(weatherData.uv)}
+                        </b>
                         <br />
-                        Tốc độ gió:{" "}
+                        Sức gió:{" "}
                         <b>
                           {Intl.NumberFormat("en", {
                             maximumFractionDigits: 2,
@@ -379,7 +393,7 @@ const HomePage: React.FC = () => {
                           km/s
                         </b>
                         <br />
-                        Tầm nhìn xa:{" "}
+                        Tầm nhìn:{" "}
                         <b>
                           {Intl.NumberFormat("en", {
                             maximumFractionDigits: 2,
