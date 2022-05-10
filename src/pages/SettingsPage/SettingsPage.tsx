@@ -3,11 +3,16 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
   IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { personOutline } from "ionicons/icons";
 import React from "react";
 import { auth } from "../../firebase";
 
@@ -23,9 +28,12 @@ const SettingsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton color="medium" expand="block" onClick={() => auth.signOut()}>
-          Logout
-        </IonButton>
+        <IonList lines="none">
+          <IonItem>
+            <IonIcon icon={personOutline} slot="start" />
+            <IonLabel>Sửa thông tin cá nhân</IonLabel>
+          </IonItem>
+        </IonList>
       </IonContent>
     </IonPage>
   );

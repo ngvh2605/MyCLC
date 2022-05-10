@@ -230,7 +230,6 @@ const MenuPage = () => {
               history.push("/my/settings");
               menuClose();
             }}
-            hidden
             color={location.pathname === "/my/settings" ? "primary" : ""}
           >
             <IonIcon

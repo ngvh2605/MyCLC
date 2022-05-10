@@ -346,7 +346,8 @@ const HomePage: React.FC = () => {
                         style={{
                           width: 54,
                           height: 54,
-                          paddingTop: 2,
+                          paddingTop: 0,
+                          paddingBottom: 4,
                           marginRight: 8,
                         }}
                         src={`https://www.weatherbit.io/static/img/icons/${weatherData.icon}.png`}
