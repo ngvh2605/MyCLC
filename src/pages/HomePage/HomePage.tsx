@@ -112,7 +112,7 @@ function getUVdiv(uv: number) {
 }
 
 const HomePage: React.FC = () => {
-  const { userId } = useAuth();
+  const { userId, userEmail } = useAuth();
   const { allowCreateNews } = useCheckUserInfo(userId);
 
   const [lastKey, setLastKey] = useState<string | number | null>(null);
@@ -145,6 +145,7 @@ const HomePage: React.FC = () => {
           );
         if (
           moment().diff(moment(firebaseData.timestamp), "minutes") >= 30 ||
+          moment().diff(moment(firebaseData.timestamp), "minutes") < 0 ||
           !firebaseData.timestamp
         ) {
           const axios = require("axios");
@@ -179,7 +180,8 @@ const HomePage: React.FC = () => {
               database.ref().child("public").child("weather").update({
                 weatherData: temp,
                 timestamp: moment().valueOf(),
-                user: userId,
+                datetime: moment().format(),
+                user: userEmail,
               });
             })
             .catch(function (error) {

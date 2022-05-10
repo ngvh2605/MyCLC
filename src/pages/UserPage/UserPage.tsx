@@ -36,7 +36,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
@@ -108,6 +108,13 @@ const UserPage: React.FC = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const locationRef = useLocation<{ isEdit: boolean }>();
+
+  useEffect(() => {
+    if (locationRef && locationRef.state && locationRef.state.isEdit) {
+      setShowModal(true);
+    }
+  }, [locationRef]);
 
   useEffect(() => {
     if (id) {
@@ -124,15 +131,24 @@ const UserPage: React.FC = () => {
   const fetchUserInfo = async () => {
     const data = await getInfoByUserId(id);
     setUserInfo({ ...data });
-    setUserCustom({
-      intro: data.intro || "",
-      facebook: data.facebook || "",
-      instagram: data.instagram || "",
-      linkedin: data.linkedin || "",
-      youtube: data.youtube || "",
-      showEmail: data.showEmail || true,
-      showPhoneNumber: data.showPhoneNumber || true,
-    });
+    if (
+      data.intro ||
+      data.facebook ||
+      data.instagram ||
+      data.linkedin ||
+      data.youtube ||
+      data.showEmail ||
+      data.showPhoneNumber
+    )
+      setUserCustom({
+        intro: data.intro,
+        facebook: data.facebook,
+        instagram: data.instagram,
+        linkedin: data.linkedin,
+        youtube: data.youtube,
+        showEmail: data.showEmail,
+        showPhoneNumber: data.showPhoneNumber,
+      });
   };
 
   const readBadge = async () => {
@@ -418,9 +434,16 @@ const UserPage: React.FC = () => {
               </IonToolbar>
             </IonHeader>
             <IonContent>
-              <IonButton hidden onClick={() => console.log(userCustom)}>
+              <IonButton
+                hidden
+                onClick={() => {
+                  console.log("info", userInfo);
+                  console.log("custom", userCustom);
+                }}
+              >
                 Click
               </IonButton>
+              <br />
               <IonList lines="full">
                 <IonItem>
                   <IonLabel position="fixed">Giới thiệu</IonLabel>
