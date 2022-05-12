@@ -29,6 +29,7 @@ import {
   sendOutline,
   settingsOutline,
   sparklesOutline,
+  timeOutline,
 } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useHistory, useLocation } from "react-router";
@@ -173,11 +174,11 @@ const MenuPage = () => {
             color={location.pathname === "/my/timetable" ? "primary" : ""}
           >
             <IonIcon
-              icon={bookOutline}
+              icon={timeOutline}
               color={location.pathname !== "/my/timetable" ? "primary" : ""}
               slot="start"
             />
-            <IonLabel>Thời khoá biểu</IonLabel>
+            <IonLabel>To Do List</IonLabel>
           </IonItem> */}
 
           {/* <IonItem
@@ -238,36 +239,6 @@ const MenuPage = () => {
               slot="start"
             />
             <IonLabel>Cài đặt</IonLabel>
-          </IonItem>
-          <IonItem
-            href="https://m.me/CLCMultimedia"
-            target="_blank"
-            detail={false}
-          >
-            <IonIcon icon={sendOutline} color="primary" slot="start" />
-            <IonLabel>Liên hệ</IonLabel>
-            <IonIcon
-              icon={logoFacebook}
-              color="medium"
-              size="small"
-              slot="end"
-              style={{ marginRight: 16 }}
-            />
-          </IonItem>
-          <IonItem
-            href="https://www.facebook.com/groups/ChuyenLaoCai"
-            target="_blank"
-            detail={false}
-          >
-            <IonIcon icon={chatbubbleOutline} color="primary" slot="start" />
-            <IonLabel>Thảo luận</IonLabel>
-            <IonIcon
-              icon={logoFacebook}
-              color="medium"
-              size="small"
-              slot="end"
-              style={{ marginRight: 16 }}
-            />
           </IonItem>
         </IonList>
       </IonContent>

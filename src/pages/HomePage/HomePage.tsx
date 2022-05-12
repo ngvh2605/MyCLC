@@ -215,7 +215,12 @@ const HomePage: React.FC = () => {
     console.log(firebaseAuth.currentUser.metadata.lastSignInTime);
 
     //firebase analytics
-    FirebaseAnalytics.setScreenName({ screenName: "HomePage" });
+    FirebaseAnalytics.logEvent({
+      name: "view_HomePage",
+      params: {
+        page_title: "CLC News",
+      },
+    });
   }, [userId]);
 
   useEffect(() => {

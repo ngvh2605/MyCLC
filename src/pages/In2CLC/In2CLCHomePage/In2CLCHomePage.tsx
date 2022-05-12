@@ -22,7 +22,7 @@ import {
 import Autolinker from "autolinker";
 import { heart, searchOutline } from "ionicons/icons";
 import LogRocket from "logrocket";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import { database, firestore } from "../../../firebase";
@@ -36,6 +36,20 @@ const In2CLCHomePage: React.FC = () => {
   const { matchInfo, updateMatchInfo } = useIn2CLCCheck(userId, userEmail);
 
   const [presentAlert] = useIonAlert();
+
+  // useEffect(() => {
+  //   firestore
+  //     .collection("in2clc")
+  //     .where("code", "==", "M2")
+  //     .get()
+  //     .then(({ docs }) => {
+  //       let temp = [];
+  //       docs.forEach((doc) => {
+  //         temp.push(doc.data().email);
+  //       });
+  //       console.log("missions", JSON.stringify(temp));
+  //     });
+  // }, []);
 
   const searchMentee = async () => {
     console.log("Runing search mentee");
