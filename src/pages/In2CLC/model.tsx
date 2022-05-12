@@ -17,6 +17,7 @@ export interface Mission {
   code: string;
   title: string;
   body: string;
+  type?: string;
   deadline?: string;
   answer?: Answer;
 }

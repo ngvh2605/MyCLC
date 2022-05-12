@@ -7,7 +7,9 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonChip,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
@@ -15,6 +17,8 @@ import {
   IonLoading,
   IonMenuButton,
   IonPage,
+  IonRow,
+  IonText,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -22,7 +26,9 @@ import {
 import Autolinker from "autolinker";
 import { heart, searchOutline } from "ionicons/icons";
 import LogRocket from "logrocket";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
+import Countdown from "react-countdown";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import { database, firestore } from "../../../firebase";
@@ -91,6 +97,67 @@ const In2CLCHomePage: React.FC = () => {
     setIsLoading(false);
   };
 
+  const renderer = ({
+    days,
+    hours,
+    minutes,
+    seconds,
+    completed,
+  }: {
+    days: any;
+    hours: any;
+    minutes: any;
+    seconds: any;
+    completed: boolean;
+  }) => {
+    return (
+      <IonGrid>
+        <IonRow>
+          <IonCol>
+            <div style={{ textAlign: "center" }}>
+              <p>
+                <IonText style={{ fontSize: "x-large" }} color="dark">
+                  <b>{days}</b>
+                </IonText>
+              </p>
+              <IonLabel color="dark">Days</IonLabel>
+            </div>
+          </IonCol>
+          <IonCol>
+            <div style={{ textAlign: "center" }}>
+              <p>
+                <IonText style={{ fontSize: "x-large" }} color="dark">
+                  <b>{hours}</b>
+                </IonText>
+              </p>
+              <IonLabel color="dark">Hours</IonLabel>
+            </div>
+          </IonCol>
+          <IonCol>
+            <div style={{ textAlign: "center" }}>
+              <p>
+                <IonText style={{ fontSize: "x-large" }} color="dark">
+                  <b>{minutes}</b>
+                </IonText>
+              </p>
+              <IonLabel color="dark">Min</IonLabel>
+            </div>
+          </IonCol>
+          <IonCol>
+            <div style={{ textAlign: "center" }}>
+              <p>
+                <IonText style={{ fontSize: "x-large" }} color="dark">
+                  <b>{seconds}</b>
+                </IonText>
+              </p>
+              <IonLabel color="dark">Sec</IonLabel>
+            </div>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    );
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -113,6 +180,30 @@ const In2CLCHomePage: React.FC = () => {
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <IonCard>
             <IonImg src="https://firebasestorage.googleapis.com/v0/b/myclcproject.appspot.com/o/public%2F%5BIn2CLC%202022%5D%20Avatar.jpeg?alt=media&token=8c539497-05e7-4a0d-a78b-b57df7fd1f2a" />
+          </IonCard>
+
+          <IonCard>
+            <IonCardContent>
+              <IonCardSubtitle color="primary" style={{ textAlign: "center" }}>
+                <IonLabel>Đếm ngược kết thúc dự án In2CLC</IonLabel>
+              </IonCardSubtitle>
+              <Countdown
+                date={moment("2022-06-06T00:00:00+07:00").toDate()}
+                renderer={renderer}
+              />
+            </IonCardContent>
+          </IonCard>
+
+          <IonCard>
+            <IonCardContent>
+              <IonCardSubtitle color="primary" style={{ textAlign: "center" }}>
+                <IonLabel>Đếm ngược đến bài thi đầu tiên</IonLabel>
+              </IonCardSubtitle>
+              <Countdown
+                date={moment("2022-06-10T07:20:00+07:00").toDate()}
+                renderer={renderer}
+              />
+            </IonCardContent>
           </IonCard>
         </div>
 

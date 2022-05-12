@@ -280,7 +280,7 @@ const In2CLCMissionPage: React.FC = () => {
                         ></span>
                       </IonLabel>
 
-                      {mission.deadline ? (
+                      {mission.deadline && mission.type !== "info" ? (
                         mission.answer ? (
                           mission.answer.isMarked ? (
                             <IonCardSubtitle
