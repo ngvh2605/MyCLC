@@ -20,7 +20,8 @@ const App: React.FC = () => {
   }
   console.log(`rendering App with auth:`, auth);
 
-  LogRocket.init("clc-multimedia/myclc");
+  // LogRocket.init("clc-multimedia/myclc");
+  LogRocket.init("myclc/myclc");
 
   return (
     <IonApp>
