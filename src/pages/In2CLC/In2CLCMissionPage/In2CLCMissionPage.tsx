@@ -183,7 +183,7 @@ const In2CLCMissionPage: React.FC = () => {
       progress =
         (answer /
           missions.filter((item) => {
-            return !!item.deadline;
+            return !!item.deadline && item.type !== "info";
           }).length) *
         100;
     }
