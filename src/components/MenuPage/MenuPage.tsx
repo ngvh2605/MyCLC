@@ -20,16 +20,12 @@ import {
   bookOutline,
   buildOutline,
   calendarOutline,
-  chatbubbleOutline,
   checkmarkCircle,
-  logoFacebook,
   logOutOutline,
   newspaperOutline,
   personOutline,
-  sendOutline,
   settingsOutline,
   sparklesOutline,
-  timeOutline,
 } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useHistory, useLocation } from "react-router";

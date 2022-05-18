@@ -16,6 +16,8 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonItem,
   IonLabel,
   IonList,
@@ -248,14 +250,17 @@ const HomePage: React.FC = () => {
     setNewsList(newIds);
   };
 
-  const fetchMore = async () => {
+  const fetchMore = async (ev: any) => {
     const news = await getNextNews(lastKey, 3);
-    if (news.length < 3) {
-      setHasNextNews(false);
-    } else {
-      setLastKey(news?.slice(-1)?.pop()?.timestamp || lastKey);
-      setNewsList([...newsList, ...news.map((p) => p.id)]);
-    }
+    setTimeout(() => {
+      if (news.length < 3) {
+        setHasNextNews(false);
+      } else {
+        setLastKey(news?.slice(-1)?.pop()?.timestamp || lastKey);
+        setNewsList([...newsList, ...news.map((p) => p.id)]);
+      }
+      ev.target.complete();
+    }, 500);
   };
 
   const handleDelete = (id: string) => {
@@ -422,7 +427,7 @@ const HomePage: React.FC = () => {
           newsList
             //.slice(0, newsCount)
             .map((item, index) => (
-              <NewsCard newId={item} key={item} handleDelete={handleDelete} />
+              <NewsCard newId={item} key={index} handleDelete={handleDelete} />
             ))
         ) : (
           <>
@@ -433,6 +438,12 @@ const HomePage: React.FC = () => {
         )}
 
         {hasNextNews && (
+          <IonInfiniteScroll threshold="100px" onIonInfinite={fetchMore}>
+            <IonInfiniteScrollContent loadingSpinner="crescent" />
+          </IonInfiniteScroll>
+        )}
+
+        {/* {hasNextNews && (
           <IonButton
             style={{
               display: "block",
@@ -448,7 +459,7 @@ const HomePage: React.FC = () => {
               <IonIcon icon={chevronDown} />
             </IonLabel>
           </IonButton>
-        )}
+        )} */}
 
         {allowCreateNews && (
           <IonFab vertical="bottom" horizontal="end" slot="fixed">

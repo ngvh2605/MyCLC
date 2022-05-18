@@ -1,6 +1,5 @@
 import { alertController } from "@ionic/core";
 import {
-  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -16,6 +15,7 @@ import {
   IonLoading,
   IonPage,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import { closeCircle, eye, eyeOff } from "ionicons/icons";
 import React, { useState } from "react";
@@ -32,19 +32,21 @@ const LoginPage: React.FC = () => {
   const [passwordIcon, setPasswordIcon] = useState(eyeOff);
   const [status, setStatus] = useState({ loading: false, error: false });
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [presentAlert] = useIonAlert();
 
   const handleLogin = async () => {
     if (email.includes("@") === false || email.includes(".") === false) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Định dạng email không hợp lệ");
-      setShowAlert(true);
+      presentAlert({
+        header: "Lỗi!",
+        message: "Định dạng email không hợp lệ",
+        buttons: ["OK"],
+      });
     } else if (password.length < 8) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
-      setShowAlert(true);
+      presentAlert({
+        header: "Lỗi!",
+        message: "Mật khẩu tối thiểu 8 ký tự",
+        buttons: ["OK"],
+      });
     } else {
       try {
         setStatus({ loading: true, error: false });
@@ -56,9 +58,12 @@ const LoginPage: React.FC = () => {
       } catch (error) {
         setStatus({ loading: false, error: true });
         console.log("error:", error);
-        setAlertHeader("Lỗi!");
-        setAlertMessage("Email hoặc mật khẩu không đúng");
-        setShowAlert(true);
+
+        presentAlert({
+          header: "Lỗi!",
+          message: "Email hoặc mật khẩu không đúng",
+          buttons: ["OK"],
+        });
       }
     }
   };
@@ -66,20 +71,33 @@ const LoginPage: React.FC = () => {
   const handleForgotPassword = () => {
     getUserEmail().then((userEmail: string) => {
       console.log(userEmail);
-      auth
-        .sendPasswordResetEmail(userEmail)
-        .then(function () {
-          setAlertHeader("Đã gửi email đặt lại mặt khẩu!");
-          setAlertMessage(
-            "Vui lòng kiểm tra hộp thư đến hoặc hộp thư rác và làm theo hướng dẫn"
-          );
-          setShowAlert(true);
-        })
-        .catch(function (error) {
-          setAlertHeader("Lỗi!");
-          setAlertMessage(error);
-          setShowAlert(true);
+
+      let re = /\S+@\S+\.\S+/;
+      if (!!re.test(userEmail)) {
+        auth
+          .sendPasswordResetEmail(userEmail)
+          .then(function () {
+            presentAlert({
+              header: "Đã gửi email đặt lại mặt khẩu!",
+              message:
+                "Vui lòng kiểm tra hộp thư đến hoặc hộp thư rác và làm theo hướng dẫn",
+              buttons: ["OK"],
+            });
+          })
+          .catch(function (error) {
+            presentAlert({
+              header: "Lỗi!",
+              message: error,
+              buttons: ["OK"],
+            });
+          });
+      } else {
+        presentAlert({
+          header: "Lỗi!",
+          message: "Địa chỉ email không hợp lệ",
+          buttons: ["OK"],
         });
+      }
     });
   };
 
@@ -125,7 +143,12 @@ const LoginPage: React.FC = () => {
       <IonContent className="ion-padding">
         <IonImg
           src="/assets/image/Logo.svg"
-          style={{ width: "20%", marginLeft: "auto", marginRight: "auto" }}
+          style={{
+            maxWidth: 200,
+            width: "20%",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
         />
         <br />
         <br />
@@ -181,14 +204,6 @@ const LoginPage: React.FC = () => {
           </IonList>
         </form>
         <IonLoading isOpen={status.loading} />
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter className="ion-no-border">
         <IonToolbar>
