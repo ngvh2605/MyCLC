@@ -28,6 +28,7 @@ import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
+import ChatPage from "./pages/ChatPage/index";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
@@ -52,6 +53,10 @@ const AppTabs: React.FC = () => {
       </Route>
       <Route exact path="/my/home/add/:id">
         {allowCreateNews ? <AddNewsPage /> : <NotFoundPage />}
+      </Route>
+
+      <Route exact path="/my/chat">
+        <ChatPage />
       </Route>
 
       <Route exact path="/my/home/view/:id">
