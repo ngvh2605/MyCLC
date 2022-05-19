@@ -15,7 +15,7 @@ import "stream-chat-react/dist/css/index.css";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
 
-const api_key = "up3dxa5vata5";
+const api_key = "u6nz6buysmyr";
 
 const client = StreamChat.getInstance(api_key);
 
@@ -33,16 +33,15 @@ const ChatPage: React.FC = () => {
           {
             id: userId,
             name: fullName,
-            image: avatarUrl || "",
+            image: avatarUrl ? avatarUrl : "",
           },
           client.devToken(userId)
         )
         .then(async () => {
-          // const temp = client.channel("messaging", "travel", {
-          //   name: "Awesome channel about traveling",
-          // });
-          // setChannel(temp);
-          // await temp.watch();
+          const temp = client.channel("messaging", "travel", {
+            name: "Awesome channel about traveling",
+          });
+          setChannel(temp);
         });
     }
   }, [fullName]);
