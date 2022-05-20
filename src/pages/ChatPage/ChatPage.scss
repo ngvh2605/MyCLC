@@ -1,5 +1,32 @@
 #chat-page {
-    .str-chat__container {
-        height: calc(100vh - 44px);
-    }
+  .str-chat__container {
+    max-height: calc(100vh - 44px - 82px);
+  }
+
+  .str-chat-channel {
+    max-height: calc(100vh - 44px - 82px);
+  }
+
+  .str-chat__main-panel {
+    padding: 0px;
+  }
+
+  //emoji hidden
+  .str-chat__input-flat-emojiselect {
+    visibility: hidden;
+  }
+
+  .str-chat__input-flat .str-chat__textarea > textarea {
+    padding: 20px 60px 20px 20px;
+  }
+
+  .rta__autocomplete .str-chat__emojisearch {
+    visibility: hidden;
+  }
+}
+
+#chat-footer {
+  .str-chat {
+    height: auto !important;
+  }
 }

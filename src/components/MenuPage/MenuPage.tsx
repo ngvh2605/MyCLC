@@ -20,6 +20,8 @@ import {
   bookOutline,
   buildOutline,
   calendarOutline,
+  chatbubbleEllipsesOutline,
+  chatbubbleOutline,
   checkmarkCircle,
   logOutOutline,
   newspaperOutline,
@@ -209,6 +211,20 @@ const MenuPage = () => {
 
           <IonItem
             onClick={() => {
+              onItemClick("/my/chat");
+            }}
+            color={location.pathname.includes("/my/chat") ? "primary" : ""}
+          >
+            <IonIcon
+              icon={chatbubbleEllipsesOutline}
+              color={!location.pathname.includes("/my/chat") ? "primary" : ""}
+              slot="start"
+            />
+            <IonLabel>Phòng chat</IonLabel>
+          </IonItem>
+
+          <IonItem
+            onClick={() => {
               history.push("/my/about");
               menuClose();
             }}
@@ -242,7 +258,7 @@ const MenuPage = () => {
         <IonToolbar className="ion-no-padding">
           <IonList lines="none">
             <IonItem>
-              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 2.4</IonLabel>
+              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 2.5</IonLabel>
             </IonItem>
             {allowCreateEvent && (
               <IonItem
