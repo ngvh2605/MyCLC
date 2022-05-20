@@ -1,14 +1,17 @@
 import {
+  IonBackButton,
   IonButtons,
   IonContent,
   IonFooter,
   IonHeader,
+  IonLoading,
   IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { DefaultGenerics, StreamChat } from "stream-chat";
 import {
   Chat,
@@ -28,33 +31,41 @@ import { auth } from "../../firebase";
 import "./ChatPage.scss";
 
 const api_key = "u6nz6buysmyr";
+interface RouteParams {
+  id: string;
+}
 
 const ChatPage: React.FC = () => {
   const { userId, userEmail } = useAuth();
-  const { isVerify, avatarVerify, fullName, avatarUrl, allowCreateEvent } =
-    useCheckUserInfo(userId);
+  const { id } = useParams<RouteParams>();
 
   const [client, setClient] = useState<StreamChat<DefaultGenerics>>(null);
   const [channel, setChannel] = useState(null);
 
   useEffect(() => {
+    console.log("id", id);
+  }, [id]);
+
+  useEffect(() => {
     async function init() {
       const chatClient = StreamChat.getInstance(api_key);
-      await chatClient.connectUser(
-        {
-          id: userId,
-          name: auth.currentUser.displayName,
-          image: auth.currentUser.photoURL,
-        },
-        chatClient.devToken(userId)
-      );
 
-      const chatChannel = chatClient.channel("messaging", "travel", {
-        name: "Awesome channel about traveling",
-        members: [userId],
-      });
+      const connectionId = chatClient._getConnectionID();
+      if (!connectionId) {
+        await chatClient.connectUser(
+          {
+            id: userId,
+            name: auth.currentUser.displayName,
+            image: auth.currentUser.photoURL,
+          },
+          chatClient.devToken(userId)
+        );
+      }
+
+      const chatChannel = chatClient.channel("messaging", id, {});
 
       await chatChannel.watch();
+      await chatChannel.addMembers([{ user_id: userId }]);
 
       setChannel(chatChannel);
       setClient(chatClient);
@@ -74,7 +85,7 @@ const ChatPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonMenuButton />
+            <IonBackButton defaultHref="/my/chat" text="" />
           </IonButtons>
 
           <IonTitle>Chat</IonTitle>
@@ -85,19 +96,27 @@ const ChatPage: React.FC = () => {
           <Chat client={client} theme="messaging light" customStyles={{}}>
             <Channel channel={channel}>
               <Window>
-                <MessageInput />
                 {/* <ChannelHeader
                   MenuIcon={() => {
                     return <></>;
                   }}
                 /> */}
                 <MessageList />
+                <MessageInput />
               </Window>
               <Thread />
             </Channel>
           </Chat>
         )}
+        <IonLoading isOpen={!client || !channel} />
       </IonContent>
+      {!!client && !!channel && (
+        <Chat client={client} theme="messaging light" customStyles={{}}>
+          <Channel channel={channel}>
+            <MessageInput />
+          </Channel>
+        </Chat>
+      )}
     </IonPage>
   );
 };

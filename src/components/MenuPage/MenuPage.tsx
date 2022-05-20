@@ -197,11 +197,11 @@ const MenuPage = () => {
             onClick={() => {
               onItemClick("/my/in2clc");
             }}
-            color={location.pathname === "/my/in2clc" ? "primary" : ""}
+            color={location.pathname.includes("/my/in2clc") ? "primary" : ""}
           >
             <IonIcon
               icon={bookOutline}
-              color={location.pathname !== "/my/in2clc" ? "primary" : ""}
+              color={!location.pathname.includes("/my/in2clc") ? "primary" : ""}
               slot="start"
             />
             <IonLabel>In2CLC</IonLabel>

@@ -174,6 +174,8 @@ const In2CLCMissionPage: React.FC = () => {
       let answer = 0;
       missions.forEach((mission) => {
         if (
+          mission.deadline &&
+          mission.type !== "info" &&
           mission.answer &&
           mission.answer.isMarked &&
           mission.answer.isApproved

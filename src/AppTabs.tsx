@@ -29,6 +29,7 @@ import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
 import ChatPage from "./pages/ChatPage/index";
+import ChatHomePage from "./pages/ChatPage/ChatHomePage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
@@ -56,6 +57,9 @@ const AppTabs: React.FC = () => {
       </Route>
 
       <Route exact path="/my/chat">
+        <ChatHomePage />
+      </Route>
+      <Route exact path="/my/chat/:id">
         <ChatPage />
       </Route>
 
