@@ -1,5 +1,6 @@
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonFooter,
@@ -9,7 +10,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useParams } from "react-router";
 import { DefaultGenerics, StreamChat } from "stream-chat";
 import {
@@ -39,6 +40,7 @@ interface stateType {
 const ChatPage: React.FC = () => {
   const location = useLocation<stateType>();
   const history = useHistory();
+  const contentRef = useRef<any>();
   const { userId, userEmail } = useAuth();
   const { id } = useParams<RouteParams>();
 
@@ -80,7 +82,9 @@ const ChatPage: React.FC = () => {
     }
 
     if (userId && location.state && location.state.from === "ChatHomePage")
-      init();
+      init().then(() => {
+        scrollToBottomOnInit();
+      });
     else history.goBack();
 
     return () => {
@@ -90,6 +94,11 @@ const ChatPage: React.FC = () => {
     };
   }, [userId]);
 
+  function scrollToBottomOnInit() {
+    setTimeout(() => {
+      contentRef.current.scrollToBottom(0);
+    }, 100);
+  }
   return (
     <IonPage id="chat-page">
       <IonHeader>
@@ -100,7 +109,15 @@ const ChatPage: React.FC = () => {
           <IonTitle>Phòng chat</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent scroll-y="false">
+      <IonContent ref={contentRef} scrollY={false}>
+        <IonButton
+          hidden
+          onClick={() => {
+            scrollToBottomOnInit();
+          }}
+        >
+          Debug
+        </IonButton>
         {!!client && !!channel && (
           <Chat client={client} theme="messaging light" customStyles={{}}>
             <Channel
@@ -117,6 +134,7 @@ const ChatPage: React.FC = () => {
                   }}
                 />
                 <MessageList />
+                <MessageInput />
               </Window>
               <Thread />
             </Channel>
@@ -124,9 +142,9 @@ const ChatPage: React.FC = () => {
         )}
         <IonLoading isOpen={!client || !channel} />
       </IonContent>
-      {!!client && !!channel && (
+      {/* {!!client && !!channel && (
         <IonFooter id="chat-footer">
-          <IonToolbar style={{}}>
+          <IonToolbar className="ion-no-padding" style={{}}>
             <Chat client={client} theme="messaging light" customStyles={{}}>
               <Channel
                 channel={channel}
@@ -139,7 +157,7 @@ const ChatPage: React.FC = () => {
             </Chat>
           </IonToolbar>
         </IonFooter>
-      )}
+      )} */}
     </IonPage>
   );
 };

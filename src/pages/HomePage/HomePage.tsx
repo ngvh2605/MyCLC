@@ -226,11 +226,6 @@ const HomePage: React.FC = () => {
   }, [userId]);
 
   useEffect(() => {
-    console.log("news mounted");
-    return () => console.log("news unmounted");
-  }, []);
-
-  useEffect(() => {
     const snapshotNewNews = firestore
       .collection("news")
       .where("timestamp", ">", lastRefresh)

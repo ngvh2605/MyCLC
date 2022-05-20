@@ -245,3 +245,11 @@ ion-card-subtitle {
   -ms-user-select: text;
   user-select: text;
 }
+
+/* skeleton text */
+ion-skeleton-text {
+  border-radius: 0;
+}
+ion-avatar ion-skeleton-text {
+  border-radius: 50px;
+}

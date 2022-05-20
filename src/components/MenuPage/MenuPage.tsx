@@ -14,6 +14,7 @@ import {
   IonMenu,
   IonRow,
   IonToolbar,
+  useIonAlert,
   useIonToast,
 } from "@ionic/react";
 import {
@@ -29,11 +30,11 @@ import {
   settingsOutline,
   sparklesOutline,
 } from "ionicons/icons";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
-import { auth } from "../../firebase";
+import { auth, database } from "../../firebase";
 import "./MenuPage.scss";
 
 const MenuPage = () => {
@@ -44,6 +45,8 @@ const MenuPage = () => {
   const menuEl = useRef<HTMLIonMenuElement>(null);
 
   const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
+  const [appVersion, setAppVersion] = useState("");
 
   const { isVerify, avatarVerify, fullName, avatarUrl, allowCreateEvent } =
     useCheckUserInfo(userId);
@@ -51,6 +54,34 @@ const MenuPage = () => {
   const menuClose = () => {
     menuEl.current.close();
   };
+
+  useEffect(() => {
+    try {
+      //get app version
+      let pjson = require("../../../package.json");
+      setAppVersion(pjson.version);
+
+      database
+        .ref()
+        .child("public")
+        .child("appVersion")
+        .once("value")
+        .then(function (snapshot) {
+          if (snapshot.val() !== pjson.version) {
+            console.log("current appVersion", pjson.version);
+            console.log("database appVersion", snapshot.val());
+
+            presentAlert({
+              header: `Đã có phiên bản ${snapshot.val()}`,
+              message: "Vui lòng tải lại trang để cập nhật phiên bản mới",
+              buttons: [{ text: "OK" }],
+            });
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [userId]);
 
   const onItemClick = async (link: string) => {
     if (isVerify) {
@@ -258,7 +289,9 @@ const MenuPage = () => {
         <IonToolbar className="ion-no-padding">
           <IonList lines="none">
             <IonItem>
-              <IonLabel style={{ marginLeft: 16 }}>Phiên bản: 2.5</IonLabel>
+              <IonLabel style={{ marginLeft: 16 }}>
+                Phiên bản: {appVersion}
+              </IonLabel>
             </IonItem>
             {allowCreateEvent && (
               <IonItem

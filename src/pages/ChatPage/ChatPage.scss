@@ -1,10 +1,18 @@
 #chat-page {
+  ion-content {
+    --background: white;
+  }
+
+  .str-chat__message-attachment-actions-button--default {
+    color: black;
+  }
+
   .str-chat__container {
-    max-height: calc(100vh - 44px - 82px);
+    max-height: calc(100vh - 44px);
   }
 
   .str-chat-channel {
-    max-height: calc(100vh - 44px - 82px);
+    max-height: calc(100vh - 44px);
   }
 
   .str-chat__main-panel {
