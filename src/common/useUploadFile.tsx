@@ -7,7 +7,7 @@ const useUploadFile = (userId?: string) => {
 
   const handleUploadImage = async (
     blobUrl: any,
-    type?: "avatar" | "news" | "events" | "adventure" | "in2clc",
+    type?: "avatar" | "news" | "events" | "adventure" | "in2clc" | "frame",
     name?: string
   ) => {
     const imgName = name ? name : `${Date.now()}`;

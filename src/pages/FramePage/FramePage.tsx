@@ -2,30 +2,40 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
   IonImg,
+  IonLabel,
+  IonLoading,
   IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
+  useIonToast,
 } from "@ionic/react";
+import { home, homeOutline, logoFacebook } from "ionicons/icons";
 import jimp from "jimp";
 import mergeImages from "merge-images";
 import React, { useEffect, useState } from "react";
-import { homeOutline } from "ionicons/icons";
-import { useAuth } from "../../auth";
 import { useHistory } from "react-router";
+import { useAuth } from "../../auth";
+import { database } from "../../firebase";
+import useUploadFile from "./../../common/useUploadFile";
 
 const FramePage: React.FC = () => {
   const history = useHistory();
   const { userId } = useAuth();
   const [imgUrl, setImgUrl] = useState("");
   const [mergeUrl, setMergeUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { handleUploadImage } = useUploadFile(userId);
+  const [presentToast] = useIonToast();
 
   useEffect(() => {
     if (!!imgUrl) {
+      setLoading(true);
       crop(imgUrl, 1).then((cropImg: string) => {
         resizeToFrame(cropImg).then((resizeImg: string) => {
           mergeImages([resizeImg, "/assets/image/FacebookFrame.png"], {
@@ -33,6 +43,7 @@ const FramePage: React.FC = () => {
             height: 960,
           }).then((b64: string) => {
             setMergeUrl(b64);
+            setLoading(false);
           });
         });
       });
@@ -86,18 +97,95 @@ const FramePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonButton
-          expand="block"
-          color="primary"
-          onClick={() => {
-            handlePictureClick();
-          }}
-        >
-          Chọn ảnh
-        </IonButton>
-        <br />
-        <br />
-        {mergeUrl && <IonImg src={mergeUrl} />}
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <IonButton
+            expand="block"
+            color={mergeUrl ? "medium" : "primary"}
+            onClick={() => {
+              handlePictureClick();
+            }}
+          >
+            {mergeUrl ? "Chọn ảnh khác" : "Chọn ảnh"}
+          </IonButton>
+
+          <br />
+          <br />
+          {mergeUrl && (
+            <>
+              <IonImg src={mergeUrl} />
+
+              <br />
+              <IonButton
+                expand="block"
+                color="primary"
+                onClick={async () => {
+                  setLoading(true);
+                  if (userId) {
+                    const uploadedUrl = await handleUploadImage(
+                      mergeUrl,
+                      "avatar"
+                    );
+                    const userData = database.ref();
+                    await userData
+                      .child("users")
+                      .child(userId)
+                      .child("verify")
+                      .update({
+                        hasAvatar: true,
+                      });
+                    await userData
+                      .child("users")
+                      .child(userId)
+                      .child("personal")
+                      .update({
+                        avatar: uploadedUrl,
+                      })
+                      .then(() => {
+                        setLoading(false);
+                        presentToast({
+                          message:
+                            "Ảnh đại diện của bạn đã được cập nhật thành công",
+                          color: "success",
+                          duration: 3000,
+                        });
+                        history.push(`/my/home`);
+                        window.open(uploadedUrl, "_blank").focus();
+                      });
+                  } else {
+                    const uploadedUrl = await handleUploadImage(
+                      mergeUrl,
+                      "frame"
+                    );
+                    setLoading(false);
+                    presentToast({
+                      message: "Hãy tải ảnh về và đổi ảnh đại diện Facebook",
+                      color: "success",
+                      duration: 3000,
+                    });
+                    history.push(`/index`);
+                    window.open(uploadedUrl, "_blank").focus();
+                  }
+                }}
+              >
+                <IonIcon icon={logoFacebook} slot="start" />
+                Đặt làm ảnh đại diện
+              </IonButton>
+
+              <br />
+              <IonChip
+                color="primary"
+                style={{ height: "max-content", marginBottom: 10 }}
+              >
+                <IonLabel text-wrap className="ion-padding">
+                  Sau khi tải ảnh xuống, bạn có thể vào Facebook và tải ảnh lên
+                  để làm ảnh đại diện
+                </IonLabel>
+              </IonChip>
+            </>
+          )}
+        </div>
+
+        <IonLoading isOpen={loading} />
       </IonContent>
     </IonPage>
   );
