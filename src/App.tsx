@@ -6,6 +6,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import AppTabs from "./AppTabs";
 import { AuthContext, useAuthInit } from "./auth";
 import MenuPage from "./components/MenuPage";
+import FramePage from "./pages/FramePage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -40,6 +41,11 @@ const App: React.FC = () => {
               <Route exact path="/register">
                 <RegisterPage />
               </Route>
+
+              <Route path="/frame">
+                <FramePage />
+              </Route>
+
               <Route path="/my">
                 <AppTabs />
               </Route>
