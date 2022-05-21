@@ -30,6 +30,7 @@ import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
 import ChatPage from "./pages/ChatPage/index";
 import ChatHomePage from "./pages/ChatPage/ChatHomePage";
+import FramePage from "./pages/FramePage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
@@ -41,6 +42,10 @@ const AppTabs: React.FC = () => {
 
   return (
     <IonRouterOutlet>
+      <Route path="/my/frame">
+        <FramePage />
+      </Route>
+
       <Route path="/my/clc2uni" component={CLC2UniPage}></Route>
       <Route path="/my/in2clc" component={In2CLCPage}></Route>
 

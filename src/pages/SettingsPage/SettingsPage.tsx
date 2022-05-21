@@ -16,6 +16,7 @@ import {
   cameraOutline,
   chatbubbleOutline,
   homeOutline,
+  imageOutline,
   logoFacebook,
   personOutline,
   sendOutline,
@@ -79,7 +80,23 @@ const SettingsPage: React.FC = () => {
             <IonLabel>Sửa trang cá nhân</IonLabel>
           </IonItem>
         </IonList>
-
+        <br />
+        <IonItemDivider
+          color="primary"
+          style={{ paddingTop: 6, paddingBottom: 6 }}
+        >
+          <IonLabel className="ion-padding-horizontal">Tiện ích</IonLabel>
+        </IonItemDivider>
+        <IonList lines="none" className="ion-padding">
+          <IonItem
+            onClick={() => {
+              history.push("/my/frame");
+            }}
+          >
+            <IonIcon icon={imageOutline} slot="start" color="primary" />
+            <IonLabel>Thêm khung ảnh đại diện</IonLabel>
+          </IonItem>
+        </IonList>
         <br />
         <IonItemDivider
           color="primary"

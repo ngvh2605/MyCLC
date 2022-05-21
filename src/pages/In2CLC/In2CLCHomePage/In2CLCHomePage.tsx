@@ -27,7 +27,7 @@ import Autolinker from "autolinker";
 import { heart, searchOutline } from "ionicons/icons";
 import LogRocket from "logrocket";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Countdown from "react-countdown";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";

@@ -22,7 +22,6 @@ import {
   buildOutline,
   calendarOutline,
   chatbubbleEllipsesOutline,
-  chatbubbleOutline,
   checkmarkCircle,
   logOutOutline,
   newspaperOutline,
@@ -67,10 +66,9 @@ const MenuPage = () => {
         .child("appVersion")
         .once("value")
         .then(function (snapshot) {
+          console.log("current appVersion", pjson.version);
+          console.log("database appVersion", snapshot.val());
           if (snapshot.val() !== pjson.version) {
-            console.log("current appVersion", pjson.version);
-            console.log("database appVersion", snapshot.val());
-
             presentAlert({
               header: `Đã có phiên bản ${snapshot.val()}`,
               message: "Vui lòng tải lại trang để cập nhật phiên bản mới",

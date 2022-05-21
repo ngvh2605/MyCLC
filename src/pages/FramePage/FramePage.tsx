@@ -1,5 +1,6 @@
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonChip,
@@ -19,12 +20,13 @@ import { home, homeOutline, logoFacebook } from "ionicons/icons";
 import jimp from "jimp";
 import mergeImages from "merge-images";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import { database } from "../../firebase";
 import useUploadFile from "./../../common/useUploadFile";
 
 const FramePage: React.FC = () => {
+  const location = useLocation();
   const history = useHistory();
   const { userId } = useAuth();
   const [imgUrl, setImgUrl] = useState("");
@@ -82,7 +84,11 @@ const FramePage: React.FC = () => {
         <IonToolbar>
           <IonButtons slot="start">
             {userId ? (
-              <IonMenuButton />
+              location.pathname.includes("/my/frame") ? (
+                <IonBackButton text="" defaultHref="/my/settings" />
+              ) : (
+                <IonMenuButton />
+              )
             ) : (
               <IonButton
                 onClick={() => {

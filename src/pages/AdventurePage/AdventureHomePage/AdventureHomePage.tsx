@@ -14,7 +14,7 @@ import {
   useIonToast,
 } from "@ionic/react";
 import { gameController, ticketOutline } from "ionicons/icons";
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../../../auth";
 import { database, firestore } from "../../../firebase";
 import useAdventureCheck from "../useAdventureCheck";

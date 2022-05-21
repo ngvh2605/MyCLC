@@ -10,7 +10,6 @@ import {
   IonImg,
   IonItem,
   IonLabel,
-  IonList,
   IonListHeader,
   IonMenuButton,
   IonPage,
@@ -19,7 +18,6 @@ import {
 } from "@ionic/react";
 import React from "react";
 import { useHistory } from "react-router";
-import { StreamChat } from "stream-chat";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useIn2CLCCheck from "../../In2CLC/useIn2CLCCheck";

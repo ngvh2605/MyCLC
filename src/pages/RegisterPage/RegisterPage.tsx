@@ -19,14 +19,14 @@ import {
 import { closeCircle, eye, eyeOff } from "ionicons/icons";
 import moment from "moment";
 import React, { useState } from "react";
-import { Redirect, useHistory } from "react-router";
+import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database } from "../../firebase";
 import "./RegisterPage.scss";
 
 const RegisterPage: React.FC = () => {
   const { loggedIn } = useAuth();
-  const history = useHistory();
+
   const [email, setEmail] = useState("");
   const [emailRe, setEmailRe] = useState("");
   const [password, setPassword] = useState("");

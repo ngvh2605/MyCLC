@@ -29,7 +29,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { firestore } from "../../../firebase";
 import { getInfoByUserId } from "../../HomePage/services";
-import { Player, Team } from "../model";
+import { Team } from "../model";
 import "./AdventureRankPage.scss";
 
 const AdventureRankPage: React.FC = () => {
