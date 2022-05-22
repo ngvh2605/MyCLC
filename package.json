@@ -1,6 +1,6 @@
 {
   "name": "myclc",
-  "version": "2.5.2",
+  "version": "2.6",
   "private": true,
   "scripts": {
     "start": "ionic serve",

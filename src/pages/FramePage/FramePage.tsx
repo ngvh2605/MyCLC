@@ -1,82 +1,199 @@
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
+  IonAvatar,
   IonBackButton,
   IonButton,
   IonButtons,
   IonChip,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
+  IonItem,
   IonLabel,
+  IonListHeader,
   IonLoading,
   IonMenuButton,
   IonPage,
+  IonRow,
+  IonSlide,
+  IonSlides,
+  IonText,
   IonTitle,
   IonToolbar,
+  isPlatform,
+  useIonAlert,
   useIonToast,
 } from "@ionic/react";
-import { home, homeOutline, logoFacebook } from "ionicons/icons";
+import { camera, home, homeOutline, logoFacebook } from "ionicons/icons";
+import Jimp from "jimp";
 import jimp from "jimp";
 import mergeImages from "merge-images";
-import React, { useEffect, useState } from "react";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
-import { database } from "../../firebase";
+import { database, storage } from "../../firebase";
 import useUploadFile from "./../../common/useUploadFile";
+
+interface Frame {
+  name: string;
+  url: string;
+  date: string;
+}
 
 const FramePage: React.FC = () => {
   const location = useLocation();
   const history = useHistory();
   const { userId } = useAuth();
+  const contentRef = useRef<any>();
+  const fileInputRef = useRef<HTMLInputElement>();
+
+  const [frameList, setFrameList] = useState<Frame[]>();
+  const [chosenFrame, setChosenFrame] = useState<Frame>();
   const [imgUrl, setImgUrl] = useState("");
   const [mergeUrl, setMergeUrl] = useState("");
+  const [uploadUrl, setUploadUrl] = useState("");
+
   const [loading, setLoading] = useState(false);
   const { handleUploadImage } = useUploadFile(userId);
   const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
 
   useEffect(() => {
-    if (!!imgUrl) {
-      setLoading(true);
-      crop(imgUrl, 1).then((cropImg: string) => {
-        resizeToFrame(cropImg).then((resizeImg: string) => {
-          mergeImages([resizeImg, "/assets/image/FacebookFrame.png"], {
-            width: 960,
-            height: 960,
-          }).then((b64: string) => {
-            setMergeUrl(b64);
-            setLoading(false);
-          });
-        });
+    if (uploadUrl) {
+      presentAlert({
+        header: "Ảnh đã xử lý xong",
+        message: "Hãy tải ảnh về và đặt làm ảnh đại diện Facebook nhé!",
+        buttons: [
+          {
+            text: "Tải ảnh",
+            handler: () => {
+              window.open(uploadUrl);
+              if (userId) history.push("/my/home");
+              else history.push("/index");
+            },
+          },
+        ],
+        backdropDismiss: false,
       });
     }
-  }, [imgUrl]);
+  }, [uploadUrl]);
 
-  const resizeToFrame = async (b64: string) => {
-    const image = await jimp.read(
-      Buffer.from(b64.replace(/^data:image\/png;base64,/, ""), "base64")
-    );
+  useEffect(() => {
+    const processMerge = async () => {
+      if (imgUrl && chosenFrame) {
+        setLoading(true);
+
+        try {
+          crop(imgUrl, 1).then(async (cropImg: string) => {
+            const cropResize = await resizeToFrame(cropImg, "b64");
+            const frameResize = await resizeToFrame(chosenFrame.url, "png");
+
+            // console.log("cropResize", cropResize);
+            // console.log("frameResize", frameResize);
+            mergeImages([cropResize, frameResize], {
+              width: 960,
+              height: 960,
+              quality: 1,
+              crossOrigin: "Anonymous",
+            }).then((b64: string) => {
+              console.log(b64);
+              setMergeUrl(b64);
+              setLoading(false);
+              scrollToBottomOnInit();
+            });
+          });
+        } catch (error) {
+          presentToast({ message: error, color: "danger", duration: 3000 });
+        }
+      }
+    };
+
+    processMerge();
+  }, [imgUrl, chosenFrame]);
+
+  useEffect(() => {
+    const readFrameDatabase = async () => {
+      setLoading(true);
+      const data = (
+        await database.ref().child("public").child("frameDatabase").get()
+      ).val();
+      let temp: Frame[] = [];
+      if (data) {
+        for (var prop in data) {
+          if (data.hasOwnProperty(prop)) {
+            temp.push(data[prop]);
+          }
+        }
+      }
+      temp = temp.sort((a, b) => {
+        return (
+          moment(b.date, "DD/MM/YYYY").valueOf() -
+          moment(a.date, "DD/MM/YYYY").valueOf()
+        );
+      });
+      setChosenFrame(temp[0]);
+      setFrameList(temp);
+      setLoading(false);
+    };
+
+    readFrameDatabase();
+  }, []);
+
+  const resizeToFrame = async (data: string, type: "b64" | "png") => {
+    let image: Jimp;
+    if (type === "b64")
+      image = await jimp.read(
+        Buffer.from(data.replace(/^data:image\/png;base64,/, ""), "base64")
+      );
+    else image = await jimp.read(data);
 
     if (image.getWidth() < image.getHeight()) {
       image.resize(960, jimp.AUTO);
     } else image.resize(jimp.AUTO, 960);
 
-    return image.getBase64Async(jimp.MIME_JPEG);
+    if (type === "b64") return image.getBase64Async(jimp.MIME_JPEG);
+    else return image.getBase64Async(jimp.MIME_PNG);
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files.length > 0) {
+      const file = event.target.files.item(0);
+      const pictureUrl = URL.createObjectURL(file);
+
+      setImgUrl(pictureUrl);
+    }
   };
 
   const handlePictureClick = async () => {
-    try {
-      const photo = await Camera.getPhoto({
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Prompt,
-        width: 960,
-      });
+    if (isPlatform("capacitor")) {
+      try {
+        const photo = await Camera.getPhoto({
+          resultType: CameraResultType.Uri,
+          source: CameraSource.Prompt,
+          width: 960,
+        });
 
-      setImgUrl(photo.webPath);
-    } catch (error) {
-      console.log("Camera error:", error);
+        setImgUrl(photo.webPath);
+      } catch (error) {
+        console.log("Camera error:", error);
+        presentToast({ message: error, color: "danger", duration: 3000 });
+      }
+    } else {
+      fileInputRef.current.click();
     }
   };
+
+  function scrollToBottomOnInit() {
+    setTimeout(() => {
+      contentRef.current.scrollToBottom(1000);
+    }, 100);
+  }
 
   return (
     <IonPage>
@@ -102,8 +219,79 @@ const FramePage: React.FC = () => {
           <IonTitle>Thêm khung</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+      <IonContent ref={contentRef}>
+        <IonListHeader style={{ marginBottom: 8 }} color="black">
+          Chọn khung
+        </IonListHeader>
+        {frameList && chosenFrame && frameList.length > 0 && (
+          <IonSlides
+            options={{
+              slidesPerView: window.screen.width / 120,
+              freeMode: true,
+            }}
+          >
+            {frameList.map((frame, index) => (
+              <IonSlide
+                key={index}
+                onClick={() => {
+                  setChosenFrame(frame);
+                }}
+              >
+                <IonGrid>
+                  <IonRow>
+                    <IonCol>
+                      <IonAvatar
+                        style={
+                          frame.url === chosenFrame.url
+                            ? {
+                                height: 80,
+                                width: 80,
+                                margin: "0 auto",
+                                boxShadow:
+                                  "0px 0px 0px 3px var(--ion-color-light), 0px 0px 0px 6px var(--ion-color-primary)",
+                              }
+                            : { height: 80, width: 80, margin: "0 auto" }
+                        }
+                      >
+                        <IonImg src={frame.url} />
+                      </IonAvatar>
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol className="ion-no-padding">
+                      <IonLabel
+                        text-wrap
+                        color={frame.url === chosenFrame.url ? "primary" : ""}
+                        style={
+                          frame.url === chosenFrame.url
+                            ? {
+                                fontWeight: "bold",
+                              }
+                            : {}
+                        }
+                      >
+                        {frame.name}
+                      </IonLabel>
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonSlide>
+            ))}
+          </IonSlides>
+        )}
+        <div
+          style={{ maxWidth: 680, margin: "0 auto" }}
+          className="ion-padding-horizontal"
+        >
+          <input
+            type="file"
+            id="upload"
+            accept="image/*"
+            hidden
+            multiple={false}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
           <IonButton
             expand="block"
             color={mergeUrl ? "medium" : "primary"}
@@ -111,13 +299,15 @@ const FramePage: React.FC = () => {
               handlePictureClick();
             }}
           >
+            <IonIcon icon={camera} slot="start" />
             {mergeUrl ? "Chọn ảnh khác" : "Chọn ảnh"}
           </IonButton>
 
           <br />
-          <br />
-          {mergeUrl && (
+
+          {mergeUrl ? (
             <>
+              <br />
               <IonImg src={mergeUrl} />
 
               <br />
@@ -131,6 +321,7 @@ const FramePage: React.FC = () => {
                       mergeUrl,
                       "avatar"
                     );
+
                     const userData = database.ref();
                     await userData
                       .child("users")
@@ -148,14 +339,7 @@ const FramePage: React.FC = () => {
                       })
                       .then(() => {
                         setLoading(false);
-                        presentToast({
-                          message:
-                            "Ảnh đại diện của bạn đã được cập nhật thành công",
-                          color: "success",
-                          duration: 3000,
-                        });
-                        history.push(`/my/home`);
-                        window.open(uploadedUrl, "_blank").focus();
+                        setUploadUrl(uploadedUrl);
                       });
                   } else {
                     const uploadedUrl = await handleUploadImage(
@@ -163,13 +347,7 @@ const FramePage: React.FC = () => {
                       "frame"
                     );
                     setLoading(false);
-                    presentToast({
-                      message: "Hãy tải ảnh về và đổi ảnh đại diện Facebook",
-                      color: "success",
-                      duration: 3000,
-                    });
-                    history.push(`/index`);
-                    window.open(uploadedUrl, "_blank").focus();
+                    setUploadUrl(uploadedUrl);
                   }
                 }}
               >
@@ -188,6 +366,15 @@ const FramePage: React.FC = () => {
                 </IonLabel>
               </IonChip>
             </>
+          ) : (
+            <IonChip
+              color="primary"
+              style={{ height: "max-content", marginBottom: 10 }}
+            >
+              <IonLabel text-wrap className="ion-padding">
+                Nên chọn ảnh hình vuông hoặc đã được crop sẵn để thêm khung
+              </IonLabel>
+            </IonChip>
           )}
         </div>
 
