@@ -179,15 +179,27 @@ const UserPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setUserCustom({
-      intro: userInfo.intro || "",
-      facebook: userInfo.facebook || "",
-      instagram: userInfo.instagram || "",
-      linkedin: userInfo.linkedin || "",
-      youtube: userInfo.youtube || "",
-      showEmail: userInfo.showEmail || true,
-      showPhoneNumber: userInfo.showPhoneNumber || true,
-    });
+    if (userInfo)
+      setUserCustom({
+        intro: userInfo.intro,
+        facebook: userInfo.facebook,
+        instagram: userInfo.instagram,
+        linkedin: userInfo.linkedin,
+        youtube: userInfo.youtube,
+        showEmail: userInfo.showEmail,
+        showPhoneNumber: userInfo.showPhoneNumber,
+      });
+    else
+      setUserCustom({
+        intro: "",
+        facebook: "",
+        instagram: "",
+        linkedin: "",
+        youtube: "",
+        showEmail: true,
+        showPhoneNumber: true,
+      });
+
     setShowModal(false);
   };
 
@@ -332,62 +344,64 @@ const UserPage: React.FC = () => {
                   userInfo.instagram ||
                   userInfo.linkedin ||
                   userInfo.youtube) && (
-                  <IonItem>
-                    <div style={{ textAlign: "center" }}>
-                      {userInfo.facebook && (
-                        <a
-                          href={userInfo.facebook}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ textDecoration: "none" }}
-                        >
-                          <IonChip color="secondary">
-                            <IonIcon icon={logoFacebook} />
-                            <IonLabel>Facebook</IonLabel>
-                          </IonChip>
-                        </a>
-                      )}
-                      {userInfo.instagram && (
-                        <a
-                          href={userInfo.instagram}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ textDecoration: "none" }}
-                        >
-                          <IonChip color="secondary">
-                            <IonIcon icon={logoInstagram} />
-                            <IonLabel>Instagram</IonLabel>
-                          </IonChip>
-                        </a>
-                      )}
-                      {userInfo.youtube && (
-                        <a
-                          href={userInfo.youtube}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ textDecoration: "none" }}
-                        >
-                          <IonChip color="secondary">
-                            <IonIcon icon={logoYoutube} />
-                            <IonLabel>Youtube</IonLabel>
-                          </IonChip>
-                        </a>
-                      )}
-                      {userInfo.linkedin && (
-                        <a
-                          href={userInfo.linkedin}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ textDecoration: "none" }}
-                        >
-                          <IonChip color="secondary">
-                            <IonIcon icon={logoLinkedin} />
-                            <IonLabel>LinkedIn</IonLabel>
-                          </IonChip>
-                        </a>
-                      )}
-                    </div>
-                  </IonItem>
+                  <>
+                    <IonItem style={{ margin: 8 }}>
+                      <div style={{ textAlign: "center" }}>
+                        {userInfo.facebook && (
+                          <a
+                            href={userInfo.facebook}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ textDecoration: "none" }}
+                          >
+                            <IonChip color="secondary">
+                              <IonIcon icon={logoFacebook} />
+                              <IonLabel>Facebook</IonLabel>
+                            </IonChip>
+                          </a>
+                        )}
+                        {userInfo.instagram && (
+                          <a
+                            href={userInfo.instagram}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ textDecoration: "none" }}
+                          >
+                            <IonChip color="secondary">
+                              <IonIcon icon={logoInstagram} />
+                              <IonLabel>Instagram</IonLabel>
+                            </IonChip>
+                          </a>
+                        )}
+                        {userInfo.youtube && (
+                          <a
+                            href={userInfo.youtube}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ textDecoration: "none" }}
+                          >
+                            <IonChip color="secondary">
+                              <IonIcon icon={logoYoutube} />
+                              <IonLabel>Youtube</IonLabel>
+                            </IonChip>
+                          </a>
+                        )}
+                        {userInfo.linkedin && (
+                          <a
+                            href={userInfo.linkedin}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ textDecoration: "none" }}
+                          >
+                            <IonChip color="secondary">
+                              <IonIcon icon={logoLinkedin} />
+                              <IonLabel>LinkedIn</IonLabel>
+                            </IonChip>
+                          </a>
+                        )}
+                      </div>
+                    </IonItem>
+                  </>
                 )}
               </IonList>
             </div>

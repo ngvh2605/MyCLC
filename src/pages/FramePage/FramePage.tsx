@@ -92,8 +92,6 @@ const FramePage: React.FC = () => {
             const cropResize = await resizeToFrame(cropImg, "b64");
             const frameResize = await resizeToFrame(chosenFrame.url, "png");
 
-            // console.log("cropResize", cropResize);
-            // console.log("frameResize", frameResize);
             mergeImages([cropResize, frameResize], {
               width: 960,
               height: 960,
