@@ -100,7 +100,6 @@ const FramePage: React.FC = () => {
               quality: 1,
               crossOrigin: "Anonymous",
             }).then((b64: string) => {
-              console.log(b64);
               setMergeUrl(b64);
               setLoading(false);
               scrollToBottomOnInit();
@@ -367,17 +366,24 @@ const FramePage: React.FC = () => {
               </IonChip>
             </>
           ) : (
-            <IonChip
-              color="primary"
-              style={{ height: "max-content", marginBottom: 10 }}
-            >
-              <IonLabel text-wrap className="ion-padding">
-                Nên chọn ảnh hình vuông hoặc đã được crop sẵn để thêm khung
-              </IonLabel>
-            </IonChip>
+            <>
+              <IonChip
+                color="primary"
+                style={{ height: "max-content", marginBottom: 10 }}
+              >
+                <IonLabel text-wrap className="ion-padding">
+                  Nên chọn ảnh hình vuông hoặc đã được crop sẵn để thêm khung
+                </IonLabel>
+              </IonChip>
+              <br />
+              <br />
+              {chosenFrame && <IonImg src={chosenFrame.url} />}
+            </>
           )}
         </div>
-
+        <br />
+        <br />
+        <br />
         <IonLoading isOpen={loading} />
       </IonContent>
     </IonPage>
