@@ -24,6 +24,7 @@ export function useAuthInit(): AuthInit {
   const [authInit, setAuthInit] = useState<AuthInit>({ loading: true });
   useEffect(() => {
     return firebaseAuth.onAuthStateChanged((firebaseUser) => {
+      console.log("user data", firebaseUser);
       const auth = firebaseUser
         ? {
             loggedIn: true,

@@ -4,6 +4,7 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFabButton,
   IonFooter,
   IonHeader,
   IonIcon,
@@ -16,12 +17,17 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import { closeCircle, eye, eyeOff } from "ionicons/icons";
+import { closeCircle, eye, eyeOff, logoGoogle } from "ionicons/icons";
 import moment from "moment";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
-import { auth, database } from "../../firebase";
+import {
+  auth,
+  database,
+  facebookProvider,
+  googleProvider,
+} from "../../firebase";
 import "./RegisterPage.scss";
 
 const RegisterPage: React.FC = () => {
@@ -95,6 +101,24 @@ const RegisterPage: React.FC = () => {
           setShowAlert(true);
         }
       }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setStatus({ loading: true, error: false });
+
+    try {
+      await auth.signInWithPopup(googleProvider).then(({ user }) => {
+        console.log(user);
+      });
+    } catch (err) {
+      console.log(err);
+      setStatus({ loading: false, error: true });
+      setAlertHeader("Lỗi!");
+      setAlertMessage(
+        "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ"
+      );
+      setShowAlert(true);
     }
   };
 
@@ -237,6 +261,15 @@ const RegisterPage: React.FC = () => {
               style={{ marginTop: 10, marginBottom: 10 }}
             >
               Tạo tài khoản
+            </IonButton>
+            <IonButton
+              expand="block"
+              shape="round"
+              fill="clear"
+              onClick={handleGoogleLogin}
+              style={{ marginTop: 10, marginBottom: 10 }}
+            >
+              <IonIcon icon={logoGoogle} slot="start" /> Đăng nhập với Google
             </IonButton>
           </div>
         </IonToolbar>

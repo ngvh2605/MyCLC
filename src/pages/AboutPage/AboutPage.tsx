@@ -73,6 +73,29 @@ const AboutPage: React.FC = () => {
               <br />• Lịch hoạt động nhà trường và sự kiện các câu lạc bộ
               <br />• Kết nối học sinh và cựu học sinh khắp nơi trên thế giới
             </IonLabel>
+            <br />
+            <a
+              href="https://myclcproject.web.app/"
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              <IonChip color="secondary">
+                <IonIcon icon={globe} />
+                <IonLabel>Website</IonLabel>
+              </IonChip>
+            </a>
+            <a
+              href="https://clcmultimedia.gitbook.io/myclc"
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              <IonChip color="secondary">
+                <IonIcon icon={globe} />
+                <IonLabel>Hướng dẫn sử dụng</IonLabel>
+              </IonChip>
+            </a>
           </IonCardContent>
         </IonCard>
         <IonCard>
@@ -217,6 +240,7 @@ const AboutPage: React.FC = () => {
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
             <IonLabel color="dark">
               Email: vhnguyen@uow.edu.au
+              <br />
               <a
                 href="https://www.linkedin.com/in/vithong/"
                 target="_blank"
@@ -298,6 +322,7 @@ const AboutPage: React.FC = () => {
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
             <IonLabel color="dark">
               Email: anh.bv@tripi.vn
+              <br />
               <a
                 href="https://www.linkedin.com/in/v%C5%A9-anh-0a76771ab/"
                 target="_blank"

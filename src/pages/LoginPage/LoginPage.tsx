@@ -17,11 +17,11 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { closeCircle, eye, eyeOff } from "ionicons/icons";
+import { closeCircle, eye, eyeOff, logoGoogle } from "ionicons/icons";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
-import { auth } from "../../firebase";
+import { auth, database, googleProvider } from "../../firebase";
 import "./LoginPage.scss";
 
 const LoginPage: React.FC = () => {
@@ -114,6 +114,7 @@ const LoginPage: React.FC = () => {
           },
         ],
         buttons: [
+          { text: "Huỷ" },
           {
             text: "OK",
             handler: (data) => {
@@ -125,6 +126,45 @@ const LoginPage: React.FC = () => {
 
       await confirm.present();
     });
+  };
+
+  const handleGoogleLogin = async () => {
+    setStatus({ loading: true, error: false });
+
+    try {
+      await auth.signInWithPopup(googleProvider).then(async ({ user }) => {
+        await database
+          .ref()
+          .child("users")
+          .child(user.uid)
+          .child("personal")
+          .child("email")
+          .once("value")
+          .then((snapshot) => {
+            if (!snapshot.exists()) {
+              database
+                .ref()
+                .child("users")
+                .child(user.uid)
+                .child("personal")
+                .update({
+                  email: user.providerData[0].email,
+                  fullName: user.providerData[0].displayName,
+                  avatar: user.providerData[0].photoURL,
+                });
+            }
+          });
+      });
+    } catch (err) {
+      console.log(err);
+      setStatus({ loading: false, error: true });
+      presentAlert({
+        header: "Lỗi!",
+        message:
+          "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ",
+        buttons: ["OK"],
+      });
+    }
   };
 
   if (loggedIn) {
@@ -155,11 +195,12 @@ const LoginPage: React.FC = () => {
         <form>
           <IonList>
             <IonItem>
-              <IonLabel position="floating">Email</IonLabel>
+              <IonLabel position="stacked">Email</IonLabel>
               <IonInput
                 type="email"
                 value={email}
                 autocomplete="on"
+                placeholder="Nhập email"
                 onIonChange={(event) => setEmail(event.detail.value)}
               />
               <IonIcon
@@ -174,11 +215,12 @@ const LoginPage: React.FC = () => {
             </IonItem>
 
             <IonItem>
-              <IonLabel position="floating">Mật khẩu</IonLabel>
+              <IonLabel position="stacked">Mật khẩu</IonLabel>
               <IonInput
                 type={passwordType}
                 value={password}
                 autocomplete="on"
+                placeholder="Nhập mật khẩu"
                 onIonChange={(event) => setPassword(event.detail.value)}
                 onKeyPress={(event) => {
                   if (event.key === "Enter") handleLogin();
@@ -201,6 +243,24 @@ const LoginPage: React.FC = () => {
                 }}
               />
             </IonItem>
+            <IonItem lines="none" style={{ marginTop: 16, marginBottom: 10 }}>
+              <div
+                style={{
+                  textAlign: "right",
+                  width: "100%",
+                  fontSize: "small",
+                }}
+              >
+                <IonLabel
+                  color="primary"
+                  onClick={() => {
+                    handleForgotPassword();
+                  }}
+                >
+                  Quên mật khẩu?
+                </IonLabel>
+              </div>
+            </IonItem>
           </IonList>
         </form>
         <IonLoading isOpen={status.loading} />
@@ -217,18 +277,14 @@ const LoginPage: React.FC = () => {
             >
               Đăng nhập
             </IonButton>
-
             <IonButton
               expand="block"
               shape="round"
               fill="clear"
-              routerLink="/login"
+              onClick={handleGoogleLogin}
               style={{ marginTop: 10, marginBottom: 10 }}
-              onClick={() => {
-                handleForgotPassword();
-              }}
             >
-              Quên mật khẩu?
+              <IonIcon icon={logoGoogle} slot="start" /> Đăng nhập với Google
             </IonButton>
           </div>
         </IonToolbar>

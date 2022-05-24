@@ -131,24 +131,26 @@ const UserPage: React.FC = () => {
   const fetchUserInfo = async () => {
     const data = await getInfoByUserId(id);
     setUserInfo({ ...data });
-    if (
-      data.intro ||
-      data.facebook ||
-      data.instagram ||
-      data.linkedin ||
-      data.youtube ||
-      data.showEmail ||
-      data.showPhoneNumber
-    )
-      setUserCustom({
-        intro: data.intro,
-        facebook: data.facebook,
-        instagram: data.instagram,
-        linkedin: data.linkedin,
-        youtube: data.youtube,
-        showEmail: data.showEmail,
-        showPhoneNumber: data.showPhoneNumber,
-      });
+    try {
+      if (
+        data.intro ||
+        data.facebook ||
+        data.instagram ||
+        data.linkedin ||
+        data.youtube ||
+        data.showEmail ||
+        data.showPhoneNumber
+      )
+        setUserCustom({
+          intro: data.intro,
+          facebook: data.facebook,
+          instagram: data.instagram,
+          linkedin: data.linkedin,
+          youtube: data.youtube,
+          showEmail: data.showEmail,
+          showPhoneNumber: data.showPhoneNumber,
+        });
+    } catch (error) {}
   };
 
   const readBadge = async () => {

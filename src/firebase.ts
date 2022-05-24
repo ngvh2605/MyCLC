@@ -40,3 +40,5 @@ export const auth = app.auth();
 export const firestore = app.firestore();
 export const storage = app.storage();
 export const database = app.database();
+export const facebookProvider = new firebase.auth.FacebookAuthProvider();
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
