@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database, googleProvider } from "../../firebase";
+import { handleGoogleLogin } from "./GoogleLogin";
 import "./LoginPage.scss";
 
 const LoginPage: React.FC = () => {
@@ -128,45 +129,6 @@ const LoginPage: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = async () => {
-    setStatus({ loading: true, error: false });
-
-    try {
-      await auth.signInWithPopup(googleProvider).then(async ({ user }) => {
-        await database
-          .ref()
-          .child("users")
-          .child(user.uid)
-          .child("personal")
-          .child("email")
-          .once("value")
-          .then((snapshot) => {
-            if (!snapshot.exists()) {
-              database
-                .ref()
-                .child("users")
-                .child(user.uid)
-                .child("personal")
-                .update({
-                  email: user.providerData[0].email,
-                  fullName: user.providerData[0].displayName,
-                  avatar: user.providerData[0].photoURL,
-                });
-            }
-          });
-      });
-    } catch (err) {
-      console.log(err);
-      setStatus({ loading: false, error: true });
-      presentAlert({
-        header: "Lỗi!",
-        message:
-          "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ",
-        buttons: ["OK"],
-      });
-    }
-  };
-
   if (loggedIn) {
     return <Redirect to="/my/home" />;
   }
@@ -184,7 +146,7 @@ const LoginPage: React.FC = () => {
         <IonImg
           src="/assets/image/Logo.svg"
           style={{
-            maxWidth: 200,
+            maxWidth: 150,
             width: "20%",
             marginLeft: "auto",
             marginRight: "auto",
@@ -281,10 +243,21 @@ const LoginPage: React.FC = () => {
               expand="block"
               shape="round"
               fill="clear"
-              onClick={handleGoogleLogin}
-              style={{ marginTop: 10, marginBottom: 10 }}
+              onClick={async () => {
+                setStatus({ loading: true, error: false });
+                await handleGoogleLogin(() => {
+                  setStatus({ loading: false, error: true });
+                  presentAlert({
+                    header: "Lỗi!",
+                    message:
+                      "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ",
+                    buttons: ["OK"],
+                  });
+                });
+              }}
+              style={{ marginTop: 10, marginBottom: 10, fontSize: 16 }}
             >
-              <IonIcon icon={logoGoogle} slot="start" /> Đăng nhập với Google
+              <IonIcon icon={logoGoogle} slot="start" /> Tiếp tục với Google
             </IonButton>
           </div>
         </IonToolbar>

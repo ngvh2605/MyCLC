@@ -4,7 +4,6 @@ import {
   IonButton,
   IonButtons,
   IonContent,
-  IonFabButton,
   IonFooter,
   IonHeader,
   IonIcon,
@@ -22,12 +21,8 @@ import moment from "moment";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
-import {
-  auth,
-  database,
-  facebookProvider,
-  googleProvider,
-} from "../../firebase";
+import { auth, database, googleProvider } from "../../firebase";
+import { handleGoogleLogin } from "../LoginPage/GoogleLogin";
 import "./RegisterPage.scss";
 
 const RegisterPage: React.FC = () => {
@@ -104,24 +99,6 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setStatus({ loading: true, error: false });
-
-    try {
-      await auth.signInWithPopup(googleProvider).then(({ user }) => {
-        console.log(user);
-      });
-    } catch (err) {
-      console.log(err);
-      setStatus({ loading: false, error: true });
-      setAlertHeader("Lỗi!");
-      setAlertMessage(
-        "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ"
-      );
-      setShowAlert(true);
-    }
-  };
-
   if (loggedIn) {
     return <Redirect to="/my/home" />;
   }
@@ -137,7 +114,12 @@ const RegisterPage: React.FC = () => {
       <IonContent className="ion-padding">
         <IonImg
           src="/assets/image/Logo.svg"
-          style={{ width: "20%", marginLeft: "auto", marginRight: "auto" }}
+          style={{
+            width: "20%",
+            maxWidth: 150,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
         />
         <br />
         <br />
@@ -150,6 +132,7 @@ const RegisterPage: React.FC = () => {
               value={email}
               onIonChange={(event) => setEmail(event.detail.value)}
               placeholder="clbclcmultimedia@gmail.com"
+              autocomplete="off"
             />
             <IonIcon
               icon={closeCircle}
@@ -169,6 +152,7 @@ const RegisterPage: React.FC = () => {
               value={emailRe}
               onIonChange={(event) => setEmailRe(event.detail.value)}
               placeholder="clbclcmultimedia@gmail.com"
+              autocomplete="off"
             />
             <IonIcon
               icon={closeCircle}
@@ -188,6 +172,7 @@ const RegisterPage: React.FC = () => {
               value={password}
               onIonChange={(event) => setPassword(event.detail.value)}
               placeholder="Tối thiểu 8 ký tự"
+              autocomplete="off"
             />
             <IonIcon
               icon={passwordIcon}
@@ -218,6 +203,7 @@ const RegisterPage: React.FC = () => {
                 if (event.key === "Enter") handleRegister();
               }}
               placeholder="Tối thiểu 8 ký tự"
+              autocomplete="off"
             />
             <IonIcon
               icon={passwordIconRe}
@@ -266,10 +252,20 @@ const RegisterPage: React.FC = () => {
               expand="block"
               shape="round"
               fill="clear"
-              onClick={handleGoogleLogin}
-              style={{ marginTop: 10, marginBottom: 10 }}
+              onClick={async () => {
+                setStatus({ loading: true, error: false });
+                await handleGoogleLogin(() => {
+                  setStatus({ loading: false, error: true });
+                  setAlertHeader("Lỗi!");
+                  setAlertMessage(
+                    "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ"
+                  );
+                  setShowAlert(true);
+                });
+              }}
+              style={{ marginTop: 10, marginBottom: 10, fontSize: 16 }}
             >
-              <IonIcon icon={logoGoogle} slot="start" /> Đăng nhập với Google
+              <IonIcon icon={logoGoogle} slot="start" /> Tiếp tục với Google
             </IonButton>
           </div>
         </IonToolbar>
