@@ -47,6 +47,7 @@ import CertificateItem from "./CertificateItem";
 import "./CertificatePage.scss";
 import useCheckUserInfo from "./../../common/useCheckUserInfo";
 import useUploadFile from "../../common/useUploadFile";
+import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 interface CertiRaw {
   email: string;
   url: string;
@@ -206,24 +207,24 @@ const CertificatePage: React.FC = () => {
           </IonSegment>
         </div>
 
-        {displayType === "grid" ? (
-          <IonGrid>
-            <IonRow>
-              {certificate &&
-                certificate.length > 0 &&
-                certificate.map((certi, index) => (
+        {certificate && certificate.length > 0 ? (
+          displayType === "grid" ? (
+            <IonGrid>
+              <IonRow>
+                {certificate.map((certi, index) => (
                   <IonCol size="6" key={index}>
                     <CertificateCard certi={certi} />
                   </IonCol>
                 ))}
-            </IonRow>
-          </IonGrid>
+              </IonRow>
+            </IonGrid>
+          ) : (
+            certificate.map((certi, index) => (
+              <CertificateItem certi={certi} key={index} />
+            ))
+          )
         ) : (
-          certificate &&
-          certificate.length > 0 &&
-          certificate.map((certi, index) => (
-            <CertificateItem certi={certi} key={index} />
-          ))
+          <EmptyUI />
         )}
 
         {isAdmin && (

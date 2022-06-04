@@ -23,6 +23,7 @@ import {
   calendarOutline,
   chatbubbleEllipsesOutline,
   checkmarkCircle,
+  folderOutline,
   logOutOutline,
   newspaperOutline,
   personOutline,
@@ -53,6 +54,55 @@ const MenuPage = () => {
   const menuClose = () => {
     menuEl.current.close();
   };
+
+  const menuList = [
+    {
+      text: "CLC News",
+      url: "home",
+      icon: newspaperOutline,
+      requireVerify: false,
+    },
+    {
+      text: "Hồ sơ",
+      url: "profile",
+      icon: personOutline,
+      requireVerify: false,
+    },
+    {
+      text: "Sự kiện",
+      url: "event",
+      icon: calendarOutline,
+      requireVerify: true,
+    },
+    // {
+    //   text: "To Do List",
+    //   url: "timetable",
+    //   icon: timeOutline,
+    // },
+    // {
+    //   text: "Adventure Hunt",
+    //   url: "adventure",
+    //   icon: gameControllerOutline,
+    // },
+    {
+      text: "In2CLC",
+      url: "in2clc",
+      icon: bookOutline,
+      requireVerify: false,
+    },
+    {
+      text: "Phòng chat",
+      url: "chat",
+      icon: chatbubbleEllipsesOutline,
+      requireVerify: true,
+    },
+    {
+      text: "Certificate",
+      url: "certi",
+      icon: folderOutline,
+      requireVerify: true,
+    },
+  ];
 
   useEffect(() => {
     try {
@@ -86,16 +136,43 @@ const MenuPage = () => {
       history.push(link);
       menuClose();
     } else {
-      presentToast({
-        message: "Bạn cần hoàn thành 3 bước xác minh trước!",
-        duration: 2000,
-        color: "danger",
-        onDidDismiss: () => console.log("dismissed"),
-        onWillDismiss: () => console.log("will dismiss"),
+      presentAlert({
+        header: "Lưu ý",
+        message:
+          "Bạn cần hoàn thành 3 bước xác minh để có thể sử dụng tính năng này!",
+        buttons: [{ text: "OK" }],
       });
-      history.push(link);
+      history.push("/my/profile");
       menuClose();
     }
+  };
+
+  const MenuItem: React.FC<{
+    text: string;
+    url: string;
+    icon: string;
+    requireVerify: boolean;
+  }> = (props) => {
+    const { text, url, icon, requireVerify } = props;
+    return (
+      <IonItem
+        onClick={() => {
+          if (!!requireVerify) onItemClick(`/my/${url}`);
+          else {
+            history.push(`/my/${url}`);
+            menuClose();
+          }
+        }}
+        color={location.pathname.includes(`/my/${url}`) ? "primary" : ""}
+      >
+        <IonIcon
+          icon={icon}
+          color={!location.pathname.includes(`/my/${url}`) ? "primary" : ""}
+          slot="start"
+        />
+        <IonLabel>{text}</IonLabel>
+      </IonItem>
+    );
   };
 
   return (
@@ -149,108 +226,17 @@ const MenuPage = () => {
       </IonHeader>
       <IonContent>
         <IonList lines="none">
-          <IonItem
-            onClick={() => {
-              history.push("/my/home");
-              menuClose();
-            }}
-            detail={false}
-            color={location.pathname === "/my/home" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={newspaperOutline}
-              color={location.pathname !== "/my/home" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>CLC News</IonLabel>
-          </IonItem>
-          <IonItem
-            onClick={() => {
-              history.push("/my/profile");
-              menuClose();
-            }}
-            detail={false}
-            color={location.pathname === "/my/profile" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={personOutline}
-              color={location.pathname !== "/my/profile" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>Hồ sơ</IonLabel>
-          </IonItem>
-          <IonItem
-            onClick={() => {
-              onItemClick("/my/event");
-            }}
-            detail={false}
-            color={location.pathname === "/my/event" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={calendarOutline}
-              color={location.pathname !== "/my/event" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>Sự kiện</IonLabel>
-          </IonItem>
-
-          {/* <IonItem
-            onClick={() => {
-              onItemClick("/my/timetable");
-            }}
-            color={location.pathname === "/my/timetable" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={timeOutline}
-              color={location.pathname !== "/my/timetable" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>To Do List</IonLabel>
-          </IonItem> */}
-
-          {/* <IonItem
-            onClick={() => {
-              onItemClick("/my/adventure");
-            }}
-            color={location.pathname.includes("/my/adventure") ? "primary" : ""}
-          >
-            <IonIcon
-              icon={gameControllerOutline}
-              color={
-                !location.pathname.includes("/my/adventure") ? "primary" : ""
-              }
-              slot="start"
-            />
-            <IonLabel>Adventure Hunt</IonLabel>
-          </IonItem> */}
-
-          <IonItem
-            onClick={() => {
-              onItemClick("/my/in2clc");
-            }}
-            color={location.pathname.includes("/my/in2clc") ? "primary" : ""}
-          >
-            <IonIcon
-              icon={bookOutline}
-              color={!location.pathname.includes("/my/in2clc") ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>In2CLC</IonLabel>
-          </IonItem>
-
-          <IonItem
-            onClick={() => {
-              onItemClick("/my/chat");
-            }}
-            color={location.pathname.includes("/my/chat") ? "primary" : ""}
-          >
-            <IonIcon
-              icon={chatbubbleEllipsesOutline}
-              color={!location.pathname.includes("/my/chat") ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>Phòng chat</IonLabel>
-          </IonItem>
+          {menuList &&
+            menuList.length > 0 &&
+            menuList.map((item, index) => (
+              <MenuItem
+                text={item.text}
+                url={item.url}
+                icon={item.icon}
+                requireVerify={item.requireVerify}
+                key={index}
+              />
+            ))}
 
           <IonItem
             onClick={() => {
