@@ -15,7 +15,6 @@ import {
   IonRow,
   IonToolbar,
   useIonAlert,
-  useIonToast,
 } from "@ionic/react";
 import {
   bookOutline,
@@ -44,7 +43,6 @@ const MenuPage = () => {
   const location = useLocation();
   const menuEl = useRef<HTMLIonMenuElement>(null);
 
-  const [presentToast] = useIonToast();
   const [presentAlert] = useIonAlert();
   const [appVersion, setAppVersion] = useState("");
 
@@ -101,6 +99,18 @@ const MenuPage = () => {
       url: "certi",
       icon: folderOutline,
       requireVerify: true,
+    },
+    {
+      text: "Giới thiệu",
+      url: "about",
+      icon: sparklesOutline,
+      requireVerify: false,
+    },
+    {
+      text: "Cài đặt",
+      url: "settings",
+      icon: settingsOutline,
+      requireVerify: false,
     },
   ];
 
@@ -237,36 +247,6 @@ const MenuPage = () => {
                 key={index}
               />
             ))}
-
-          <IonItem
-            onClick={() => {
-              history.push("/my/about");
-              menuClose();
-            }}
-            color={location.pathname === "/my/about" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={sparklesOutline}
-              color={location.pathname !== "/my/about" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>Giới thiệu</IonLabel>
-          </IonItem>
-
-          <IonItem
-            onClick={() => {
-              history.push("/my/settings");
-              menuClose();
-            }}
-            color={location.pathname === "/my/settings" ? "primary" : ""}
-          >
-            <IonIcon
-              icon={settingsOutline}
-              color={location.pathname !== "/my/settings" ? "primary" : ""}
-              slot="start"
-            />
-            <IonLabel>Cài đặt</IonLabel>
-          </IonItem>
         </IonList>
       </IonContent>
       <IonFooter className="ion-no-border">

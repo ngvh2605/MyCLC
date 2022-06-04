@@ -1,10 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router";
-
 import {
-  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -22,8 +17,11 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
-
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { database } from "../../../firebase";
 
@@ -31,9 +29,7 @@ const PersonalInfo: React.FC = () => {
   const { userId, userEmail } = useAuth();
   const history = useHistory();
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [presentAlert] = useIonAlert();
 
   const [phone, setPhone] = useState("");
 
@@ -70,12 +66,6 @@ const PersonalInfo: React.FC = () => {
     }
   }, [grade, gradeStart]);
 
-  useEffect(() => {
-    if (role === "club") {
-      getClubCode();
-    }
-  }, [role]);
-
   const isDisable = () => {
     if (!(fullName && birth && gender && role)) return true;
     switch (role) {
@@ -94,6 +84,7 @@ const PersonalInfo: React.FC = () => {
   };
 
   const buttonDisabled = isDisable();
+
   const readData = async () => {
     const userData = database.ref();
     userData
@@ -109,26 +100,31 @@ const PersonalInfo: React.FC = () => {
           setBirth(data.birth);
           setGender(data.gender);
           setRole(data.role);
-          if (data.role === "student") {
-            setGrade(data.studentClass);
-            setGradeStart(data.studentStart);
-            setGradeEnd(data.studentEnd);
-          }
-          if (data.role === "teacher") {
-            setTeacherSubject(data.teacherSubject);
-            if (data.teacherClass) setTeacherClass(data.teacherClass);
-          }
-          if (data.role === "club") {
-            setClubCode(data.clubCode);
-            setClubLink(data.clubLink);
-          }
-          if (data.role === "parent") {
-            setChildName(data.childName);
-            setChildClass(data.childClass);
-          }
-          if (data.role === "other") {
-            setOther(data.otherSpecify);
-            setOtherPurpose(data.otherPurpose);
+
+          switch (data.role) {
+            case "student":
+              setGrade(data.studentClass);
+              setGradeStart(data.studentStart);
+              setGradeEnd(data.studentEnd);
+              break;
+            case "teacher":
+              setTeacherSubject(data.teacherSubject);
+              if (data.teacherClass) setTeacherClass(data.teacherClass);
+              break;
+            case "club":
+              setClubCode(data.clubCode);
+              setClubLink(data.clubLink);
+              break;
+            case "parent":
+              setChildName(data.childName);
+              setChildClass(data.childClass);
+              break;
+            case "other":
+              setOther(data.otherSpecify);
+              setOtherPurpose(data.otherPurpose);
+              break;
+            default:
+              break;
           }
         } else {
           console.log("No data available");
@@ -139,55 +135,43 @@ const PersonalInfo: React.FC = () => {
       });
   };
 
-  interface Code {
-    code: string;
-    value: string;
-  }
-  const [codeList, setCodeList] = useState<Code[]>();
+  async function checkCode() {
+    let isAvailable = false;
 
-  const getClubCode = () => {
-    const userData = database.ref();
-    userData
+    const data = await database
+      .ref()
       .child("clubCode")
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setCodeList(snapshot.val());
-          console.log("clubCode", snapshot.val());
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+      .child(clubCode)
+      .once("value");
 
-  function checkCode() {
-    var isAvailable = false;
-    codeList.forEach((item) => {
-      if (
-        clubCode === item.code &&
-        (item.value === "available" || item.value === userId)
-      ) {
-        isAvailable = true;
-      }
-    });
+    if (
+      data.exists() &&
+      (data.val() === "available" || data.val() === userId)
+    ) {
+      isAvailable = true;
+    }
     return isAvailable;
   }
 
-  function getCodeIndex() {
-    let index: number;
-    codeList.forEach((item) => {
-      if (
-        clubCode === item.code &&
-        (item.value === "available" || item.value === userId)
-      ) {
-        index = codeList.indexOf(item);
-      }
+  const successAlert = async () => {
+    const userData = database.ref();
+
+    await userData.child("users").child(userId).child("verify").update({
+      personalInfo: true,
     });
-    return index;
-  }
+    presentAlert({
+      header: "Hoàn thành!",
+      message: "Thông tin của bạn đã được lưu thành công",
+      buttons: [
+        {
+          text: "OK",
+          handler: () => {
+            history.push("/my/profile");
+          },
+        },
+      ],
+    });
+  };
 
   const handleSaveInfo = async () => {
     const userData = database.ref();
@@ -198,80 +182,60 @@ const PersonalInfo: React.FC = () => {
       role: role,
     });
 
-    if (role === "student") {
-      await userData.child("users").child(userId).child("personal").update({
-        studentClass: grade,
-        studentStart: gradeStart,
-        studentEnd: gradeEnd,
-      });
-      await userData.child("users").child(userId).child("verify").update({
-        personalInfo: true,
-      });
-      setAlertHeader("Hoàn thành!");
-      setAlertMessage("Thông tin của bạn đã được lưu thành công");
-      setShowAlert(true);
-    }
-    if (role === "teacher") {
-      await userData.child("users").child(userId).child("personal").update({
-        teacherSubject: teacherSubject,
-        teacherClass: teacherClass,
-      });
-      await userData.child("users").child(userId).child("verify").update({
-        personalInfo: true,
-      });
-      setAlertHeader("Hoàn thành!");
-      setAlertMessage("Thông tin của bạn đã được lưu thành công");
-      setShowAlert(true);
-    }
-    if (role === "club") {
-      if (codeList) {
-        if (checkCode()) {
+    switch (role) {
+      case "student":
+        await userData.child("users").child(userId).child("personal").update({
+          studentClass: grade,
+          studentStart: gradeStart,
+          studentEnd: gradeEnd,
+        });
+
+        successAlert();
+        break;
+      case "teacher":
+        await userData.child("users").child(userId).child("personal").update({
+          teacherSubject: teacherSubject,
+          teacherClass: teacherClass,
+        });
+
+        successAlert();
+        break;
+      case "club":
+        const isAvailable = await checkCode();
+        if (isAvailable) {
           await userData.child("users").child(userId).child("personal").update({
             clubCode: clubCode,
             clubLink: clubLink,
           });
-          await userData.child("users").child(userId).child("verify").update({
-            personalInfo: true,
-          });
-          await userData
-            .child("clubCode")
-            .child(getCodeIndex().toString())
-            .update({
-              value: userId,
-            });
-          setAlertHeader("Hoàn thành!");
-          setAlertMessage("Thông tin của bạn đã được lưu thành công");
-          setShowAlert(true);
+
+          await userData.child("clubCode").child(clubCode).set(userId);
+          successAlert();
         } else {
-          setAlertHeader("Lỗi!");
-          setAlertMessage("Mã giới thiệu không chính xác. Vui lòng thử lại");
-          setShowAlert(true);
+          presentAlert({
+            header: "Lỗi!",
+            message: "Mã giới thiệu không chính xác. Vui lòng thử lại",
+            buttons: [{ text: "OK" }],
+          });
         }
-      }
-    }
-    if (role === "parent") {
-      await userData.child("users").child(userId).child("personal").update({
-        childName: childName,
-        childClass: childClass,
-      });
-      await userData.child("users").child(userId).child("verify").update({
-        personalInfo: true,
-      });
-      setAlertHeader("Hoàn thành!");
-      setAlertMessage("Thông tin của bạn đã được lưu thành công");
-      setShowAlert(true);
-    }
-    if (role === "other") {
-      await userData.child("users").child(userId).child("personal").update({
-        otherSpecify: other,
-        otherPurpose: otherPurpose,
-      });
-      await userData.child("users").child(userId).child("verify").update({
-        personalInfo: true,
-      });
-      setAlertHeader("Hoàn thành!");
-      setAlertMessage("Thông tin của bạn đã được lưu thành công");
-      setShowAlert(true);
+        break;
+      case "parent":
+        await userData.child("users").child(userId).child("personal").update({
+          childName: childName,
+          childClass: childClass,
+        });
+
+        successAlert();
+        break;
+      case "other":
+        await userData.child("users").child(userId).child("personal").update({
+          otherSpecify: other,
+          otherPurpose: otherPurpose,
+        });
+
+        successAlert();
+        break;
+      default:
+        break;
     }
   };
 
@@ -524,20 +488,6 @@ const PersonalInfo: React.FC = () => {
             />
           </IonItem>
         </IonList>
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-            if (alertHeader !== "Lỗi!") {
-              history.replace("/my/profile");
-            }
-          }}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter>
         <IonToolbar>
