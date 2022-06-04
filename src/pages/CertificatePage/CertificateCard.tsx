@@ -1,6 +1,5 @@
 import {
   IonCard,
-  IonCardContent,
   IonImg,
   IonItem,
   IonLabel,
@@ -8,14 +7,14 @@ import {
   IonThumbnail,
 } from "@ionic/react";
 import React, { useState } from "react";
-
 import { Certificate } from "./CertificatePage";
+
 interface Props {
   certi: Certificate;
 }
 
 function calImgScale() {
-  const width = window.screen.width - 52 > 648 ? 648 : window.screen.width - 52;
+  const width = window.screen.width - 62;
   const height = (width * 9) / 16;
   return { width: width / 2, height: height / 2 };
 }
@@ -25,7 +24,13 @@ const CertificateCard: React.FC<Props> = (props) => {
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
   return (
-    <IonCard className="ion-no-margin" style={{ margin: 8 }}>
+    <IonCard
+      className="ion-no-margin"
+      style={{ margin: 8 }}
+      onClick={() => {
+        window.open(certi.url, "_blank");
+      }}
+    >
       <IonThumbnail
         style={{
           height: calImgScale().height,
@@ -49,20 +54,11 @@ const CertificateCard: React.FC<Props> = (props) => {
           onClick={() => {}}
         />
       </IonThumbnail>
-      <IonCardContent style={{ padding: "0px 16px" }}>
-        <IonItem
-          lines="none"
-          className="ion-no-margin ion-no-padding"
-          style={{ height: 200 }}
-        >
-          <IonLabel
-            className="ion-no-margin ion-no-padding"
-            style={{ fontSize: 14, height: "100%" }}
-          >
-            {certi.name}
-          </IonLabel>
-        </IonItem>
-      </IonCardContent>
+      <IonItem lines="none">
+        <IonLabel style={{ fontSize: 14, textAlign: "center" }}>
+          {certi.name}
+        </IonLabel>
+      </IonItem>
     </IonCard>
   );
 };

@@ -9,13 +9,13 @@ const useCheckUserInfo = (userId: string) => {
   const [avatarUrl, setAvatarUrl] = useState("");
 
   const [status, setStatus] = useState<{
-    isLoading: boolean;
     allowCreateNews: boolean;
     allowCreateEvent: boolean;
+    isAdmin: boolean;
   }>({
-    isLoading: false,
     allowCreateNews: false,
     allowCreateEvent: false,
+    isAdmin: false,
   });
 
   useEffect(() => {
@@ -88,9 +88,9 @@ const useCheckUserInfo = (userId: string) => {
           const data = snapshot.val();
 
           setStatus({
-            isLoading: true,
             allowCreateEvent: data && data.createEvent,
             allowCreateNews: data && data.createNews,
+            isAdmin: data && data.isAdmin,
           });
         });
     }

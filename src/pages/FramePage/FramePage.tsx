@@ -11,7 +11,6 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
-  IonItem,
   IonLabel,
   IonListHeader,
   IonLoading,
@@ -20,22 +19,20 @@ import {
   IonRow,
   IonSlide,
   IonSlides,
-  IonText,
   IonTitle,
   IonToolbar,
   isPlatform,
   useIonAlert,
   useIonToast,
 } from "@ionic/react";
-import { camera, home, homeOutline, logoFacebook } from "ionicons/icons";
-import Jimp from "jimp";
-import jimp from "jimp";
+import { camera, homeOutline, logoFacebook } from "ionicons/icons";
+import { default as Jimp, default as jimp } from "jimp";
 import mergeImages from "merge-images";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
-import { database, storage } from "../../firebase";
+import { database } from "../../firebase";
 import useUploadFile from "./../../common/useUploadFile";
 
 interface Frame {

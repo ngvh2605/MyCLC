@@ -129,7 +129,10 @@ const In2CLCMissionPage: React.FC = () => {
         image = await handleUploadImage(
           answer.image,
           "in2clc",
-          `${chosen.code}_${userEmail}`
+          `${chosen.code}_${userEmail
+            .replace(/[^a-zA-Z0-9 ]/g, "")
+            .replace(/\s/g, "")
+            .toLowerCase()}.png`
         );
       }
       await firestore.doc(`in2clc/${chosen.code}_${userEmail}`).set({

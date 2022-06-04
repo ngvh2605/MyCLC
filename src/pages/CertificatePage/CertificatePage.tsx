@@ -12,23 +12,41 @@ import {
   IonIcon,
   IonImg,
   IonInput,
+  IonItem,
   IonLabel,
+  IonList,
+  IonLoading,
   IonMenuButton,
   IonModal,
   IonPage,
   IonRow,
+  IonSegment,
+  IonSegmentButton,
   IonText,
   IonTextarea,
   IonTitle,
   IonToolbar,
+  useIonToast,
 } from "@ionic/react";
-import { add, close } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import {
+  add,
+  close,
+  grid,
+  gridOutline,
+  image,
+  listOutline,
+} from "ionicons/icons";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth";
+import useAddImage from "../../common/useAddImage";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
 import CertificateCard from "./CertificateCard";
-
+import CertificateItem from "./CertificateItem";
+import "./CertificatePage.scss";
+import useCheckUserInfo from "./../../common/useCheckUserInfo";
+import useUploadFile from "../../common/useUploadFile";
 interface CertiRaw {
   email: string;
   url: string;
@@ -46,60 +64,122 @@ export interface Certificate {
 }
 
 const CertificatePage: React.FC = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, userId } = useAuth();
+  const { isAdmin } = useCheckUserInfo(userId);
+
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [certificate, setCertificate] = useState<Certificate[]>();
+  const [displayType, setDisplayType] = useState("grid");
 
   const [addCertiName, setAddCertiName] = useState("");
   const [addCertiText, setAddCertiText] = useState("");
 
+  const fileInputRef = useRef<HTMLInputElement>();
+  const { imageUrl, clearImageUrl, handleFileChange, handlePictureClick } =
+    useAddImage(800, fileInputRef);
+  const { handleUploadImage } = useUploadFile();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [presentToast] = useIonToast();
+
   useEffect(() => {
     const fetchCerti = async () => {
-      const temp: Certificate[] = [];
-      const email = userEmail
+      try {
+        const temp: Certificate[] = [];
+        const email = userEmail
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .replace(/\s/g, "")
+          .toLowerCase();
+        const snapshot = await database
+          .ref()
+          .child("certi")
+          .child(email)
+          .once("value");
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          for (var prop in data) {
+            // if (data.hasOwnProperty(prop)) {
+            //   temp.push(data[prop]);
+            // }
+
+            const propSnapshot = await database
+              .ref()
+              .child("certiDatabase")
+              .child(prop)
+              .once("value");
+
+            if (propSnapshot.exists()) {
+              const certiData: CertiData = propSnapshot.val();
+
+              temp.push({
+                name: certiData.name,
+                url: data[prop],
+                image: certiData.image,
+              });
+            }
+          }
+        }
+        setCertificate(temp);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCerti();
+  }, []);
+
+  const addBulkCerti = async () => {
+    setIsLoading(true);
+    try {
+      const data: CertiRaw[] = formatCsv(addCertiText);
+      const certi = addCertiName
         .replace(/[^a-zA-Z0-9 ]/g, "")
         .replace(/\s/g, "")
         .toLowerCase();
-      const snapshot = await database
-        .ref()
-        .child("certi")
-        .child(email)
-        .once("value");
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        for (var prop in data) {
-          // if (data.hasOwnProperty(prop)) {
-          //   temp.push(data[prop]);
-          // }
 
-          const propSnapshot = await database
-            .ref()
-            .child("certiDatabase")
-            .child(prop)
-            .once("value");
-
-          if (propSnapshot.exists()) {
-            const certiData: CertiData = propSnapshot.val();
-
-            temp.push({
-              name: certiData.name,
-              url: data[prop],
-              image: certiData.image,
-            });
-          }
+      if (data && data.length > 0) {
+        //add certi infor
+        let image = "";
+        if (imageUrl) {
+          image = await handleUploadImage(
+            imageUrl,
+            "certiDatabase",
+            `${addCertiName}.png`
+          );
         }
-      }
-      setCertificate(temp);
-    };
+        database.ref().child("certiDatabase").child(certi).update({
+          name: "In2CLC 2022",
+          image: image,
+          timestamp: moment().valueOf(),
+        });
 
-    try {
-      fetchCerti();
-    } catch (error) {}
-  }, []);
+        //add personal certi
+        data.forEach((item) => {
+          const email = item.email
+            .replace(/[^a-zA-Z0-9 ]/g, "")
+            .replace(/\s/g, "")
+            .toLowerCase();
+          database.ref().child("certi").child(email).child(certi).set(item.url);
+        });
+      }
+
+      presentToast({
+        message: "Đã thêm certificate thành công!",
+        color: "success",
+        duration: 3000,
+      });
+      setShowAddModal(false);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+      presentToast({ message: err, color: "danger", duration: 3000 });
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <IonPage>
+    <IonPage id="certificate-page">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
@@ -109,27 +189,59 @@ const CertificatePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonGrid>
-          <IonRow>
-            {certificate &&
-              certificate.length > 0 &&
-              certificate.map((certi, index) => (
-                <IonCol size="6" key={index}>
-                  <CertificateCard certi={certi} />
-                </IonCol>
-              ))}
-          </IonRow>
-        </IonGrid>
+        <div className="ion-padding-horizontal ion-padding-top">
+          <IonSegment
+            value={displayType}
+            onIonChange={(e) => {
+              setDisplayType(e.detail.value);
+            }}
+            color="primary"
+          >
+            <IonSegmentButton value="grid">
+              <IonIcon icon={gridOutline} style={{ fontSize: 14 }} />
+            </IonSegmentButton>
+            <IonSegmentButton value="list">
+              <IonIcon icon={listOutline} style={{ fontSize: 14 }} />
+            </IonSegmentButton>
+          </IonSegment>
+        </div>
 
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => setShowAddModal(true)}>
-            <IonIcon icon={add} />
-          </IonFabButton>
-        </IonFab>
+        {displayType === "grid" ? (
+          <IonGrid>
+            <IonRow>
+              {certificate &&
+                certificate.length > 0 &&
+                certificate.map((certi, index) => (
+                  <IonCol size="6" key={index}>
+                    <CertificateCard certi={certi} />
+                  </IonCol>
+                ))}
+            </IonRow>
+          </IonGrid>
+        ) : (
+          certificate &&
+          certificate.length > 0 &&
+          certificate.map((certi, index) => (
+            <CertificateItem certi={certi} key={index} />
+          ))
+        )}
+
+        {isAdmin && (
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton onClick={() => setShowAddModal(true)}>
+              <IonIcon icon={add} />
+            </IonFabButton>
+          </IonFab>
+        )}
 
         <IonModal
           isOpen={showAddModal}
-          onDidDismiss={() => setShowAddModal(false)}
+          onDidDismiss={() => {
+            setShowAddModal(false);
+            setAddCertiName("");
+            setAddCertiText("");
+            clearImageUrl();
+          }}
         >
           <IonHeader>
             <IonToolbar>
@@ -138,68 +250,121 @@ const CertificatePage: React.FC = () => {
                   <IonIcon icon={close} color="primary" />
                 </IonButton>
               </IonButtons>
+              <IonButtons slot="end">
+                <IonButton
+                  disabled={!addCertiName || !addCertiText || !imageUrl}
+                  onClick={() => {
+                    addBulkCerti();
+                  }}
+                >
+                  <b>Đăng</b>
+                </IonButton>
+              </IonButtons>
               <IonTitle>Thêm Certificate</IonTitle>
             </IonToolbar>
           </IonHeader>
-          <IonContent className="ion-padding">
+          <IonContent>
             <IonButton
+              hidden
               onClick={() => {
-                console.log(addCertiText);
-                try {
-                  const data: CertiRaw[] = JSON.parse(addCertiText);
-                  const certi = addCertiName
-                    .replace(/[^a-zA-Z0-9 ]/g, "")
-                    .replace(/\s/g, "")
-                    .toLowerCase();
-
-                  if (data && data.length > 0) {
-                    //add certi infor
-                    database.ref().child("certiDatabase").child(certi).update({
-                      name: "In2CLC 2022",
-                      image:
-                        "https://scontent.fcbr1-1.fna.fbcdn.net/v/t39.30808-6/277738715_2137464263097110_7884089031801519933_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=e3f864&_nc_ohc=52GWwWZV9U8AX_DomdA&_nc_ht=scontent.fcbr1-1.fna&oh=00_AT_lP152CAKi_RVP_M5o_hL8TNXbeYwuUFZCvgUQOYflPQ&oe=6299D496",
-                    });
-
-                    //add personal certi
-
-                    data.forEach((item) => {
-                      const email = item.email
-                        .replace(/[^a-zA-Z0-9 ]/g, "")
-                        .replace(/\s/g, "")
-                        .toLowerCase();
-                      database
-                        .ref()
-                        .child("certi")
-                        .child(email)
-                        .child(certi)
-                        .set(item.url);
-                    });
-                  }
-                } catch (err) {
-                  console.log(err);
-                }
+                console.log("data", formatCsv(addCertiText));
               }}
             >
-              Debug
+              Debug Button
             </IonButton>
-            <IonInput
-              placeholder="Nhập tên certi (viết thường, không dấu, không khoảng trống)"
-              onIonChange={(e) => {
-                setAddCertiName(e.detail.value);
-              }}
+            <br />
+            <IonList>
+              <IonItem>
+                <IonLabel position="stacked">Certificate Code</IonLabel>
+                <IonInput
+                  placeholder="Viết thường, không dấu, không cách"
+                  onIonChange={(e) => {
+                    setAddCertiName(e.detail.value);
+                  }}
+                />
+              </IonItem>
+              <br />
+              <IonItem>
+                <IonLabel position="stacked">Nhập csv</IonLabel>
+                <IonTextarea
+                  placeholder="email, name, url"
+                  autoGrow={true}
+                  onIonChange={(e) => {
+                    setAddCertiText(e.detail.value);
+                  }}
+                />
+              </IonItem>
+            </IonList>
+
+            <input
+              type="file"
+              id="upload"
+              accept="image/*"
+              hidden
+              multiple={false}
+              ref={fileInputRef}
+              onChange={handleFileChange}
             />
-            <IonTextarea
-              placeholder="Nhập json"
-              autoGrow={true}
-              onIonChange={(e) => {
-                setAddCertiText(e.detail.value);
+            <br />
+            <br />
+
+            <IonButton
+              shape="round"
+              expand="full"
+              className="ion-margin-horizontal"
+              onClick={() => {
+                handlePictureClick();
               }}
-            />
+            >
+              <IonIcon icon={image} slot="start" />
+              <IonText>{imageUrl ? "Đổi ảnh khác" : "Thêm hình ảnh"}</IonText>
+            </IonButton>
+
+            <IonCard hidden={!imageUrl}>
+              <IonImg
+                src={imageUrl}
+                style={{
+                  width: window.screen.width - 32,
+                  height: ((window.screen.width - 32) * 9) / 16,
+                  margin: 0,
+                  objectFit: "cover",
+                }}
+                onClick={handlePictureClick}
+              />
+            </IonCard>
           </IonContent>
         </IonModal>
+
+        <IonLoading isOpen={isLoading} />
       </IonContent>
     </IonPage>
   );
 };
+
+function formatCsv(csv: string) {
+  var lines = csv.split("\n");
+
+  var result = [];
+
+  // NOTE: If your columns contain commas in their values, you'll need
+  // to deal with those before doing the next step
+  // (you might convert them to &&& or something, then covert them back later)
+  // jsfiddle showing the issue https://jsfiddle.net/
+  var headers = lines[0].split(",");
+
+  for (var i = 1; i < lines.length; i++) {
+    var obj = {};
+    var currentline = lines[i].split(",");
+
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j]] = currentline[j];
+    }
+
+    result.push(obj);
+  }
+
+  //return result; //JavaScript object
+  return result; //JSON
+}
 
 export default CertificatePage;
