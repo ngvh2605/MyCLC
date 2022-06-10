@@ -21,7 +21,7 @@ import { closeCircle, eye, eyeOff, logoGoogle } from "ionicons/icons";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
-import { auth, database, googleProvider } from "../../firebase";
+import { auth } from "../../firebase";
 import { handleGoogleLogin } from "./GoogleLogin";
 import "./LoginPage.scss";
 

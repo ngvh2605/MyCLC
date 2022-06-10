@@ -2,7 +2,6 @@ import {
   IonButton,
   IonButtons,
   IonCard,
-  IonCardContent,
   IonCol,
   IonContent,
   IonFab,
@@ -28,26 +27,18 @@ import {
   IonToolbar,
   useIonToast,
 } from "@ionic/react";
-import {
-  add,
-  close,
-  grid,
-  gridOutline,
-  image,
-  listOutline,
-} from "ionicons/icons";
+import { add, close, gridOutline, image, listOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth";
 import useAddImage from "../../common/useAddImage";
+import useUploadFile from "../../common/useUploadFile";
+import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import { database } from "../../firebase";
-import { getInfoByUserId } from "../HomePage/services";
+import useCheckUserInfo from "./../../common/useCheckUserInfo";
 import CertificateCard from "./CertificateCard";
 import CertificateItem from "./CertificateItem";
 import "./CertificatePage.scss";
-import useCheckUserInfo from "./../../common/useCheckUserInfo";
-import useUploadFile from "../../common/useUploadFile";
-import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 interface CertiRaw {
   email: string;
   url: string;

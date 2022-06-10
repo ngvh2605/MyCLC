@@ -21,7 +21,7 @@ import moment from "moment";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
-import { auth, database, googleProvider } from "../../firebase";
+import { auth, database } from "../../firebase";
 import { handleGoogleLogin } from "../LoginPage/GoogleLogin";
 import "./RegisterPage.scss";
 
