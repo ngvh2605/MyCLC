@@ -1,7 +1,7 @@
 import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
 import LogRocket from "logrocket";
 import React, { useContext, useEffect, useState } from "react";
-import { auth as firebaseAuth } from "./firebase";
+import { auth as firebaseAuth, remoteConfig } from "./firebase";
 interface Auth {
   loggedIn: boolean;
   userId?: string;
@@ -23,6 +23,19 @@ export function useAuth(): Auth {
 export function useAuthInit(): AuthInit {
   const [authInit, setAuthInit] = useState<AuthInit>({ loading: true });
   useEffect(() => {
+    const initializeLogrocket = () => {
+      try {
+        remoteConfig.fetchAndActivate().then(() => {
+          console.log("remote config", remoteConfig.getAll());
+
+          LogRocket.init(remoteConfig.getString("logrocket"));
+        });
+      } catch (err) {
+        console.log("LogRocket error: ", err);
+      }
+    };
+    initializeLogrocket();
+
     return firebaseAuth.onAuthStateChanged((firebaseUser) => {
       console.log("user data", firebaseUser);
       const auth = firebaseUser

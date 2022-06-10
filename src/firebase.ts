@@ -3,6 +3,7 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 import "firebase/database";
+import "firebase/remote-config";
 
 import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
 
@@ -40,5 +41,10 @@ export const auth = app.auth();
 export const firestore = app.firestore();
 export const storage = app.storage();
 export const database = app.database();
+export const remoteConfig = app.remoteConfig();
+remoteConfig.settings = {
+  minimumFetchIntervalMillis: 0,
+  fetchTimeoutMillis: 60000,
+};
 export const facebookProvider = new firebase.auth.FacebookAuthProvider();
 export const googleProvider = new firebase.auth.GoogleAuthProvider();

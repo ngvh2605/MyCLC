@@ -23,6 +23,7 @@ import {
   chatbubbleEllipsesOutline,
   checkmarkCircle,
   folderOutline,
+  gameControllerOutline,
   logOutOutline,
   newspaperOutline,
   personOutline,
@@ -33,7 +34,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
-import { auth, database } from "../../firebase";
+import { auth, database, remoteConfig } from "../../firebase";
 import "./MenuPage.scss";
 
 const MenuPage = () => {
@@ -59,58 +60,67 @@ const MenuPage = () => {
       url: "home",
       icon: newspaperOutline,
       requireVerify: false,
+      isShown: true,
     },
     {
       text: "Hồ sơ",
       url: "profile",
       icon: personOutline,
       requireVerify: false,
+      isShown: true,
     },
     {
       text: "Sự kiện",
       url: "event",
       icon: calendarOutline,
       requireVerify: true,
+      isShown: true,
     },
     // {
     //   text: "To Do List",
     //   url: "timetable",
     //   icon: timeOutline,
     // },
-    // {
-    //   text: "Adventure Hunt",
-    //   url: "adventure",
-    //   icon: gameControllerOutline,
-    // },
+    {
+      text: "Adventure Hunt",
+      url: "adventure",
+      icon: gameControllerOutline,
+      isShown: remoteConfig.getBoolean("showAdventure"),
+    },
     {
       text: "In2CLC",
       url: "in2clc",
       icon: bookOutline,
       requireVerify: false,
+      isShown: remoteConfig.getBoolean("showIn2CLC"),
     },
     {
       text: "Phòng chat",
       url: "chat",
       icon: chatbubbleEllipsesOutline,
       requireVerify: true,
+      isShown: true,
     },
     {
       text: "Certificate",
       url: "certi",
       icon: folderOutline,
       requireVerify: true,
+      isShown: true,
     },
     {
       text: "Giới thiệu",
       url: "about",
       icon: sparklesOutline,
       requireVerify: false,
+      isShown: true,
     },
     {
       text: "Cài đặt",
       url: "settings",
       icon: settingsOutline,
       requireVerify: false,
+      isShown: true,
     },
   ];
 
@@ -162,26 +172,29 @@ const MenuPage = () => {
     url: string;
     icon: string;
     requireVerify: boolean;
+    isShown: boolean;
   }> = (props) => {
-    const { text, url, icon, requireVerify } = props;
+    const { text, url, icon, requireVerify, isShown } = props;
     return (
-      <IonItem
-        onClick={() => {
-          if (!!requireVerify) onItemClick(`/my/${url}`);
-          else {
-            history.push(`/my/${url}`);
-            menuClose();
-          }
-        }}
-        color={location.pathname.includes(`/my/${url}`) ? "primary" : ""}
-      >
-        <IonIcon
-          icon={icon}
-          color={!location.pathname.includes(`/my/${url}`) ? "primary" : ""}
-          slot="start"
-        />
-        <IonLabel>{text}</IonLabel>
-      </IonItem>
+      isShown && (
+        <IonItem
+          onClick={() => {
+            if (!!requireVerify) onItemClick(`/my/${url}`);
+            else {
+              history.push(`/my/${url}`);
+              menuClose();
+            }
+          }}
+          color={location.pathname.includes(`/my/${url}`) ? "primary" : ""}
+        >
+          <IonIcon
+            icon={icon}
+            color={!location.pathname.includes(`/my/${url}`) ? "primary" : ""}
+            slot="start"
+          />
+          <IonLabel>{text}</IonLabel>
+        </IonItem>
+      )
     );
   };
 
@@ -244,6 +257,7 @@ const MenuPage = () => {
                 url={item.url}
                 icon={item.icon}
                 requireVerify={item.requireVerify}
+                isShown={item.isShown}
                 key={index}
               />
             ))}

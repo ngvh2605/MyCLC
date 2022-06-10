@@ -1,6 +1,5 @@
 import { IonApp, IonLoading, IonRouterOutlet, setupConfig } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import LogRocket from "logrocket";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import AppTabs from "./AppTabs";
@@ -22,7 +21,6 @@ const App: React.FC = () => {
   console.log(`rendering App with auth:`, auth);
 
   // LogRocket.init("clc-multimedia/myclc");
-  LogRocket.init("myclc/myclc");
 
   return (
     <IonApp>
