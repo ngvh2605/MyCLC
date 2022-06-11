@@ -34,6 +34,7 @@ import { useAuth } from "../../auth";
 import useAddImage from "../../common/useAddImage";
 import useUploadFile from "../../common/useUploadFile";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
+import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { database } from "../../firebase";
 import useCheckUserInfo from "./../../common/useCheckUserInfo";
 import CertificateCard from "./CertificateCard";
@@ -189,14 +190,12 @@ const CertificatePage: React.FC = () => {
             }}
             color="primary"
           >
-            <IonSegmentButton value="grid">
-              <IonIcon icon={gridOutline} style={{ fontSize: 14 }} />
-            </IonSegmentButton>
-            <IonSegmentButton value="list">
-              <IonIcon icon={listOutline} style={{ fontSize: 14 }} />
-            </IonSegmentButton>
+            <IonSegmentButton value="grid">Dạng lưới</IonSegmentButton>
+            <IonSegmentButton value="list">Danh sách</IonSegmentButton>
           </IonSegment>
         </div>
+
+        <RefresherItem handleRefresh={() => {}} />
 
         {certificate && certificate.length > 0 ? (
           displayType === "grid" ? (
