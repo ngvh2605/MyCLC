@@ -26,7 +26,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
-import { firestore, storage } from "../../../firebase";
+import { auth, firestore, storage } from "../../../firebase";
 import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
@@ -88,7 +88,6 @@ const AddNewsPage: React.FC = () => {
       fileInputRef.current.click();
     }
   };
-
   const handlePost = async () => {
     setStatus({ loading: true, error: false });
     let uploadedUrl = "";
@@ -104,6 +103,39 @@ const AddNewsPage: React.FC = () => {
         timestamp: moment().valueOf(),
       })
       .then(() => {
+        //send news to discord
+        try {
+          var request = new XMLHttpRequest();
+          request.open(
+            "POST",
+            "https://discord.com/api/webhooks/983977150145261590/B4YzLh3pu_lSG8ltxWswzP1YuAGiZIhGDftJxBA4Lo6Cg2Yxqot1FNoJL5bJE01JPQJh"
+          );
+
+          const params = {
+            content: null,
+            embeds: [
+              {
+                title: title,
+                description: body,
+                color: null,
+                author: {
+                  name: auth.currentUser.displayName,
+                  icon_url: auth.currentUser.photoURL,
+                },
+                timestamp: moment().format(),
+                image: {
+                  url: uploadedUrl,
+                },
+              },
+            ],
+            attachments: [],
+          };
+
+          request.setRequestHeader("Content-type", "application/json");
+          request.send(JSON.stringify(params));
+        } catch (error) {
+          console.log("Send news to discord error", error);
+        }
         setStatus({ loading: false, error: false });
         //setAlertHeader("Chúc mừng!");
         //setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
