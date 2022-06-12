@@ -1,4 +1,3 @@
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
@@ -14,8 +13,6 @@ import {
   IonLoading,
   IonMenuButton,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonRow,
   IonText,
   IonTitle,
@@ -23,12 +20,12 @@ import {
   useIonAlert,
   useIonToast,
 } from "@ionic/react";
-import { chevronDown } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
+import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { auth, database, firestore } from "../../../firebase";
 import { Answer, toAnswer } from "../model";
-import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
-import { useHistory } from "react-router";
 
 const In2CLCMarkPage: React.FC = () => {
   const history = useHistory();
@@ -62,13 +59,6 @@ const In2CLCMarkPage: React.FC = () => {
           setAnswers(docs.map(toAnswer));
         }
       });
-  };
-
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchAnswers();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
   };
 
   const submitMark = async (
@@ -129,13 +119,11 @@ const In2CLCMarkPage: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchAnswers();
+          }}
+        />
 
         {answers &&
         answers.filter((answer) => {

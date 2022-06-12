@@ -17,7 +17,12 @@ const useUploadFile = (userId?: string) => {
       | "certiDatabase",
     name?: string
   ) => {
-    const imgName = name ? name : `${Date.now()}.png`;
+    const imgName = name
+      ? `${name
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .replace(/\s/g, "")
+          .toLowerCase()}.png`
+      : `${Date.now()}.png`;
     const rootFolder = `/${userId ? `users/${userId}` : "public"}`;
     const folderPath = `${rootFolder}/${type ? type + "/" : ""}`;
 

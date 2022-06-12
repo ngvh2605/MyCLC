@@ -1,4 +1,3 @@
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
@@ -15,8 +14,6 @@ import {
   IonMenuButton,
   IonNote,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonText,
   IonTitle,
   IonToolbar,
@@ -24,12 +21,12 @@ import {
   useIonToast,
   useIonViewWillEnter,
 } from "@ionic/react";
-import { chevronDown } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router";
 import { useAuth } from "../../../auth";
 import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
+import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { firestore } from "../../../firebase";
 import { Answer, toAnswer } from "../model";
 import useAdventureCheck from "../useAdventureCheck";
@@ -62,13 +59,6 @@ const AdventureMarkPage: React.FC = () => {
           setAnswers(docs.map(toAnswer));
         }
       });
-  };
-
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchAnswers();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
   };
 
   const submitMark = async (answer: Answer, index: number) => {
@@ -116,13 +106,11 @@ const AdventureMarkPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchAnswers();
+          }}
+        />
 
         {answers &&
         answers.filter((answer) => {

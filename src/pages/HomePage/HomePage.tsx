@@ -1,5 +1,4 @@
 import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
   IonBadge,
@@ -25,8 +24,6 @@ import {
   IonModal,
   IonNote,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonRow,
   IonSkeletonText,
   IonText,
@@ -38,7 +35,6 @@ import {
   add as addIcon,
   arrowUp,
   checkmark,
-  chevronDown,
   close,
   mailOpenOutline,
   mailOutline,
@@ -48,6 +44,7 @@ import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
+import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { auth as firebaseAuth, database, firestore } from "../../firebase";
 import "./HomePage.scss";
 import NewsCard from "./NewsCard";
@@ -262,13 +259,6 @@ const HomePage: React.FC = () => {
     setNewsList(newsList.filter((p) => p !== id));
   };
 
-  const refreshNews = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchNews();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
-  };
-
   const clearMailbox = () => {
     database.ref().child("mailbox").child(userId).remove();
     setMailbox([]);
@@ -311,13 +301,11 @@ const HomePage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="">
-        <IonRefresher slot="fixed" onIonRefresh={refreshNews}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchNews();
+          }}
+        />
 
         <IonFab
           hidden={!showRefresh}

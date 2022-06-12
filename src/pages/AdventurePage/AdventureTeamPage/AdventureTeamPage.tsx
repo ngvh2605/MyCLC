@@ -1,5 +1,4 @@
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
   IonButton,
@@ -21,8 +20,6 @@ import {
   IonMenuButton,
   IonModal,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonSegment,
   IonSegmentButton,
   IonText,
@@ -33,7 +30,6 @@ import {
 } from "@ionic/react";
 import {
   checkmarkCircle,
-  chevronDown,
   close,
   closeCircle,
   time,
@@ -46,6 +42,7 @@ import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useUploadFile from "../../../common/useUploadFile";
+import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { UnAuth } from "../../../components/CommonUI/UnAuth";
 import { firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
@@ -191,13 +188,6 @@ const AdventureTeamPage: React.FC = () => {
     setLoading(false);
   };
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchMissions();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -211,13 +201,12 @@ const AdventureTeamPage: React.FC = () => {
       {isVerify ? (
         teamInfo && teamInfo.isStarted ? (
           <IonContent>
-            <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-              <IonRefresherContent
-                style={{ marginTop: 10 }}
-                pullingIcon={chevronDown}
-                pullingText="Kéo xuống để làm mới"
-              ></IonRefresherContent>
-            </IonRefresher>
+            <RefresherItem
+              handleRefresh={() => {
+                fetchMissions();
+              }}
+            />
+
             <div className="ion-padding">
               <IonSegment
                 color="primary"

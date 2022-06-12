@@ -1,5 +1,4 @@
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
@@ -20,8 +19,6 @@ import {
   IonModal,
   IonNote,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonSlide,
   IonText,
   IonTextarea,
@@ -31,11 +28,12 @@ import {
   useIonToast,
 } from "@ionic/react";
 import Autolinker from "autolinker";
-import { chevronDown, close, school, time } from "ionicons/icons";
+import { close, school, time } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
+import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 import { Answer, Mission } from "../model";
@@ -115,13 +113,6 @@ const In2CLCMissionPage: React.FC = () => {
     }
   };
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchMissions();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
-  };
-
   const submitAnswer = async () => {
     try {
       let image = "";
@@ -129,10 +120,7 @@ const In2CLCMissionPage: React.FC = () => {
         image = await handleUploadImage(
           answer.image,
           "in2clc",
-          `${chosen.code}_${userEmail
-            .replace(/[^a-zA-Z0-9 ]/g, "")
-            .replace(/\s/g, "")
-            .toLowerCase()}.png`
+          `${chosen.code}_${userEmail}`
         );
       }
       await firestore.doc(`in2clc/${chosen.code}_${userEmail}`).set({
@@ -234,13 +222,11 @@ const In2CLCMissionPage: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent>
-            <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-              <IonRefresherContent
-                style={{ marginTop: 10 }}
-                pullingIcon={chevronDown}
-                pullingText="Kéo xuống để làm mới"
-              ></IonRefresherContent>
-            </IonRefresher>
+            <RefresherItem
+              handleRefresh={() => {
+                fetchMissions();
+              }}
+            />
 
             <IonList>
               {missions &&

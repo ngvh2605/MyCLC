@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButtons,
   IonContent,
@@ -9,18 +8,17 @@ import {
   IonIcon,
   IonMenuButton,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonSegment,
   IonSegmentButton,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { add, chevronDown } from "ionicons/icons";
+import { add } from "ionicons/icons";
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
+import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { firestore } from "../../firebase";
 import { Events, toEvents } from "../../models";
 import ManageCard from "./ManageCard";
@@ -37,7 +35,7 @@ const ManagePage: React.FC = () => {
     fetchEvent();
   }, []);
 
-  const fetchEvent = async (event?: CustomEvent<RefresherEventDetail>) => {
+  const fetchEvent = async () => {
     const { docs } = await firestore
       .collection("events")
       .where("author", "==", userId)
@@ -54,12 +52,6 @@ const ManagePage: React.FC = () => {
       .get();
 
     setOldEvents(oldDocs.map(toEvents));
-
-    if (event) {
-      setTimeout(() => {
-        event.detail.complete();
-      }, 2000);
-    }
   };
 
   return (
@@ -74,13 +66,12 @@ const ManagePage: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        <IonRefresher slot="fixed" onIonRefresh={fetchEvent}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchEvent();
+          }}
+        />
+
         <div style={{ margin: 16 }}>
           <IonSegment
             value={segment}

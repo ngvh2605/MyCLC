@@ -1,4 +1,3 @@
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonButton,
   IonButtons,
@@ -7,17 +6,16 @@ import {
   IonIcon,
   IonMenuButton,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronDown, ticketOutline } from "ionicons/icons";
+import { ticketOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
+import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { Events } from "../../models";
 import EventCard from "./EventCard";
@@ -49,13 +47,6 @@ const EventPage: React.FC = () => {
     setLoading((p) => !p);
   };
 
-  const refreshEvents = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchEvents();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -78,13 +69,11 @@ const EventPage: React.FC = () => {
       </IonHeader>
       {isVerify ? (
         <IonContent>
-          <IonRefresher slot="fixed" onIonRefresh={refreshEvents}>
-            <IonRefresherContent
-              style={{ marginTop: 10 }}
-              pullingIcon={chevronDown}
-              pullingText="Kéo xuống để làm mới"
-            ></IonRefresherContent>
-          </IonRefresher>
+          <RefresherItem
+            handleRefresh={() => {
+              fetchEvents();
+            }}
+          />
 
           {!loading ? (
             eventsList && eventsList.length > 0 ? (

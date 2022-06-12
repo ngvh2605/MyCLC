@@ -1,4 +1,3 @@
-import { RefresherEventDetail } from "@ionic/core";
 import {
   IonAvatar,
   IonButtons,
@@ -17,16 +16,15 @@ import {
   IonMenuButton,
   IonNote,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonRow,
   IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { chevronDown, trophy } from "ionicons/icons";
+import { trophy } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { firestore } from "../../../firebase";
 import { getInfoByUserId } from "../../HomePage/services";
 import { Team } from "../model";
@@ -70,12 +68,6 @@ const AdventureRankPage: React.FC = () => {
     setTeams(temp);
   };
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    fetchTeams();
-    setTimeout(() => {
-      event.detail.complete();
-    }, 2000);
-  };
   return (
     <IonPage id="adventure-rank">
       <IonHeader>
@@ -102,13 +94,11 @@ const AdventureRankPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="">
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent
-            style={{ marginTop: 10 }}
-            pullingIcon={chevronDown}
-            pullingText="Kéo xuống để làm mới"
-          ></IonRefresherContent>
-        </IonRefresher>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchTeams();
+          }}
+        />
 
         {teams
           .sort((a, b) => {
