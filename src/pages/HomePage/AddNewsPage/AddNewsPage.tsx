@@ -26,9 +26,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
-import { auth, firestore, storage } from "../../../firebase";
+import { auth, database, firestore, storage } from "../../../firebase";
 import { News } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
+const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 const AddNewsPage: React.FC = () => {
   const location = useLocation<News>();
@@ -102,7 +103,7 @@ const AddNewsPage: React.FC = () => {
         author: userId,
         timestamp: moment().valueOf(),
       })
-      .then(() => {
+      .then(async () => {
         //send news to discord
         try {
           var request = new XMLHttpRequest();
@@ -136,6 +137,50 @@ const AddNewsPage: React.FC = () => {
         } catch (error) {
           console.log("Send news to discord error", error);
         }
+
+        //send news to facebook group
+        try {
+          const doc = new GoogleSpreadsheet(
+            "1OfgDg7Ahk_q3tw0wZYjQP12KMCxOT5XsaleHgc8wjP8"
+          );
+          await doc.useServiceAccountAuth({
+            type: "service_account",
+            project_id: "myclcproject",
+            private_key_id: "1e78ee294ac75df46728216dbe2126939bb0baf5",
+            private_key:
+              "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCix7uaI7ZYZGp7\nxDJVlpFQWlQHD8R7/D1vDgx93JSnLIkbYN1QnrPlPQZBITEu/aKPwtJRhqRUNb26\nabAOWijAGz+0madRbs+3oV59mnxgvtPh18UICaJLsNaFTCketcTfhTvgH67E60h8\ngP0SJxTyyKViAR+NUoFF1EkK/nh2AZoz+H32kSKXUl0Cmx2xDBpvWY0+MT53DdOv\nRXSYksLZTFWuM6q8syIFFSP2JEq1xBHAOB2FGPkV8qmRRflNWLUXltD37imgpS7c\njPZ7435F9vsEAPKMZu/l6sRY1lT04VnSzRMZKmjSLcc7XPHVjXciUrT+qAOM5tiv\n6byhnhPVAgMBAAECggEABrv3nzDqCQOQtNw0p8U/RPvokJPHlQFQum/VvehcacpW\nKRYw2qDuLjfxzyD5dlBhXFpsmWCAxcgzKgf0TM9CK8VNtXO8xV9KKvZ7QKar4vCD\n4Wcr9vZwZ0GQyfafQm6ZctvXKATM3RzNpLpNKJ8KEcSR0MQWIVtTgMrjAZhDmId3\nqQM2C/vxXV8Pvjgli7d4ztQlpBU0COMf4HajS7pxcWD9THZaT3Ieoey5HH1zTx+t\n8nXoHirTvgz777vf4gzVHa8M9KXYx2a6VAaNSSRWl2+n0XEoOVK0MqRHyufiAWS+\nGhs6zKVItJB9L+Kk0XFVQPp8fxgL/sbijfc3benoMwKBgQDO8iqIEQYZJUzQQsIX\ncX1Okip6HzJ5JFmqukEGCK61QK9+/qlaI1C2VSl5PF/uVly8hbprbBgsdeUpkTTT\nPFbu5LbbIk5+kbQcEpr9PHPc1d2kVoLu1edfYEkc0cL3A1/TgWr5T5sQVWNtu8j/\naKOY5hgvhp7fhQOcjO7NX2yHawKBgQDJXYNqTcjD8XsA1XLvpxk+7yIdoJNh9+9Y\n31YAnJQMD20Y+ohTxqkQ4yQ8sKOfBBhNNIu7D4Thi62yKgSbIO7ii1dvqPiTwqOM\nXNk2GWTW4qpSyBGVTPFtqKHMB598GbCdWuITVijp31zccfM8FLiZS3BoBJOQK1k8\nAP1PbeDhvwKBgFx6veT2bpo4H/6FhsUBM3U0PoU6gcy/IM750usGYEShdouy9C1S\n0NPadOE3yMryjxi0Th2JPbhIqzMLL+ch9NtnHAwLZbaMGEffTKHULRbH//dbrcFb\nl7z4g1O8rXrDaERVdl+ZYntHHVrBa04wDcPbN32tlDvg7j88f88JUK+nAoGARVaN\nFQLZ2hcB+wSFAl7ww4oGnlsXxQliAqFM9QL1u71oHMzQOsDSoL0GUluky/HWCGfK\nocwzPpMhaZMsaNqLR7khj5KIniDMvl2OciGGZrRAYCcCXv3SuKbzp9UMJuiVt2l/\nJZdqmTXPvR0D27Fq62Zdu4Ov6Fn07UON9lbos/MCgYEAyhVKIa80suoV1FkrPxSb\nQ3bT8xl7F9IEKcjC96izCC+Apf37VVmcBjwG+xV3XM7d5qCkWU/YfauETFs2YV9o\nDTEpAldL5snCd0dyFhUIzACk1IyayVGbxvwvjwos3nO12r7C7qoNC+9QWI3BmOEM\nFy+I7Ea4awb/2lZXZU9VqcE=\n-----END PRIVATE KEY-----\n",
+            client_email:
+              "google-sheet-service-account@myclcproject.iam.gserviceaccount.com",
+            client_id: "104531246062669966612",
+            auth_uri: "https://accounts.google.com/o/oauth2/auth",
+            token_uri: "https://oauth2.googleapis.com/token",
+            auth_provider_x509_cert_url:
+              "https://www.googleapis.com/oauth2/v1/certs",
+            client_x509_cert_url:
+              "https://www.googleapis.com/robot/v1/metadata/x509/google-sheet-service-account%40myclcproject.iam.gserviceaccount.com",
+          });
+          await doc.loadInfo();
+          const sheet = doc.sheetsByIndex[0];
+          await sheet.addRow({
+            name: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            timestamp: moment().format(),
+            title: title ? title.toUpperCase() : "",
+            body: body,
+            picture: uploadedUrl
+              ? uploadedUrl
+              : (
+                  await database
+                    .ref()
+                    .child("public")
+                    .child("newsDefault")
+                    .get()
+                ).val(),
+          });
+        } catch (error) {
+          console.log("Send news to facebook error", error);
+        }
+
         setStatus({ loading: false, error: false });
         //setAlertHeader("Chúc mừng!");
         //setAlertMessage("Bài viết của bạn đã được đăng tải thành công");
