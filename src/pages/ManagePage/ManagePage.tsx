@@ -18,6 +18,7 @@ import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth";
+import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { firestore } from "../../firebase";
 import { Events, toEvents } from "../../models";
@@ -82,19 +83,25 @@ const ManagePage: React.FC = () => {
             <IonSegmentButton value="old">Sự kiện đã qua</IonSegmentButton>
           </IonSegment>
         </div>
-        {segment === "new"
-          ? events &&
+        {segment === "new" ? (
+          events && events.length > 0 ? (
             events
               .sort((a, b) => a.startDate - b.startDate)
               .map((item, index) => (
                 <ManageCard event={item} key={index} allowEdit={true} />
               ))
-          : oldEvents &&
-            oldEvents
-              .sort((a, b) => b.startDate - a.startDate)
-              .map((item, index) => (
-                <ManageCard event={item} key={index} allowEdit={false} />
-              ))}
+          ) : (
+            <EmptyUI />
+          )
+        ) : oldEvents && oldEvents.length > 0 ? (
+          oldEvents
+            .sort((a, b) => b.startDate - a.startDate)
+            .map((item, index) => (
+              <ManageCard event={item} key={index} allowEdit={false} />
+            ))
+        ) : (
+          <EmptyUI />
+        )}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton routerLink="/my/manage/add">

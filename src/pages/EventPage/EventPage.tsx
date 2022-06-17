@@ -1,11 +1,15 @@
 import {
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
+  IonImg,
+  IonLabel,
   IonMenuButton,
   IonPage,
+  IonSlide,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -81,7 +85,28 @@ const EventPage: React.FC = () => {
                 .sort((a, b) => a.startDate - b.startDate)
                 .map((item, index) => <EventCard event={item} key={index} />)
             ) : (
-              <EmptyUI />
+              <IonContent className="ion-padding">
+                <IonSlide>
+                  <div className="ion-margin">
+                    <IonImg
+                      src="/assets/image/slides2.svg"
+                      style={{
+                        height: window.screen.height / 4,
+                        marginBottom: 10,
+                      }}
+                    />
+                    <IonLabel
+                      style={{
+                        fontSize: "x-large",
+                        margin: "auto",
+                        lineHeight: "40px",
+                      }}
+                    >
+                      <b>Các sự kiện sắp tới sẽ xuất hiện tại đây</b>
+                    </IonLabel>
+                  </div>
+                </IonSlide>
+              </IonContent>
             )
           ) : (
             <>

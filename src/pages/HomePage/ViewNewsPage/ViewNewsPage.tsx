@@ -282,11 +282,7 @@ const ViewNewsPage: React.FC = () => {
             </IonCardContent>
 
             <hr
-              className="ion-margin"
               style={{
-                borderBottom: "1px solid",
-                opacity: 0.2,
-                marginBottom: 10,
                 marginLeft: 0,
                 marginRight: 0,
               }}

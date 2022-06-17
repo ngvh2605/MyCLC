@@ -253,3 +253,11 @@ ion-skeleton-text {
 ion-avatar ion-skeleton-text {
   border-radius: 50px;
 }
+
+/* divider style */
+hr {
+  margin: 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid;
+  opacity: 0.2;
+}

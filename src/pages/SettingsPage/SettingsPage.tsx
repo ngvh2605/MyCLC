@@ -7,6 +7,7 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
+  IonListHeader,
   IonMenuButton,
   IonPage,
   IonTitle,
@@ -40,15 +41,7 @@ const SettingsPage: React.FC = () => {
       </IonHeader>
       <IonContent>
         <br />
-        <br />
-        <IonItemDivider
-          color="primary"
-          style={{ paddingTop: 6, paddingBottom: 6 }}
-        >
-          <IonLabel className="ion-padding-horizontal">
-            Cài đặt tài khoản
-          </IonLabel>
-        </IonItemDivider>
+        <IonListHeader>Cài đặt tài khoản</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             onClick={() => {
@@ -80,13 +73,9 @@ const SettingsPage: React.FC = () => {
             <IonLabel>Sửa trang cá nhân</IonLabel>
           </IonItem>
         </IonList>
-        <br />
-        <IonItemDivider
-          color="primary"
-          style={{ paddingTop: 6, paddingBottom: 6 }}
-        >
-          <IonLabel className="ion-padding-horizontal">Tiện ích</IonLabel>
-        </IonItemDivider>
+
+        <hr />
+        <IonListHeader>Tiện ích</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             onClick={() => {
@@ -97,15 +86,9 @@ const SettingsPage: React.FC = () => {
             <IonLabel>Thêm khung ảnh đại diện</IonLabel>
           </IonItem>
         </IonList>
-        <br />
-        <IonItemDivider
-          color="primary"
-          style={{ paddingTop: 6, paddingBottom: 6 }}
-        >
-          <IonLabel className="ion-padding-horizontal">
-            Trợ giúp & hỗ trợ
-          </IonLabel>
-        </IonItemDivider>
+
+        <hr />
+        <IonListHeader>Trợ giúp & hỗ trợ</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             href="https://m.me/CLCMultimedia"

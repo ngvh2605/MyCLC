@@ -15,6 +15,7 @@ import {
   IonItemDivider,
   IonLabel,
   IonList,
+  IonListHeader,
   IonLoading,
   IonModal,
   IonPage,
@@ -45,7 +46,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import { database, firestore } from "../../firebase";
-import { getInfoByUserId } from "../HomePage/services";
+import NewsCard from "../HomePage/NewsCard";
+import { getInfoByUserId, getNew } from "../HomePage/services";
 import { followClub, unfollowClub } from "./services";
 import "./UserPage.scss";
 
@@ -118,6 +120,7 @@ const UserPage: React.FC = () => {
   const locationRef = useLocation<{ isEdit: boolean }>();
 
   const [isFollow, setIsFollow] = useState<boolean | string>("undefined");
+  const [newsList, setNewsList] = useState<string[]>([]);
 
   useEffect(() => {
     if (locationRef && locationRef.state && locationRef.state.isEdit) {
@@ -165,6 +168,15 @@ const UserPage: React.FC = () => {
         .get();
 
       setIsFollow(!data.empty);
+    }
+
+    //fetch new list
+    if (data && data.role && data.role === "club") {
+      const news = await getNew(3);
+      const newIds = news.map((p) => {
+        return p.id;
+      });
+      setNewsList(newIds);
     }
   };
 
@@ -325,18 +337,13 @@ const UserPage: React.FC = () => {
               )}
 
               <br />
-              <br />
             </>
           )}
 
         {userInfo && (
           <>
-            <IonItemDivider
-              color="primary"
-              style={{ paddingTop: 6, paddingBottom: 6 }}
-            >
-              <IonLabel className="ion-padding-horizontal">Thông tin</IonLabel>
-            </IonItemDivider>
+            <hr />
+            <IonListHeader>Thông tin</IonListHeader>
             <div className="ion-padding">
               <IonList lines="none">
                 {userInfo.role && (
@@ -388,9 +395,13 @@ const UserPage: React.FC = () => {
                   <IonItem>
                     <IonIcon icon={balloon} slot="start" color="medium" />
                     <IonLabel text-wrap>
-                      {moment(userInfo.birth).format(
-                        "[Sinh ngày] DD [tháng] MM, YYYY"
-                      )}
+                      {userInfo.role && userInfo.role === "club"
+                        ? moment(userInfo.birth).format(
+                            "[Thành lập] D [tháng] M, YYYY"
+                          )
+                        : moment(userInfo.birth).format(
+                            "[Sinh ngày] D [tháng] M, YYYY"
+                          )}
                     </IonLabel>
                   </IonItem>
                 )}
@@ -439,7 +450,7 @@ const UserPage: React.FC = () => {
                             rel="noreferrer"
                             style={{ textDecoration: "none" }}
                           >
-                            <IonChip color="secondary">
+                            <IonChip color="primary">
                               <IonIcon icon={logoFacebook} />
                               <IonLabel>Facebook</IonLabel>
                             </IonChip>
@@ -452,7 +463,7 @@ const UserPage: React.FC = () => {
                             rel="noreferrer"
                             style={{ textDecoration: "none" }}
                           >
-                            <IonChip color="secondary">
+                            <IonChip color="primary">
                               <IonIcon icon={logoInstagram} />
                               <IonLabel>Instagram</IonLabel>
                             </IonChip>
@@ -465,7 +476,7 @@ const UserPage: React.FC = () => {
                             rel="noreferrer"
                             style={{ textDecoration: "none" }}
                           >
-                            <IonChip color="secondary">
+                            <IonChip color="primary">
                               <IonIcon icon={logoYoutube} />
                               <IonLabel>Youtube</IonLabel>
                             </IonChip>
@@ -478,7 +489,7 @@ const UserPage: React.FC = () => {
                             rel="noreferrer"
                             style={{ textDecoration: "none" }}
                           >
-                            <IonChip color="secondary">
+                            <IonChip color="primary">
                               <IonIcon icon={logoLinkedin} />
                               <IonLabel>LinkedIn</IonLabel>
                             </IonChip>
@@ -495,12 +506,8 @@ const UserPage: React.FC = () => {
 
         {badges && badges.length > 0 && badges[0] !== null && (
           <>
-            <IonItemDivider
-              color="primary"
-              style={{ paddingTop: 6, paddingBottom: 6 }}
-            >
-              <IonLabel className="ion-padding-horizontal">Huy hiệu</IonLabel>
-            </IonItemDivider>
+            <hr />
+            <IonListHeader>Huy hiệu</IonListHeader>
 
             <div className="ion-padding">
               <IonList lines="none">
@@ -516,6 +523,30 @@ const UserPage: React.FC = () => {
             </div>
           </>
         )}
+
+        {userInfo &&
+          userInfo.role &&
+          userInfo.role === "club" &&
+          newsList &&
+          newsList.length > 0 && (
+            <>
+              <hr />
+              <IonListHeader>News gần đây</IonListHeader>
+              {newsList.map((item, index) => (
+                <NewsCard
+                  newId={item}
+                  key={index}
+                  handleDelete={() => {
+                    setNewsList(
+                      newsList.filter((p) => {
+                        return p !== item;
+                      })
+                    );
+                  }}
+                />
+              ))}
+            </>
+          )}
 
         {id === userId && (
           <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>

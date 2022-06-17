@@ -50,39 +50,6 @@ import "./HomePage.scss";
 import NewsCard from "./NewsCard";
 import { getNew, getNextNews } from "./services";
 
-const LoadingNews = () => (
-  <div style={{ maxWidth: 680, margin: "0 auto" }}>
-    <IonCard>
-      <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-        <IonAvatar slot="start">
-          <IonSkeletonText animated />
-        </IonAvatar>
-        <IonLabel text-wrap>
-          <p>
-            <IonSkeletonText animated style={{ width: "50%" }} />
-          </p>
-          <IonLabel>
-            <IonNote>
-              <IonSkeletonText animated style={{ width: "30%" }} />
-            </IonNote>
-          </IonLabel>
-        </IonLabel>
-      </IonItem>
-      <IonCardContent style={{ paddingTop: 0 }}>
-        <IonCardSubtitle style={{ paddingBottom: 10 }}>
-          <IonSkeletonText animated style={{ width: "100%" }} />
-        </IonCardSubtitle>
-        <IonLabel text-wrap>
-          <IonSkeletonText animated style={{ width: "100%" }} />
-          <IonSkeletonText animated style={{ width: "100%" }} />
-          <IonSkeletonText animated style={{ width: "100%" }} />
-          <IonSkeletonText animated style={{ width: "30%" }} />
-        </IonLabel>
-      </IonCardContent>
-    </IonCard>
-  </div>
-);
-
 interface Mail {
   sender: string;
   message: string;
@@ -545,5 +512,38 @@ const HomePage: React.FC = () => {
     </IonPage>
   );
 };
+
+const LoadingNews = () => (
+  <div style={{ maxWidth: 680, margin: "0 auto" }}>
+    <IonCard>
+      <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+        <IonAvatar slot="start">
+          <IonSkeletonText animated />
+        </IonAvatar>
+        <IonLabel text-wrap>
+          <p>
+            <IonSkeletonText animated style={{ width: "50%" }} />
+          </p>
+          <IonLabel>
+            <IonNote>
+              <IonSkeletonText animated style={{ width: "30%" }} />
+            </IonNote>
+          </IonLabel>
+        </IonLabel>
+      </IonItem>
+      <IonCardContent style={{ paddingTop: 0 }}>
+        <IonCardSubtitle style={{ paddingBottom: 10 }}>
+          <IonSkeletonText animated style={{ width: "100%" }} />
+        </IonCardSubtitle>
+        <IonLabel text-wrap>
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "100%" }} />
+          <IonSkeletonText animated style={{ width: "30%" }} />
+        </IonLabel>
+      </IonCardContent>
+    </IonCard>
+  </div>
+);
 
 export default HomePage;

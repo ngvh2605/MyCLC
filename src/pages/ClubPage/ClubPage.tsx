@@ -133,29 +133,39 @@ const ClubPage: React.FC = () => {
               </div>
             ))
         ) : (
-          <div style={{ maxWidth: 680, margin: "0 auto" }}>
-            <IonCard>
-              <IonCardContent>
-                <IonItem lines="none">
-                  <IonAvatar slot="start" style={{ width: 50, height: 50 }}>
-                    <IonSkeletonText animated />
-                  </IonAvatar>
-                  <IonLabel className="ion-no-margin">
-                    <IonSkeletonText animated style={{ width: "50%" }} />
-
-                    <IonLabel text-wrap>
-                      <IonSkeletonText animated />
-                      <IonSkeletonText animated />
-                      <IonSkeletonText animated style={{ width: "30%" }} />
-                    </IonLabel>
-                  </IonLabel>
-                </IonItem>
-              </IonCardContent>
-            </IonCard>
-          </div>
+          <>
+            <ClubCardSkeleton />
+            <ClubCardSkeleton />
+            <ClubCardSkeleton />
+          </>
         )}
       </IonContent>
     </IonPage>
+  );
+};
+
+const ClubCardSkeleton = () => {
+  return (
+    <div style={{ maxWidth: 680, margin: "0 auto" }}>
+      <IonCard>
+        <IonCardContent>
+          <IonItem lines="none">
+            <IonAvatar slot="start" style={{ width: 50, height: 50 }}>
+              <IonSkeletonText animated />
+            </IonAvatar>
+            <IonLabel className="ion-no-margin">
+              <IonSkeletonText animated style={{ width: "50%" }} />
+
+              <IonLabel text-wrap>
+                <IonSkeletonText animated />
+                <IonSkeletonText animated />
+                <IonSkeletonText animated style={{ width: "30%" }} />
+              </IonLabel>
+            </IonLabel>
+          </IonItem>
+        </IonCardContent>
+      </IonCard>
+    </div>
   );
 };
 

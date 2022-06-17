@@ -12,6 +12,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonLoading,
   IonPage,
   IonSelect,
   IonSelectOption,
@@ -30,6 +31,7 @@ const PersonalInfo: React.FC = () => {
   const history = useHistory();
 
   const [presentAlert] = useIonAlert();
+  const [loading, setLoading] = useState(false);
 
   const [userInfo, setUserInfo] = useState<any>();
 
@@ -165,6 +167,8 @@ const PersonalInfo: React.FC = () => {
       personalInfo: true,
     });
 
+    setLoading(false);
+
     presentAlert({
       header: "Hoàn thành!",
       message: "Thông tin của bạn đã được lưu thành công",
@@ -180,6 +184,7 @@ const PersonalInfo: React.FC = () => {
   };
 
   const handleSaveInfo = async () => {
+    setLoading(true);
     const userData = database.ref();
     await userData.child("users").child(userId).child("personal").update({
       fullName: fullName,
@@ -214,11 +219,20 @@ const PersonalInfo: React.FC = () => {
             clubContact: clubContact,
           });
 
-          await userData.child("clubCode").child(clubCode).set(userId);
+          await userData
+            .child("clubCode")
+            .child(clubCode.toUpperCase())
+            .set(userId);
 
           //auto verify phone
           await userData.child("users").child(userId).child("verify").update({
             phoneVerify: true,
+          });
+
+          //allow create role and event
+          await userData.child("auth").child(userId).update({
+            createEvent: true,
+            createNews: true,
           });
 
           successAlert();
@@ -502,6 +516,8 @@ const PersonalInfo: React.FC = () => {
             />
           </IonItem>
         </IonList>
+
+        <IonLoading isOpen={loading} />
       </IonContent>
       <IonFooter>
         <IonToolbar>

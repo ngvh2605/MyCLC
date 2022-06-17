@@ -219,14 +219,7 @@ const NewsCard: React.FC<any> = (props) => {
                 ></div>
               </IonLabel>
             </IonCardContent>
-            <hr
-              className="ion-margin"
-              style={{
-                borderBottom: "1px solid",
-                opacity: 0.2,
-                marginBottom: 10,
-              }}
-            />
+            <hr />
             <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
               <IonRow className="ion-align-items-center">
                 <IonCol

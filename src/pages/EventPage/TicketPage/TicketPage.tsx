@@ -66,6 +66,8 @@ const TicketPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <br />
+        <br />
         <IonItemDivider
           color="primary"
           style={{ paddingTop: 6, paddingBottom: 6 }}

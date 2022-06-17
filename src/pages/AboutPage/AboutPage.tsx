@@ -74,13 +74,14 @@ const AboutPage: React.FC = () => {
               <br />• Kết nối học sinh và cựu học sinh khắp nơi trên thế giới
             </IonLabel>
             <br />
+            <br />
             <a
               href="https://myclcproject.web.app/"
               target="_blank"
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={globe} />
                 <IonLabel>Website</IonLabel>
               </IonChip>
@@ -91,7 +92,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={globe} />
                 <IonLabel>Hướng dẫn sử dụng</IonLabel>
               </IonChip>
@@ -114,7 +115,7 @@ const AboutPage: React.FC = () => {
                   <b>CLC Multimedia</b>
                 </p>
               </IonText>
-              <IonLabel color="medium">Câu lạc bộ Truyền thông</IonLabel>
+              <IonLabel color="medium">Câu lạc bộ Truyền Thông</IonLabel>
             </IonLabel>
           </IonItem>
 
@@ -123,9 +124,9 @@ const AboutPage: React.FC = () => {
             <IonLabel color="dark">
               • Câu lạc bộ Truyền thông đa phương tiện Chuyên Lào Cai được thành
               lập vào ngày 20/3/2015
-              <br />• Qua 6 năm hoạt động và phát triển không ngừng với trung
-              bình gần 100 thành viên mỗi năm, đến nay CLC Multimedia tự hào là
-              một trong những câu lạc bộ hàng đầu ở Chuyên Lào Cai
+              <br />• Qua nhiều thế hệ hoạt động và phát triển không ngừng với
+              trung bình gần 100 thành viên mỗi năm, đến nay CLC Multimedia tự
+              hào là một trong những câu lạc bộ hàng đầu ở Chuyên Lào Cai
             </IonLabel>
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
@@ -137,13 +138,14 @@ const AboutPage: React.FC = () => {
               <br />• Phó chủ nhiệm: Nguyễn Linh Đan A1K18 0913.337.829
             </IonLabel>
             <br />
+            <br />
             <a
               href="https://www.clcmultimedia.com"
               target="_blank"
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={globe} />
                 <IonLabel>Website</IonLabel>
               </IonChip>
@@ -154,7 +156,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={logoFacebook} />
                 <IonLabel>Facebook Page</IonLabel>
               </IonChip>
@@ -165,7 +167,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={logoFacebook} />
                 <IonLabel>Facebook Group</IonLabel>
               </IonChip>
@@ -176,7 +178,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={logoInstagram} />
                 <IonLabel>Instagram CLB</IonLabel>
               </IonChip>
@@ -187,7 +189,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={logoInstagram} />
                 <IonLabel>Instagram CLC</IonLabel>
               </IonChip>
@@ -198,7 +200,7 @@ const AboutPage: React.FC = () => {
               rel="noreferrer"
               style={{ textDecoration: "none" }}
             >
-              <IonChip color="secondary">
+              <IonChip color="primary">
                 <IonIcon icon={logoYoutube} />
                 <IonLabel>Youtube</IonLabel>
               </IonChip>
@@ -241,13 +243,14 @@ const AboutPage: React.FC = () => {
             <IonLabel color="dark">
               Email: vhnguyen@uow.edu.au
               <br />
+              <br />
               <a
                 href="https://www.linkedin.com/in/vithong/"
                 target="_blank"
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoLinkedin} />
                   <IonLabel>Connect on LinkedIn</IonLabel>
                 </IonChip>
@@ -258,7 +261,7 @@ const AboutPage: React.FC = () => {
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoFacebook} />
                   <IonLabel>Facebook</IonLabel>
                 </IonChip>
@@ -269,7 +272,7 @@ const AboutPage: React.FC = () => {
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoInstagram} />
                   <IonLabel>Instagram</IonLabel>
                 </IonChip>
@@ -280,7 +283,7 @@ const AboutPage: React.FC = () => {
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoYoutube} />
                   <IonLabel>Youtube</IonLabel>
                 </IonChip>
@@ -323,13 +326,14 @@ const AboutPage: React.FC = () => {
             <IonLabel color="dark">
               Email: anh.bv@tripi.vn
               <br />
+              <br />
               <a
                 href="https://www.linkedin.com/in/v%C5%A9-anh-0a76771ab/"
                 target="_blank"
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoLinkedin} />
                   <IonLabel>Connect on LinkedIn</IonLabel>
                 </IonChip>
@@ -340,7 +344,7 @@ const AboutPage: React.FC = () => {
                 rel="noreferrer"
                 style={{ textDecoration: "none" }}
               >
-                <IonChip color="secondary">
+                <IonChip color="primary">
                   <IonIcon icon={logoFacebook} />
                   <IonLabel>Facebook</IonLabel>
                 </IonChip>
