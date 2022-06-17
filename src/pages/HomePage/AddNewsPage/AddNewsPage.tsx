@@ -104,39 +104,39 @@ const AddNewsPage: React.FC = () => {
         timestamp: moment().valueOf(),
       })
       .then(async () => {
-        //send news to discord
-        try {
-          var request = new XMLHttpRequest();
-          request.open(
-            "POST",
-            "https://discord.com/api/webhooks/983977150145261590/B4YzLh3pu_lSG8ltxWswzP1YuAGiZIhGDftJxBA4Lo6Cg2Yxqot1FNoJL5bJE01JPQJh"
-          );
+        // //send news to discord
+        // try {
+        //   var request = new XMLHttpRequest();
+        //   request.open(
+        //     "POST",
+        //     "https://discord.com/api/webhooks/983977150145261590/B4YzLh3pu_lSG8ltxWswzP1YuAGiZIhGDftJxBA4Lo6Cg2Yxqot1FNoJL5bJE01JPQJh"
+        //   );
 
-          const params = {
-            content: null,
-            embeds: [
-              {
-                title: title,
-                description: body,
-                color: null,
-                author: {
-                  name: auth.currentUser.displayName,
-                  icon_url: auth.currentUser.photoURL,
-                },
-                timestamp: moment().format(),
-                image: {
-                  url: uploadedUrl,
-                },
-              },
-            ],
-            attachments: [],
-          };
+        //   const params = {
+        //     content: null,
+        //     embeds: [
+        //       {
+        //         title: title,
+        //         description: body,
+        //         color: null,
+        //         author: {
+        //           name: auth.currentUser.displayName,
+        //           icon_url: auth.currentUser.photoURL,
+        //         },
+        //         timestamp: moment().format(),
+        //         image: {
+        //           url: uploadedUrl,
+        //         },
+        //       },
+        //     ],
+        //     attachments: [],
+        //   };
 
-          request.setRequestHeader("Content-type", "application/json");
-          request.send(JSON.stringify(params));
-        } catch (error) {
-          console.log("Send news to discord error", error);
-        }
+        //   request.setRequestHeader("Content-type", "application/json");
+        //   request.send(JSON.stringify(params));
+        // } catch (error) {
+        //   console.log("Send news to discord error", error);
+        // }
 
         //send news to facebook group
         try {

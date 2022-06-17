@@ -32,6 +32,7 @@ import ChatPage from "./pages/ChatPage/index";
 import ChatHomePage from "./pages/ChatPage/ChatHomePage";
 import FramePage from "./pages/FramePage";
 import CertificatePage from "./pages/CertificatePage/CertificatePage";
+import ClubPage from "./pages/ClubPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
@@ -43,6 +44,10 @@ const AppTabs: React.FC = () => {
 
   return (
     <IonRouterOutlet>
+      <Route path="/my/club">
+        <ClubPage />
+      </Route>
+
       <Route path="/my/frame">
         <FramePage />
       </Route>
@@ -85,9 +90,11 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/entries/view/:id">
         <EntryPage />
       </Route>
+
       <Route exact path="/my/settings">
         <SettingsPage />
       </Route>
+
       <Route exact path="/my/profile">
         <ProfilePage />
       </Route>
@@ -103,6 +110,7 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/profile/avatar">
         <AvatarPage />
       </Route>
+
       <Route exact path="/my/event">
         <EventPage />
       </Route>

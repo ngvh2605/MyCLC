@@ -31,6 +31,8 @@ const PersonalInfo: React.FC = () => {
 
   const [presentAlert] = useIonAlert();
 
+  const [userInfo, setUserInfo] = useState<any>();
+
   const [phone, setPhone] = useState("");
 
   const [fullName, setFullName] = useState("");
@@ -42,7 +44,7 @@ const PersonalInfo: React.FC = () => {
   const [otherPurpose, setOtherPurpose] = useState("");
 
   const [clubCode, setClubCode] = useState("");
-  const [clubLink, setClubLink] = useState("");
+  const [clubContact, setClubContact] = useState("");
 
   const [grade, setGrade] = useState("");
   const [gradeStart, setGradeStart] = useState("");
@@ -74,7 +76,7 @@ const PersonalInfo: React.FC = () => {
       case "teacher":
         return teacherSubject ? false : true;
       case "club":
-        return clubCode && clubLink ? false : true;
+        return clubCode && clubContact ? false : true;
       case "parent":
         return childName && childClass ? false : true;
       case "other":
@@ -95,7 +97,10 @@ const PersonalInfo: React.FC = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
+          setUserInfo({ ...data });
+
           setPhone("(" + data.dialCode + ") " + data.phoneNumber);
+
           setFullName(data.fullName);
           setBirth(data.birth);
           setGender(data.gender);
@@ -113,7 +118,7 @@ const PersonalInfo: React.FC = () => {
               break;
             case "club":
               setClubCode(data.clubCode);
-              setClubLink(data.clubLink);
+              setClubContact(data.clubContact);
               break;
             case "parent":
               setChildName(data.childName);
@@ -141,7 +146,7 @@ const PersonalInfo: React.FC = () => {
     const data = await database
       .ref()
       .child("clubCode")
-      .child(clubCode)
+      .child(clubCode.toUpperCase())
       .once("value");
 
     if (
@@ -159,6 +164,7 @@ const PersonalInfo: React.FC = () => {
     await userData.child("users").child(userId).child("verify").update({
       personalInfo: true,
     });
+
     presentAlert({
       header: "Hoàn thành!",
       message: "Thông tin của bạn đã được lưu thành công",
@@ -205,10 +211,16 @@ const PersonalInfo: React.FC = () => {
         if (isAvailable) {
           await userData.child("users").child(userId).child("personal").update({
             clubCode: clubCode,
-            clubLink: clubLink,
+            clubContact: clubContact,
           });
 
           await userData.child("clubCode").child(clubCode).set(userId);
+
+          //auto verify phone
+          await userData.child("users").child(userId).child("verify").update({
+            phoneVerify: true,
+          });
+
           successAlert();
         } else {
           presentAlert({
@@ -315,6 +327,7 @@ const PersonalInfo: React.FC = () => {
               onIonChange={(e) => {
                 setRole(e.detail.value);
               }}
+              disabled={userInfo && userInfo.role && userInfo.role === "club"}
             >
               <IonSelectOption value="student">
                 Học sinh/Cựu học sinh
@@ -369,16 +382,17 @@ const PersonalInfo: React.FC = () => {
               type="text"
               value={clubCode}
               onIonChange={(e) => setClubCode(e.detail.value)}
+              disabled={userInfo && userInfo.role && userInfo.role === "club"}
             />
           </IonItem>
 
           <IonItem>
-            <IonLabel position="floating">Link trang Facebook</IonLabel>
+            <IonLabel position="floating">Số điện thoại liên hệ</IonLabel>
             <IonInput
               type="url"
-              value={clubLink}
+              value={clubContact}
               onIonChange={(e) => {
-                setClubLink(e.detail.value);
+                setClubContact(e.detail.value);
               }}
             />
           </IonItem>

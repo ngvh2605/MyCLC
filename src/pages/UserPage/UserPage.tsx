@@ -4,7 +4,9 @@ import {
   IonButton,
   IonButtons,
   IonChip,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
@@ -16,6 +18,8 @@ import {
   IonLoading,
   IonModal,
   IonPage,
+  IonRow,
+  IonSpinner,
   IonText,
   IonTitle,
   IonToggle,
@@ -32,14 +36,17 @@ import {
   logoYoutube,
   mail,
   person,
+  personAdd,
+  personRemoveOutline,
   school,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
-import { database } from "../../firebase";
+import { database, firestore } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
+import { followClub, unfollowClub } from "./services";
 import "./UserPage.scss";
 
 interface RouteParams {
@@ -58,7 +65,7 @@ interface User {
   studentEnd?: string;
   teacherSubject?: string;
   teacherClass?: string;
-  clubLink?: string;
+  clubContact?: string;
   childName?: string;
   childClass?: string;
   otherSpecify?: string;
@@ -110,6 +117,8 @@ const UserPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const locationRef = useLocation<{ isEdit: boolean }>();
 
+  const [isFollow, setIsFollow] = useState<boolean | string>("undefined");
+
   useEffect(() => {
     if (locationRef && locationRef.state && locationRef.state.isEdit) {
       setShowModal(true);
@@ -119,14 +128,9 @@ const UserPage: React.FC = () => {
   useEffect(() => {
     if (id) {
       fetchUserInfo();
-    }
-  }, [id]);
-
-  useIonViewDidEnter(() => {
-    if (id) {
       readBadge();
     }
-  });
+  }, [id]);
 
   const fetchUserInfo = async () => {
     const data = await getInfoByUserId(id);
@@ -151,6 +155,17 @@ const UserPage: React.FC = () => {
           showPhoneNumber: data.showPhoneNumber,
         });
     } catch (error) {}
+
+    //fetch is Followed
+    if (data && data.role && data.role === "club" && id !== userId) {
+      const data = await firestore
+        .collection("followers")
+        .where("clubId", "==", id)
+        .where("userId", "==", userId)
+        .get();
+
+      setIsFollow(!data.empty);
+    }
   };
 
   const readBadge = async () => {
@@ -257,6 +272,63 @@ const UserPage: React.FC = () => {
             </IonLabel>
           </div>
         )}
+
+        {userInfo &&
+          userInfo.role &&
+          userInfo.role === "club" &&
+          id !== userId && (
+            <>
+              {isFollow !== "undefined" ? (
+                <>
+                  {!!!isFollow && (
+                    <IonButton
+                      expand="block"
+                      className="ion-padding-horizontal"
+                      color="primary"
+                      onClick={() => {
+                        setIsFollow("undefined");
+                        followClub(userId, id).then(() => {
+                          setIsFollow(true);
+                        });
+                      }}
+                    >
+                      <IonIcon icon={personAdd} slot="start" />
+                      Theo dõi
+                    </IonButton>
+                  )}
+                  {!!isFollow && (
+                    <IonButton
+                      expand="block"
+                      fill="outline"
+                      className="ion-padding-horizontal"
+                      color="primary"
+                      onClick={() => {
+                        setIsFollow("undefined");
+                        unfollowClub(userId, id).then(() => {
+                          setIsFollow(false);
+                        });
+                      }}
+                    >
+                      <IonIcon icon={personRemoveOutline} slot="start" />
+                      Huỷ theo dõi
+                    </IonButton>
+                  )}
+                </>
+              ) : (
+                <IonButton
+                  expand="block"
+                  fill="clear"
+                  className="ion-padding-horizontal"
+                >
+                  <IonSpinner />
+                </IonButton>
+              )}
+
+              <br />
+              <br />
+            </>
+          )}
+
         {userInfo && (
           <>
             <IonItemDivider
@@ -329,19 +401,30 @@ const UserPage: React.FC = () => {
                     <IonLabel text-wrap>{userInfo.email}</IonLabel>
                   </IonItem>
                 )}
-                {((userInfo.showPhoneNumber &&
-                  userInfo.phoneNumber &&
-                  userInfo.dialCode) ||
-                  (userInfo.phoneNumber &&
-                    userInfo.dialCode &&
-                    userInfo.showPhoneNumber === undefined)) && (
-                  <IonItem>
-                    <IonIcon icon={call} slot="start" color="medium" />
-                    <IonLabel text-wrap>
-                      ({userInfo.dialCode}) {userInfo.phoneNumber}
-                    </IonLabel>
-                  </IonItem>
-                )}
+
+                {userInfo.role && userInfo.role === "club"
+                  ? ((userInfo.showPhoneNumber && userInfo.clubContact) ||
+                      (userInfo.clubContact &&
+                        userInfo.showPhoneNumber === undefined)) && (
+                      <IonItem>
+                        <IonIcon icon={call} slot="start" color="medium" />
+                        <IonLabel text-wrap>{userInfo.clubContact}</IonLabel>
+                      </IonItem>
+                    )
+                  : ((userInfo.showPhoneNumber &&
+                      userInfo.phoneNumber &&
+                      userInfo.dialCode) ||
+                      (userInfo.phoneNumber &&
+                        userInfo.dialCode &&
+                        userInfo.showPhoneNumber === undefined)) && (
+                      <IonItem>
+                        <IonIcon icon={call} slot="start" color="medium" />
+                        <IonLabel text-wrap>
+                          ({userInfo.dialCode}) {userInfo.phoneNumber}
+                        </IonLabel>
+                      </IonItem>
+                    )}
+
                 {(userInfo.facebook ||
                   userInfo.instagram ||
                   userInfo.linkedin ||

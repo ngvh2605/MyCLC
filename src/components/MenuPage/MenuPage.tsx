@@ -27,6 +27,7 @@ import {
   logOutOutline,
   newspaperOutline,
   personOutline,
+  planetOutline,
   settingsOutline,
   sparklesOutline,
 } from "ionicons/icons";
@@ -74,6 +75,14 @@ const MenuPage = () => {
       url: "event",
       icon: calendarOutline,
       requireVerify: true,
+      isShown: true,
+    },
+
+    {
+      text: "Câu lạc bộ",
+      url: "club",
+      icon: planetOutline,
+      requireVerify: false,
       isShown: true,
     },
     // {
