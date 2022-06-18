@@ -40,7 +40,7 @@ const ChatPage: React.FC = () => {
   const location = useLocation<stateType>();
   const history = useHistory();
   const contentRef = useRef<any>();
-  const { userId, userEmail } = useAuth();
+  const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
 
   const [client, setClient] = useState<StreamChat<DefaultGenerics>>(null);
@@ -91,6 +91,7 @@ const ChatPage: React.FC = () => {
         client.disconnectUser();
       } catch (err) {}
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   function scrollToBottomOnInit() {

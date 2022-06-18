@@ -18,7 +18,6 @@ import {
 import { person } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { useAuth } from "../../auth";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";

@@ -27,7 +27,7 @@ import {
   IonToolbar,
   useIonToast,
 } from "@ionic/react";
-import { add, close, gridOutline, image, listOutline } from "ionicons/icons";
+import { add, close, image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth";
@@ -120,7 +120,7 @@ const CertificatePage: React.FC = () => {
     };
 
     fetchCerti();
-  }, []);
+  }, [userEmail]);
 
   const addBulkCerti = async () => {
     setIsLoading(true);

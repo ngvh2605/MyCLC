@@ -12,7 +12,7 @@ const CustomAvatar = <
   const {
     image,
     name,
-    onClick = () => undefined,
+
     onMouseOver = () => undefined,
     shape = "circle",
     size = 32,
@@ -36,7 +36,6 @@ const CustomAvatar = <
       className={`str-chat__avatar str-chat__avatar--${shape}`}
       data-testid="avatar"
       onClick={() => {
-        // console.log(props);
         if (userId !== props.user.id && (!props.size || props.size === 32))
           history.push(`/my/user/${props.user.id}`);
       }}

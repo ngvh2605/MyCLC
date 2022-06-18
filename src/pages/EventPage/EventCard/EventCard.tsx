@@ -89,6 +89,7 @@ const EventCard: React.FC<Props> = (props) => {
     return () => {
       checkIsBuy();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
 
   return (

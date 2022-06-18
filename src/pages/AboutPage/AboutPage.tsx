@@ -38,7 +38,7 @@ const AboutPage: React.FC = () => {
           <IonTitle>Về chúng tôi</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent>
         <IonCard>
           <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
             <IonAvatar slot="start">
@@ -61,14 +61,14 @@ const AboutPage: React.FC = () => {
 
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Giới thiệu</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               MyCLC là một dự án của CLC Multimedia với mong muốn xây dựng một
               ứng dụng Cộng đồng dành riêng cho Trường THPT Chuyên Lào Cai
             </IonLabel>
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Sứ mệnh</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               • Cập nhật những tin tức mới nhất tại Chuyên Lào Cai
               <br />• Lịch hoạt động nhà trường và sự kiện các câu lạc bộ
               <br />• Kết nối học sinh và cựu học sinh khắp nơi trên thế giới
@@ -121,7 +121,7 @@ const AboutPage: React.FC = () => {
 
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Giới thiệu</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               • Câu lạc bộ Truyền thông đa phương tiện Chuyên Lào Cai được thành
               lập vào ngày 20/3/2015
               <br />• Qua nhiều thế hệ hoạt động và phát triển không ngừng với
@@ -131,7 +131,7 @@ const AboutPage: React.FC = () => {
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               • Email: CLBCLCMultimedia@gmail.com
               <br />• GV phụ trách: Cô Bùi Thị Thanh Hoa 0988.669.331
               <br />• Chủ nhiệm: Nguyễn Mai Anh VK18 0916.287.699
@@ -230,7 +230,7 @@ const AboutPage: React.FC = () => {
 
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Giới thiệu</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               • Cựu học sinh Chuyên Lý K12
               <br />• Founder & 1st President CLC Multimedia
               <br />• Tốt nghiệp Cử nhân CNTT tại Đại học Wollongong, Úc
@@ -240,7 +240,7 @@ const AboutPage: React.FC = () => {
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               Email: vhnguyen@uow.edu.au
               <br />
               <br />
@@ -314,7 +314,7 @@ const AboutPage: React.FC = () => {
 
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Giới thiệu</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               • Cựu học sinh Chuyên Lý K12
               <br />• Tốt nghiệp Cử nhân CNTT tại Đại học Công nghệ - ĐHQG Hà
               Nội
@@ -323,7 +323,7 @@ const AboutPage: React.FC = () => {
           </IonCardContent>
           <IonCardContent style={{ paddingTop: 0 }}>
             <IonCardSubtitle color="primary">Liên hệ</IonCardSubtitle>
-            <IonLabel color="dark">
+            <IonLabel color="dark" text-wrap>
               Email: anh.bv@tripi.vn
               <br />
               <br />

@@ -42,6 +42,7 @@ const In2CLCMarkPage: React.FC = () => {
     )
       fetchAnswers();
     else history.push("/my/in2clc");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

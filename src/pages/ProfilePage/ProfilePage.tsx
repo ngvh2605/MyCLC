@@ -12,15 +12,15 @@ import {
   IonIcon,
   IonImg,
   IonItem,
-  IonItemDivider,
   IonLabel,
   IonList,
+  IonListHeader,
   IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { camera, createOutline } from "ionicons/icons";
+import { camera, createOutline, settingsOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
@@ -131,16 +131,32 @@ const ProfilePage: React.FC = () => {
             <b>{fullName || <i>Tên bạn là gì?</i>}</b>
           </p>
         </div>
-        <br />
 
-        <IonItemDivider
+        <>
+          <IonButton
+            expand="block"
+            color="primary"
+            fill="outline"
+            className="ion-padding-horizontal"
+            routerLink="/my/settings"
+            style={{ marginTop: 32 }}
+          >
+            <IonIcon icon={settingsOutline} slot="start" />
+            Cài đặt
+          </IonButton>
+        </>
+
+        {/* <IonItemDivider
           color="primary"
           style={{ paddingTop: 6, paddingBottom: 6 }}
         >
           <IonLabel className="ion-padding-horizontal">
             Xác minh 3 bước
           </IonLabel>
-        </IonItemDivider>
+        </IonItemDivider> */}
+
+        <hr style={{ paddingTop: 16 }} />
+        <IonListHeader>Xác minh 3 bước</IonListHeader>
         <div className="ion-padding">
           <IonChip
             color="primary"
@@ -198,13 +214,16 @@ const ProfilePage: React.FC = () => {
             </IonItem>
           </IonList>
         </div>
-        <br />
-        <IonItemDivider
+
+        {/* <IonItemDivider
           color="primary"
           style={{ paddingTop: 6, paddingBottom: 6 }}
         >
           <IonLabel className="ion-padding-horizontal">Mã QR của bạn</IonLabel>
-        </IonItemDivider>
+        </IonItemDivider> */}
+        <hr />
+        <IonListHeader>Mã QR của bạn</IonListHeader>
+
         <div className="ion-padding">
           <IonChip
             color="primary"

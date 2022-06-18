@@ -77,6 +77,7 @@ const FramePage: React.FC = () => {
         backdropDismiss: false,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadUrl]);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ const FramePage: React.FC = () => {
     };
 
     processMerge();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgUrl, chosenFrame]);
 
   useEffect(() => {

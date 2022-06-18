@@ -157,6 +157,7 @@ const HomePage: React.FC = () => {
           setWeatherData(firebaseData.weatherData);
         }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   useEffect(() => {
@@ -198,6 +199,7 @@ const HomePage: React.FC = () => {
       });
     fetchNews();
     return snapshotNewNews;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchNews = async () => {

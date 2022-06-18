@@ -52,6 +52,7 @@ const useIn2CLCCheck = (userId: string, userEmail: string) => {
         });
     };
     fetchInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return { matchInfo, updateMatchInfo, userSubmission, addSubmission };

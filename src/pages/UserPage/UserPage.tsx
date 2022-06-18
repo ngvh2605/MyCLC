@@ -4,28 +4,23 @@ import {
   IonButton,
   IonButtons,
   IonChip,
-  IonCol,
   IonContent,
-  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
   IonInput,
   IonItem,
-  IonItemDivider,
   IonLabel,
   IonList,
   IonListHeader,
   IonLoading,
   IonModal,
   IonPage,
-  IonRow,
   IonSpinner,
   IonText,
   IonTitle,
   IonToggle,
   IonToolbar,
-  useIonViewDidEnter,
 } from "@ionic/react";
 import {
   balloon,
@@ -40,6 +35,7 @@ import {
   personAdd,
   personRemoveOutline,
   school,
+  settingsOutline,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -47,7 +43,7 @@ import { useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import { database, firestore } from "../../firebase";
 import NewsCard from "../HomePage/NewsCard";
-import { getInfoByUserId, getNew } from "../HomePage/services";
+import { getInfoByUserId, getNewByUserId } from "../HomePage/services";
 import { followClub, unfollowClub } from "./services";
 import "./UserPage.scss";
 
@@ -133,6 +129,7 @@ const UserPage: React.FC = () => {
       fetchUserInfo();
       readBadge();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchUserInfo = async () => {
@@ -172,7 +169,8 @@ const UserPage: React.FC = () => {
 
     //fetch new list
     if (data && data.role && data.role === "club") {
-      const news = await getNew(3);
+      const news = await getNewByUserId(id, 3);
+      console.log("news", news);
       const newIds = news.map((p) => {
         return p.id;
       });
@@ -340,6 +338,22 @@ const UserPage: React.FC = () => {
             </>
           )}
 
+        {userInfo && id === userId && (
+          <>
+            <IonButton
+              expand="block"
+              color="primary"
+              fill="outline"
+              className="ion-padding-horizontal"
+              routerLink="/my/settings"
+            >
+              <IonIcon icon={settingsOutline} slot="start" />
+              Cài đặt
+            </IonButton>
+            <br />
+          </>
+        )}
+
         {userInfo && (
           <>
             <hr />
@@ -441,7 +455,7 @@ const UserPage: React.FC = () => {
                   userInfo.linkedin ||
                   userInfo.youtube) && (
                   <>
-                    <IonItem style={{ margin: 8 }}>
+                    <IonItem style={{ margin: 8, marginBottom: 0 }}>
                       <div style={{ textAlign: "center" }}>
                         {userInfo.facebook && (
                           <a

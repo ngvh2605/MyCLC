@@ -1,7 +1,6 @@
 import {
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -18,7 +17,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
-import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { Events } from "../../models";
@@ -32,7 +30,6 @@ const EventPage: React.FC = () => {
   const history = useHistory();
 
   const [eventsList, setEventsList] = useState<Events[]>([]);
-  const [lastKey, setLastKey] = useState<number | string>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -44,7 +41,6 @@ const EventPage: React.FC = () => {
     setLoading((p) => !p);
     const events = await getEvent();
     if (events.length > 0) {
-      setLastKey(events.slice(-1).pop().endDate || 0);
       setEventsList(events);
     }
     console.log(events);
