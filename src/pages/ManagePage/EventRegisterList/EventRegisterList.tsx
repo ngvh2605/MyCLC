@@ -1,12 +1,10 @@
 import {
   IonBackButton,
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
   IonItem,
-  IonItemDivider,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
@@ -18,9 +16,11 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { checkmarkCircle } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import { checkmarkCircle, chevronBack, ticket } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router";
+import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
+import HeaderToolbar from "../../../components/CommonUI/HeaderToolbar";
 import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
 import { getInfoByUserId } from "../../HomePage/services";
@@ -32,6 +32,7 @@ interface RouteParams {
 const EventRegisterList: React.FC = () => {
   const { id } = useParams<RouteParams>();
   const locationRef = useLocation<Events>();
+  const slidingEl = useRef<HTMLIonItemSlidingElement>(null);
 
   const [events, setEvents] = useState<Events>();
   const [tickets, setTickets] = useState<
@@ -40,6 +41,7 @@ const EventRegisterList: React.FC = () => {
       status: string;
     }[]
   >();
+  const [totalTickets, setTotalTickets] = useState(0);
   const [userInfo, setUserInfo] = useState<any[]>();
   const [search, setSearch] = useState("");
 
@@ -68,17 +70,20 @@ const EventRegisterList: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    console.log(tickets);
     const fetchUserInfo = async () => {
+      console.log(tickets);
+
       let tempInfo = [];
       for (let item of tickets) {
         tempInfo.push(await getInfoByUserId(item.userId));
       }
       setUserInfo(tempInfo);
+      setTotalTickets(tempInfo.length);
     };
-    if (tickets && tickets.length > 0) {
+    if (tickets && tickets.length > 0 && tickets.length > totalTickets) {
       fetchUserInfo();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets]);
 
   useEffect(() => {
@@ -86,6 +91,7 @@ const EventRegisterList: React.FC = () => {
   }, [userInfo]);
 
   const handleCheckin = (index: number) => {
+    slidingEl.current.close();
     firestore
       .collection("eventsTicket")
       .doc(`${id}_${tickets[index].userId}`)
@@ -93,6 +99,7 @@ const EventRegisterList: React.FC = () => {
   };
 
   const handleUnCheckin = (index: number) => {
+    slidingEl.current.close();
     firestore
       .collection("eventsTicket")
       .doc(`${id}_${tickets[index].userId}`)
@@ -109,23 +116,40 @@ const EventRegisterList: React.FC = () => {
           <IonTitle>{events && events.title}</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <IonItemDivider color="primary">
-          <IonLabel>
-            Số lượng đăng ký: {tickets && tickets.length ? tickets.length : 0}
-          </IonLabel>
-        </IonItemDivider>
-        <IonSearchbar
-          placeholder="Tìm kiếm"
-          onIonChange={(e) => {
-            setSearch(e.detail.value);
-          }}
-        ></IonSearchbar>
+      <HeaderToolbar
+        icon={ticket}
+        text="Check in"
+        note={
+          tickets && tickets.length
+            ? `${
+                tickets.filter((item) => {
+                  return item.status === "checkin";
+                }).length
+              } / ${tickets.length}`
+            : "0 / 0"
+        }
+        color="primary"
+      />
+      <IonContent>
+        <div>
+          <IonSearchbar
+            placeholder="Tìm kiếm"
+            onIonChange={(e) => {
+              setSearch(e.detail.value);
+            }}
+          ></IonSearchbar>
+        </div>
         <IonList>
           {tickets &&
-            tickets.length > 0 &&
-            userInfo &&
-            userInfo.length > 0 &&
+          tickets.length > 0 &&
+          userInfo &&
+          userInfo.length > 0 &&
+          userInfo.filter(function (user) {
+            return (
+              user.fullName.toLowerCase().includes(search.toLowerCase()) ||
+              user.email.toLowerCase().includes(search.toLowerCase())
+            );
+          }).length > 0 ? (
             userInfo
               .filter(function (user) {
                 return (
@@ -134,8 +158,8 @@ const EventRegisterList: React.FC = () => {
                 );
               })
               .map((user, index) => (
-                <IonItemSliding key={index}>
-                  <IonItem lines="full" detail={true}>
+                <IonItemSliding key={index} ref={slidingEl}>
+                  <IonItem lines="full" detail={true} detailIcon={chevronBack}>
                     <IonIcon
                       icon={checkmarkCircle}
                       color="success"
@@ -151,37 +175,31 @@ const EventRegisterList: React.FC = () => {
                       <br />
                       <IonText>{user.email}</IonText>
                     </IonLabel>
-                    <IonButton
-                      onClick={() => {
-                        handleCheckin(index);
-                      }}
-                      hidden={true}
-                    >
-                      Check in
-                    </IonButton>
                   </IonItem>
 
                   <IonItemOptions side="end">
                     <IonItemOption
-                      color="success"
-                      onClick={() => handleCheckin(index)}
-                      hidden={tickets[index].status === "checkin"}
+                      color={
+                        tickets[index].status === "checkin"
+                          ? "danger"
+                          : "success"
+                      }
+                      onClick={() => {
+                        if (tickets[index].status === "checkin") {
+                          handleUnCheckin(index);
+                        } else handleCheckin(index);
+                      }}
                     >
-                      Check in
-                    </IonItemOption>
-                  </IonItemOptions>
-
-                  <IonItemOptions side="start">
-                    <IonItemOption
-                      color="danger"
-                      onClick={() => handleUnCheckin(index)}
-                      hidden={!(tickets[index].status === "checkin")}
-                    >
-                      Huỷ check in
+                      {tickets[index].status === "checkin"
+                        ? "Huỷ check in"
+                        : "Check in"}
                     </IonItemOption>
                   </IonItemOptions>
                 </IonItemSliding>
-              ))}
+              ))
+          ) : (
+            <EmptyUI />
+          )}
         </IonList>
       </IonContent>
     </IonPage>

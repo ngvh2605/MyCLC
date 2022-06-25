@@ -25,6 +25,7 @@ import { buyTicket } from "./../../HomePage/services";
 import "./EventCard.scss";
 
 interface Props {
+  isVerify: boolean;
   event: Events;
 }
 
@@ -61,7 +62,7 @@ const EventCard: React.FC<Props> = (props) => {
   const history = useHistory();
   const { userId } = useAuth();
 
-  const { event } = props;
+  const { isVerify, event } = props;
 
   const [authorInfo, setAuthorInfo] = useState<any>({});
   const [isBuy, setIsBuy] = useState(false);
@@ -127,6 +128,7 @@ const EventCard: React.FC<Props> = (props) => {
                           event: event,
                           authorInfo: authorInfo,
                           isBuy: isBuy,
+                          isVerify: isVerify,
                         },
                       });
                     }}
@@ -166,6 +168,7 @@ const EventCard: React.FC<Props> = (props) => {
                         event: event,
                         authorInfo: authorInfo,
                         isBuy: isBuy,
+                        isVerify: isVerify,
                       },
                     });
                   }}
@@ -208,21 +211,30 @@ const EventCard: React.FC<Props> = (props) => {
                           expand="block"
                           shape="round"
                           onClick={() => {
-                            presentAlert({
-                              header: event.title,
-                              message:
-                                "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
-                              buttons: [
-                                "Huỷ",
-                                {
-                                  text: "Đồng ý",
-                                  handler: (d) => {
-                                    buyTicket(userId, event.id);
+                            if (isVerify) {
+                              presentAlert({
+                                header: event.title,
+                                message:
+                                  "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                                buttons: [
+                                  "Huỷ",
+                                  {
+                                    text: "Đồng ý",
+                                    handler: (d) => {
+                                      buyTicket(userId, event.id);
+                                    },
                                   },
-                                },
-                              ],
-                              onDidDismiss: (e) => console.log("did dismiss"),
-                            });
+                                ],
+                              });
+                            } else {
+                              presentAlert({
+                                header: "Lưu ý",
+                                message:
+                                  "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
+                                buttons: [{ text: "OK" }],
+                              });
+                              history.push("/my/profile");
+                            }
                           }}
                           hidden={isBuy}
                         >
@@ -230,6 +242,7 @@ const EventCard: React.FC<Props> = (props) => {
                           <IonLabel>Đăng ký</IonLabel>
                         </IonButton>
                       )}
+
                       <IonButton
                         color="primary"
                         fill="solid"

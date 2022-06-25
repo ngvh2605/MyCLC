@@ -295,8 +295,10 @@ const AddEventPage: React.FC = () => {
             <IonSelect
               interface="popover"
               onIonChange={(e) => {
-                if (e.detail.value === "Yes") setSellTicket(true);
-                else setSellTicket(false);
+                if (e.detail.value === "Yes") {
+                  setSellTicket(true);
+                  setSellInApp(true);
+                } else setSellTicket(false);
               }}
               value={!!sellTicket ? "Yes" : "No"}
             >

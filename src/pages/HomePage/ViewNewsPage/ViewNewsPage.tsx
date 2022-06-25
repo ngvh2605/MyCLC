@@ -183,438 +183,447 @@ const ViewNewsPage: React.FC = () => {
 
       {news ? (
         <IonContent>
-          {news.pictureUrl && (
-            <>
-              {imgLoaded ? null : (
-                <IonSkeletonText
-                  animated
-                  style={{
-                    width: window.screen.width,
-                    height: window.screen.width / news.pictureRatio,
-                  }}
-                  className="ion-no-margin"
-                />
-              )}
+          <div style={{ maxWidth: 680, margin: "0 auto" }}>
+            {news.pictureUrl && (
+              <>
+                {imgLoaded ? null : (
+                  <IonSkeletonText
+                    animated
+                    style={{
+                      width:
+                        window.screen.width > 680 ? 680 : window.screen.width,
+                      height:
+                        window.screen.width > 680
+                          ? 680 / news.pictureRatio
+                          : window.screen.width / news.pictureRatio,
+                    }}
+                    className="ion-no-margin"
+                  />
+                )}
 
-              <IonImg
-                src={news.pictureUrl}
-                hidden={!news.pictureUrl}
-                onIonImgDidLoad={() => setImgLoaded(true)}
-                style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
-              />
-            </>
-          )}
-
-          <div>
-            <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
-              <IonAvatar
-                slot="start"
-                onClick={() => {
-                  history.push(`/my/user/${news.author}`);
-                }}
-              >
                 <IonImg
-                  src={
-                    news.authorInfo && news.authorInfo.avatar
-                      ? news.authorInfo.avatar
-                      : "/assets/image/placeholder.png"
-                  }
+                  src={news.pictureUrl}
+                  hidden={!news.pictureUrl}
+                  onIonImgDidLoad={() => setImgLoaded(true)}
+                  style={!imgLoaded ? { opacity: 0 } : { opacity: 1 }}
                 />
-              </IonAvatar>
-              <IonLabel text-wrap color="dark">
-                <IonIcon
-                  icon={ellipsisHorizontal}
-                  className="ion-float-right"
-                  color="medium"
-                  onClick={() => {
-                    setShowNewsActionSheet(true);
-                  }}
-                  hidden={news && news.author !== userId}
-                  style={{ fontSize: "large", paddingLeft: 8 }}
-                />
-                <IonText
+              </>
+            )}
+
+            <div>
+              <IonItem lines="none" style={{ marginTop: 10, marginBottom: 10 }}>
+                <IonAvatar
+                  slot="start"
                   onClick={() => {
                     history.push(`/my/user/${news.author}`);
                   }}
                 >
-                  <b>
-                    {news.authorInfo && news.authorInfo.fullName
-                      ? news.authorInfo.fullName
-                      : ""}
-                  </b>
-                </IonText>
-                <IonLabel>
-                  <IonText color="primary">
-                    <IonIcon
-                      icon={checkmarkCircle}
-                      style={{ fontSize: "small" }}
-                    />
-                    {news.authorInfo &&
-                      news.authorInfo.title &&
-                      " " + news.authorInfo.title}
+                  <IonImg
+                    src={
+                      news.authorInfo && news.authorInfo.avatar
+                        ? news.authorInfo.avatar
+                        : "/assets/image/placeholder.png"
+                    }
+                  />
+                </IonAvatar>
+                <IonLabel text-wrap color="dark">
+                  <IonIcon
+                    icon={ellipsisHorizontal}
+                    className="ion-float-right"
+                    color="medium"
+                    onClick={() => {
+                      setShowNewsActionSheet(true);
+                    }}
+                    hidden={news && news.author !== userId}
+                    style={{ fontSize: "large", paddingLeft: 8 }}
+                  />
+                  <IonText
+                    onClick={() => {
+                      history.push(`/my/user/${news.author}`);
+                    }}
+                  >
+                    <b>
+                      {news.authorInfo && news.authorInfo.fullName
+                        ? news.authorInfo.fullName
+                        : ""}
+                    </b>
                   </IonText>
-                  <IonText color="medium">
-                    {" · "}
-                    <i>
-                      {moment(news.timestamp)
-                        .locale("vi")
-                        .format("Do MMM, H:mm")}
-                    </i>
-                  </IonText>
+                  <IonLabel>
+                    <IonText color="primary">
+                      <IonIcon
+                        icon={checkmarkCircle}
+                        style={{ fontSize: "small" }}
+                      />
+                      {news.authorInfo &&
+                        news.authorInfo.title &&
+                        " " + news.authorInfo.title}
+                    </IonText>
+                    <IonText color="medium">
+                      {" · "}
+                      <i>
+                        {moment(news.timestamp)
+                          .locale("vi")
+                          .format("Do MMM, H:mm")}
+                      </i>
+                    </IonText>
+                  </IonLabel>
                 </IonLabel>
-              </IonLabel>
-            </IonItem>
-            <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-              <IonCardSubtitle color="primary">{news.title}</IonCardSubtitle>
-              <IonLabel
-                color="dark"
-                text-wrap
-                style={{ whiteSpace: "pre-wrap" }}
-              >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: Autolinker.link(decodeURI(news.body), {
-                      truncate: { length: 50, location: "smart" },
-                    }),
-                  }}
-                ></div>
-              </IonLabel>
-            </IonCardContent>
-
-            <hr
-              style={{
-                marginLeft: 0,
-                marginRight: 0,
-              }}
-            />
-            <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
-              <IonRow className="ion-align-items-center">
-                <IonCol
-                  className="ion-align-self-center"
-                  style={{ textAlign: "center" }}
+              </IonItem>
+              <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
+                <IonCardSubtitle color="primary">{news.title}</IonCardSubtitle>
+                <IonLabel
+                  color="dark"
+                  text-wrap
+                  style={{ whiteSpace: "pre-wrap" }}
                 >
-                  <IonButton
-                    fill="clear"
-                    expand="full"
-                    style={{ height: "max-content" }}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: Autolinker.link(decodeURI(news.body), {
+                        truncate: { length: 50, location: "smart" },
+                      }),
+                    }}
+                  ></div>
+                </IonLabel>
+              </IonCardContent>
+
+              <hr
+                style={{
+                  marginLeft: 0,
+                  marginRight: 0,
+                }}
+              />
+              <IonGrid className="ion-no-padding" style={{ paddingBottom: 10 }}>
+                <IonRow className="ion-align-items-center">
+                  <IonCol
+                    className="ion-align-self-center"
+                    style={{ textAlign: "center" }}
                   >
-                    <IonIcon
-                      icon={chatbubbleEllipses}
-                      color="primary"
-                      style={{ fontSize: "large" }}
-                      slot="start"
-                    />
-
-                    <IonLabel color="primary" style={{ fontSize: "small" }}>
-                      {news.totalComments > 0 ? news.totalComments : ""} Bình
-                      luận
-                    </IonLabel>
-                  </IonButton>
-                </IonCol>
-                <IonCol
-                  className="ion-align-self-center"
-                  style={{ textAlign: "center" }}
-                >
-                  {news.isLiked ? (
                     <IonButton
                       fill="clear"
                       expand="full"
                       style={{ height: "max-content" }}
-                      onClick={() => {
-                        unlikeNews(userId, news.id);
-                        handleReaction(false);
-                      }}
                     >
                       <IonIcon
-                        icon={heart}
-                        color="danger"
+                        icon={chatbubbleEllipses}
+                        color="primary"
                         style={{ fontSize: "large" }}
                         slot="start"
                       />
 
-                      <IonLabel color="danger" style={{ fontSize: "small" }}>
-                        {news.totalLikes} Yêu thích
+                      <IonLabel color="primary" style={{ fontSize: "small" }}>
+                        {news.totalComments > 0 ? news.totalComments : ""} Bình
+                        luận
                       </IonLabel>
                     </IonButton>
-                  ) : (
-                    <IonButton
-                      fill="clear"
-                      expand="full"
-                      style={{ height: "max-content" }}
-                      onClick={() => {
-                        likeNews(userId, news.id);
-                        handleReaction(true);
-                      }}
-                    >
-                      <IonIcon
-                        icon={heartOutline}
-                        color="dark"
-                        style={{ fontSize: "large" }}
-                        slot="start"
-                      />
-
-                      <IonLabel color="dark" style={{ fontSize: "small" }}>
-                        {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
-                      </IonLabel>
-                    </IonButton>
-                  )}
-                </IonCol>
-              </IonRow>
-            </IonGrid>
-
-            <IonList>
-              {comments &&
-                comments.slice(0, limitComment).map((comment, index) => (
-                  <IonItem
-                    key={index}
-                    lines="none"
-                    style={{ marginTop: 10, marginBottom: 10 }}
+                  </IonCol>
+                  <IonCol
+                    className="ion-align-self-center"
+                    style={{ textAlign: "center" }}
                   >
-                    {commentAuthors[index] && commentAuthors[index].avatar ? (
-                      <IonAvatar
-                        slot="start"
+                    {news.isLiked ? (
+                      <IonButton
+                        fill="clear"
+                        expand="full"
+                        style={{ height: "max-content" }}
                         onClick={() => {
-                          history.push(`/my/user/${comments[index].author}`);
+                          unlikeNews(userId, news.id);
+                          handleReaction(false);
                         }}
                       >
-                        <IonImg src={commentAuthors[index].avatar} />
-                      </IonAvatar>
+                        <IonIcon
+                          icon={heart}
+                          color="danger"
+                          style={{ fontSize: "large" }}
+                          slot="start"
+                        />
+
+                        <IonLabel color="danger" style={{ fontSize: "small" }}>
+                          {news.totalLikes} Yêu thích
+                        </IonLabel>
+                      </IonButton>
                     ) : (
-                      <IonAvatar
-                        slot="start"
+                      <IonButton
+                        fill="clear"
+                        expand="full"
+                        style={{ height: "max-content" }}
                         onClick={() => {
-                          history.push(`/my/user/${comments[index].author}`);
+                          likeNews(userId, news.id);
+                          handleReaction(true);
                         }}
                       >
-                        <IonImg src={"assets/image/placeholder.png"} />
-                      </IonAvatar>
-                    )}
-                    <div style={{ width: "100%" }}>
-                      <IonChip
-                        color="medium"
-                        style={{ width: "100%", height: "max-content" }}
-                      >
-                        <IonLabel
-                          text-wrap
+                        <IonIcon
+                          icon={heartOutline}
                           color="dark"
-                          style={{ whiteSpace: "pre-wrap", width: "100%" }}
-                        >
-                          <IonIcon
-                            icon={ellipsisHorizontal}
-                            className="ion-float-right"
-                            color="medium"
-                            onClick={() => {
-                              setChosenComment(comment);
-                              setShowActionSheet(true);
-                            }}
-                            hidden={comment.author !== userId}
-                            style={{ fontSize: "large", paddingLeft: 8 }}
-                          />
-                          {commentAuthors[index] &&
-                            commentAuthors[index].fullName && (
-                              <IonText
-                                style={{ paddingBottom: 5 }}
-                                onClick={() => {
-                                  history.push(
-                                    `/my/user/${comments[index].author}`
-                                  );
-                                }}
-                              >
-                                <b>{commentAuthors[index].fullName}</b>
-                              </IonText>
-                            )}
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: Autolinker.link(decodeURI(comment.body), {
-                                truncate: { length: 50, location: "smart" },
-                              }),
-                            }}
-                          ></div>
+                          style={{ fontSize: "large" }}
+                          slot="start"
+                        />
+
+                        <IonLabel color="dark" style={{ fontSize: "small" }}>
+                          {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
                         </IonLabel>
-                      </IonChip>
-                      <IonNote>
-                        <IonLabel
-                          text-wrap
+                      </IonButton>
+                    )}
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+
+              <IonList>
+                {comments &&
+                  comments.slice(0, limitComment).map((comment, index) => (
+                    <IonItem
+                      key={index}
+                      lines="none"
+                      style={{ marginTop: 10, marginBottom: 10 }}
+                    >
+                      {commentAuthors[index] && commentAuthors[index].avatar ? (
+                        <IonAvatar
+                          slot="start"
+                          onClick={() => {
+                            history.push(`/my/user/${comments[index].author}`);
+                          }}
+                        >
+                          <IonImg src={commentAuthors[index].avatar} />
+                        </IonAvatar>
+                      ) : (
+                        <IonAvatar
+                          slot="start"
+                          onClick={() => {
+                            history.push(`/my/user/${comments[index].author}`);
+                          }}
+                        >
+                          <IonImg src={"assets/image/placeholder.png"} />
+                        </IonAvatar>
+                      )}
+                      <div style={{ width: "100%" }}>
+                        <IonChip
                           color="medium"
-                          className="ion-float-right"
+                          style={{ width: "100%", height: "max-content" }}
                         >
-                          <b>#{comment.order}</b>
-                          {" · "}
-                          <i>
-                            {moment(comment.timestamp).locale("vi").fromNow()}
-                          </i>
-                        </IonLabel>
-                      </IonNote>
-                    </div>
-                  </IonItem>
-                ))}
-            </IonList>
+                          <IonLabel
+                            text-wrap
+                            color="dark"
+                            style={{ whiteSpace: "pre-wrap", width: "100%" }}
+                          >
+                            <IonIcon
+                              icon={ellipsisHorizontal}
+                              className="ion-float-right"
+                              color="medium"
+                              onClick={() => {
+                                setChosenComment(comment);
+                                setShowActionSheet(true);
+                              }}
+                              hidden={comment.author !== userId}
+                              style={{ fontSize: "large", paddingLeft: 8 }}
+                            />
+                            {commentAuthors[index] &&
+                              commentAuthors[index].fullName && (
+                                <IonText
+                                  style={{ paddingBottom: 5 }}
+                                  onClick={() => {
+                                    history.push(
+                                      `/my/user/${comments[index].author}`
+                                    );
+                                  }}
+                                >
+                                  <b>{commentAuthors[index].fullName}</b>
+                                </IonText>
+                              )}
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: Autolinker.link(
+                                  decodeURI(comment.body),
+                                  {
+                                    truncate: { length: 50, location: "smart" },
+                                  }
+                                ),
+                              }}
+                            ></div>
+                          </IonLabel>
+                        </IonChip>
+                        <IonNote>
+                          <IonLabel
+                            text-wrap
+                            color="medium"
+                            className="ion-float-right"
+                          >
+                            <b>#{comment.order}</b>
+                            {" · "}
+                            <i>
+                              {moment(comment.timestamp).locale("vi").fromNow()}
+                            </i>
+                          </IonLabel>
+                        </IonNote>
+                      </div>
+                    </IonItem>
+                  ))}
+              </IonList>
 
-            <IonButton
-              fill="clear"
-              color="primary"
-              hidden={
-                news.totalComments
-                  ? limitComment >= news.totalComments
-                    ? true
-                    : false
-                  : true
-              }
-              onClick={() => setLimitComment(limitComment + 2)}
-              style={{
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              <IonLabel>
-                Đọc thêm
-                <br />
-                <IonIcon icon={chevronDown} />
-              </IonLabel>
-            </IonButton>
-          </div>
-          <IonLoading isOpen={false} />
+              <IonButton
+                fill="clear"
+                color="primary"
+                hidden={
+                  news.totalComments
+                    ? limitComment >= news.totalComments
+                      ? true
+                      : false
+                    : true
+                }
+                onClick={() => setLimitComment(limitComment + 2)}
+                style={{
+                  display: "block",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                <IonLabel>
+                  Đọc thêm
+                  <br />
+                  <IonIcon icon={chevronDown} />
+                </IonLabel>
+              </IonButton>
+            </div>
+            <IonLoading isOpen={false} />
 
-          <IonActionSheet
-            isOpen={showActionSheet}
-            onDidDismiss={() => setShowActionSheet(false)}
-            cssClass="my-custom-class"
-            buttons={[
-              {
-                text: "Chỉnh sửa",
-                icon: brush,
-                handler: () => {
-                  presentAlert({
-                    header: "Sửa bình luận",
-                    inputs: [
-                      {
-                        placeholder: "Nhập bình luận mới",
-                        name: "text",
-                        type: "text",
-                      },
-                    ],
-                    buttons: [
-                      "Huỷ",
-                      {
-                        text: "Xong",
-                        handler: async (d) => {
-                          await firestore
-                            .collection("news")
-                            .doc(news.id)
-                            .collection("comment")
-                            .doc(chosenComment.id)
-                            .update({
-                              body: d.text,
-                              order: parseFloat(
-                                (chosenComment.order + 0.01).toFixed(2)
-                              ),
-                              lastEdited: moment(moment.now()).format(),
-                            });
+            <IonActionSheet
+              isOpen={showActionSheet}
+              onDidDismiss={() => setShowActionSheet(false)}
+              cssClass="my-custom-class"
+              buttons={[
+                {
+                  text: "Chỉnh sửa",
+                  icon: brush,
+                  handler: () => {
+                    presentAlert({
+                      header: "Sửa bình luận",
+                      inputs: [
+                        {
+                          placeholder: "Nhập bình luận mới",
+                          name: "text",
+                          type: "text",
                         },
-                      },
-                    ],
-                    onDidDismiss: (e) => console.log("did dismiss"),
-                  });
+                      ],
+                      buttons: [
+                        "Huỷ",
+                        {
+                          text: "Xong",
+                          handler: async (d) => {
+                            await firestore
+                              .collection("news")
+                              .doc(news.id)
+                              .collection("comment")
+                              .doc(chosenComment.id)
+                              .update({
+                                body: d.text,
+                                order: parseFloat(
+                                  (chosenComment.order + 0.01).toFixed(2)
+                                ),
+                                lastEdited: moment(moment.now()).format(),
+                              });
+                          },
+                        },
+                      ],
+                      onDidDismiss: (e) => console.log("did dismiss"),
+                    });
+                  },
                 },
-              },
-              {
-                text: "Xoá",
-                role: "destructive",
-                icon: trash,
-                handler: () => {
-                  presentAlert({
-                    header: "Xoá bình luận",
-                    message:
-                      "Bạn có chắc chắn xoá vĩnh viễn bình luận này khỏi MyCLC không?",
-                    buttons: [
-                      "Huỷ",
-                      {
-                        text: "Xoá",
-                        handler: (d) => {
-                          firestore
-                            .collection("news")
-                            .doc(news.id)
-                            .collection("comment")
-                            .doc(chosenComment.id)
-                            .delete();
-                          firestore
-                            .collection("news")
-                            .doc(news.id)
-                            .update({
+                {
+                  text: "Xoá",
+                  role: "destructive",
+                  icon: trash,
+                  handler: () => {
+                    presentAlert({
+                      header: "Xoá bình luận",
+                      message:
+                        "Bạn có chắc chắn xoá vĩnh viễn bình luận này khỏi MyCLC không?",
+                      buttons: [
+                        "Huỷ",
+                        {
+                          text: "Xoá",
+                          handler: (d) => {
+                            firestore
+                              .collection("news")
+                              .doc(news.id)
+                              .collection("comment")
+                              .doc(chosenComment.id)
+                              .delete();
+                            firestore
+                              .collection("news")
+                              .doc(news.id)
+                              .update({
+                                totalComments: news.totalComments - 1,
+                              });
+                            setNews({
+                              ...news,
                               totalComments: news.totalComments - 1,
                             });
-                          setNews({
-                            ...news,
-                            totalComments: news.totalComments - 1,
-                          });
+                          },
                         },
-                      },
-                    ],
-                    onDidDismiss: (e) => console.log("did dismiss"),
-                  });
+                      ],
+                      onDidDismiss: (e) => console.log("did dismiss"),
+                    });
+                  },
                 },
-              },
-              {
-                text: "Cancel",
-                icon: close,
-                role: "cancel",
-                handler: () => {
-                  console.log("Cancel clicked");
+                {
+                  text: "Cancel",
+                  icon: close,
+                  role: "cancel",
+                  handler: () => {
+                    console.log("Cancel clicked");
+                  },
                 },
-              },
-            ]}
-          ></IonActionSheet>
+              ]}
+            ></IonActionSheet>
 
-          <IonActionSheet
-            isOpen={showNewsActionSheet}
-            onDidDismiss={() => setShowNewsActionSheet(false)}
-            cssClass="my-custom-class"
-            buttons={[
-              {
-                text: "Chỉnh sửa",
-                icon: brush,
-                handler: () => {
-                  history.push({
-                    pathname: `/my/home/add/${news.id}`,
-                    state: news,
-                  });
+            <IonActionSheet
+              isOpen={showNewsActionSheet}
+              onDidDismiss={() => setShowNewsActionSheet(false)}
+              cssClass="my-custom-class"
+              buttons={[
+                {
+                  text: "Chỉnh sửa",
+                  icon: brush,
+                  handler: () => {
+                    history.push({
+                      pathname: `/my/home/add/${news.id}`,
+                      state: news,
+                    });
+                  },
                 },
-              },
-              {
-                text: "Xoá",
-                role: "destructive",
-                icon: trash,
-                handler: () => {
-                  presentAlert({
-                    header: "Xoá bài viết",
-                    message:
-                      "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
-                    buttons: [
-                      "Huỷ",
-                      {
-                        text: "Xoá",
-                        handler: (d) => {
-                          setNews({ ...news, body: "" });
-                          deleteNews(news);
-                          history.goBack();
+                {
+                  text: "Xoá",
+                  role: "destructive",
+                  icon: trash,
+                  handler: () => {
+                    presentAlert({
+                      header: "Xoá bài viết",
+                      message:
+                        "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
+                      buttons: [
+                        "Huỷ",
+                        {
+                          text: "Xoá",
+                          handler: (d) => {
+                            setNews({ ...news, body: "" });
+                            deleteNews(news);
+                            history.goBack();
+                          },
                         },
-                      },
-                    ],
-                    onDidDismiss: (e) => console.log("did dismiss"),
-                  });
+                      ],
+                      onDidDismiss: (e) => console.log("did dismiss"),
+                    });
+                  },
                 },
-              },
-              {
-                text: "Cancel",
-                icon: close,
-                role: "cancel",
-                handler: () => {
-                  console.log("Cancel clicked");
+                {
+                  text: "Cancel",
+                  icon: close,
+                  role: "cancel",
+                  handler: () => {
+                    console.log("Cancel clicked");
+                  },
                 },
-              },
-            ]}
-          ></IonActionSheet>
+              ]}
+            ></IonActionSheet>
+          </div>{" "}
         </IonContent>
       ) : (
         <IonContent></IonContent>

@@ -74,7 +74,7 @@ const MenuPage = () => {
       text: "Sự kiện",
       url: "event",
       icon: calendarOutline,
-      requireVerify: true,
+      requireVerify: false,
       isShown: true,
     },
 

@@ -8,7 +8,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 
 import {
   IonAvatar,
@@ -36,10 +36,13 @@ import {
 
 import { useAuth } from "../../../auth";
 import { Events } from "../../../models";
-import { buyTicket } from "../../HomePage/services";
+import { buyTicket, getInfoByUserId } from "../../HomePage/services";
 import Autolinker from "autolinker";
+import { database, firestore } from "../../../firebase";
+import { Storage } from "@capacitor/storage";
 
 interface stateType {
+  isVerify: boolean;
   event: Events;
   authorInfo: any;
   isBuy: boolean;
@@ -49,25 +52,68 @@ const ViewEventPage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
   const locationRef = useLocation<stateType>();
+  const { id } = useParams<{
+    id: string;
+  }>();
 
+  const [isVerify, setIsVerify] = useState<boolean>(false);
   const [event, setEvent] = useState<Events>();
   const [authorInfo, setAuthorInfo] = useState<any>({});
   const [isBuy, setIsBuy] = useState<boolean>(false);
+
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
   const [presentAlert] = useIonAlert();
 
   useEffect(() => {
+    console.log("id", id);
+  }, [id]);
+
+  useEffect(() => {
     if (locationRef.state) {
+      console.log("ref", locationRef.state);
       try {
+        setIsVerify(locationRef.state["isVerify"]);
         setEvent({ ...locationRef.state["event"] });
         setAuthorInfo({ ...locationRef.state["authorInfo"] });
         setIsBuy(locationRef.state["isBuy"]);
       } catch (err) {
         console.log(err);
       }
+    } else {
+      try {
+        fetchEvent();
+      } catch (err) {
+        console.log(err);
+      }
     }
+
+    //is user buy ticket?
+    const checkIsBuy = firestore
+      .collection("eventsTicket")
+      .where("eventId", "==", id)
+      .where("userId", "==", userId)
+      .onSnapshot((doc) => {
+        if (doc.empty) setIsBuy(false);
+        else setIsBuy(true);
+      });
+
+    return () => {
+      if (!locationRef.state) {
+        checkIsBuy();
+      }
+    };
   }, []);
+
+  const fetchEvent = async () => {
+    const data = await Storage.get({ key: "isVerify" });
+    setIsVerify(data.value === "true" ? true : false);
+    const tempEvent = (
+      await firestore.collection("events").doc(id).get()
+    ).data() as Events;
+    setEvent({ ...tempEvent, id: id });
+    setAuthorInfo(await getInfoByUserId(tempEvent.author));
+  };
 
   return (
     <IonPage>
@@ -190,22 +236,31 @@ const ViewEventPage: React.FC = () => {
                       expand="block"
                       shape="round"
                       onClick={() => {
-                        presentAlert({
-                          header: event.title,
-                          message:
-                            "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
-                          buttons: [
-                            "Huỷ",
-                            {
-                              text: "Đồng ý",
-                              handler: (d) => {
-                                buyTicket(userId, event.id);
-                                setIsBuy(true);
+                        if (isVerify) {
+                          presentAlert({
+                            header: event.title,
+                            message:
+                              "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                            buttons: [
+                              "Huỷ",
+                              {
+                                text: "Đồng ý",
+                                handler: (d) => {
+                                  buyTicket(userId, event.id);
+                                  setIsBuy(true);
+                                },
                               },
-                            },
-                          ],
-                          onDidDismiss: (e) => console.log("did dismiss"),
-                        });
+                            ],
+                          });
+                        } else {
+                          presentAlert({
+                            header: "Lưu ý",
+                            message:
+                              "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
+                            buttons: [{ text: "OK" }],
+                          });
+                          history.push("/my/profile");
+                        }
                       }}
                       hidden={isBuy}
                     >

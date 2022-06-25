@@ -34,8 +34,8 @@ const EventPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isVerify) fetchEvents();
-  }, [isVerify]);
+    fetchEvents();
+  }, []);
 
   const fetchEvents = async () => {
     setLoading((p) => !p);
@@ -67,52 +67,51 @@ const EventPage: React.FC = () => {
           )}
         </IonToolbar>
       </IonHeader>
-      {isVerify ? (
-        <IonContent>
-          <RefresherItem
-            handleRefresh={() => {
-              fetchEvents();
-            }}
-          />
 
-          {!loading ? (
-            eventsList && eventsList.length > 0 ? (
-              eventsList
-                .sort((a, b) => a.startDate - b.startDate)
-                .map((item, index) => <EventCard event={item} key={index} />)
-            ) : (
-              <IonContent className="ion-padding">
-                <IonSlide>
-                  <div className="ion-margin">
-                    <IonImg
-                      src="/assets/image/slides2.svg"
-                      style={{
-                        height: window.screen.height / 4,
-                        marginBottom: 10,
-                      }}
-                    />
-                    <IonLabel
-                      style={{
-                        fontSize: "x-large",
-                        margin: "auto",
-                        lineHeight: "40px",
-                      }}
-                    >
-                      <b>Các sự kiện sắp tới sẽ xuất hiện tại đây</b>
-                    </IonLabel>
-                  </div>
-                </IonSlide>
-              </IonContent>
-            )
+      <IonContent>
+        <RefresherItem
+          handleRefresh={() => {
+            fetchEvents();
+          }}
+        />
+
+        {!loading ? (
+          eventsList && eventsList.length > 0 ? (
+            eventsList
+              .sort((a, b) => a.startDate - b.startDate)
+              .map((item, index) => (
+                <EventCard isVerify={isVerify} event={item} key={index} />
+              ))
           ) : (
-            <>
-              <EventSkeleton />
-            </>
-          )}
-        </IonContent>
-      ) : (
-        <UnAuth />
-      )}
+            <IonContent className="ion-padding">
+              <IonSlide>
+                <div className="ion-margin">
+                  <IonImg
+                    src="/assets/image/slides2.svg"
+                    style={{
+                      height: window.screen.height / 4,
+                      marginBottom: 10,
+                    }}
+                  />
+                  <IonLabel
+                    style={{
+                      fontSize: "x-large",
+                      margin: "auto",
+                      lineHeight: "40px",
+                    }}
+                  >
+                    <b>Các sự kiện sắp tới sẽ xuất hiện tại đây</b>
+                  </IonLabel>
+                </div>
+              </IonSlide>
+            </IonContent>
+          )
+        ) : (
+          <>
+            <EventSkeleton />
+          </>
+        )}
+      </IonContent>
     </IonPage>
   );
 };

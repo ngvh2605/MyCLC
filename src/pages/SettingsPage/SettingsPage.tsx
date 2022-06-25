@@ -1,4 +1,5 @@
 import {
+  IonBackButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -22,18 +23,24 @@ import {
   sendOutline,
 } from "ionicons/icons";
 import React from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 
 const SettingsPage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
+  const location = useLocation<{ isBack: boolean }>();
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonMenuButton />
+            {location && location.state && location.state.isBack ? (
+              <IonBackButton text="" />
+            ) : (
+              <IonMenuButton />
+            )}
           </IonButtons>
           <IonTitle>Cài đặt</IonTitle>
         </IonToolbar>

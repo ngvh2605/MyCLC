@@ -1,3 +1,4 @@
+import { Storage } from "@capacitor/storage";
 import { useEffect, useState } from "react";
 import { auth, database } from "../firebase";
 
@@ -25,9 +26,18 @@ const useCheckUserInfo = (userId: string) => {
         .on("value", (snapshot) => {
           const data = snapshot.val();
           console.log("data", data);
-          if (data && data.emailVerify && data.phoneVerify && data.personalInfo)
+          if (
+            data &&
+            data.emailVerify &&
+            data.phoneVerify &&
+            data.personalInfo
+          ) {
             setIsVerify(true);
-          else setIsVerify(false);
+            setVerifyStatus("true");
+          } else {
+            setIsVerify(false);
+            setVerifyStatus("false");
+          }
           if (data && data.avatarVerify) setAvatarVerify(true);
           else setAvatarVerify(false);
         });
@@ -35,6 +45,10 @@ const useCheckUserInfo = (userId: string) => {
         database.ref(`/users/${userId}/verify`).off("value", onVerifyStatus);
     }
   }, [userId]);
+
+  const setVerifyStatus = async (status: string) => {
+    await Storage.set({ key: "isVerify", value: status });
+  };
 
   useEffect(() => {
     if (userId) {

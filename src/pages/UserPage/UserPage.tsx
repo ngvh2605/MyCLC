@@ -39,7 +39,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import { database, firestore } from "../../firebase";
 import NewsCard from "../HomePage/NewsCard";
@@ -96,6 +96,7 @@ interface UserCustom {
 const UserPage: React.FC = () => {
   const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
+  const history = useHistory();
 
   const [userInfo, setUserInfo] = useState<User>();
   const [badges, setBadges] = useState<String[]>([]);
@@ -345,7 +346,14 @@ const UserPage: React.FC = () => {
               color="primary"
               fill="outline"
               className="ion-padding-horizontal"
-              routerLink="/my/settings"
+              onClick={() => {
+                history.push({
+                  pathname: "/my/settings",
+                  state: {
+                    isBack: true,
+                  },
+                });
+              }}
             >
               <IonIcon icon={settingsOutline} slot="start" />
               Cài đặt

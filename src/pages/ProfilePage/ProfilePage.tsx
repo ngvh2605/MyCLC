@@ -138,8 +138,15 @@ const ProfilePage: React.FC = () => {
             color="primary"
             fill="outline"
             className="ion-padding-horizontal"
-            routerLink="/my/settings"
             style={{ marginTop: 32 }}
+            onClick={() => {
+              history.push({
+                pathname: "/my/settings",
+                state: {
+                  isBack: true,
+                },
+              });
+            }}
           >
             <IonIcon icon={settingsOutline} slot="start" />
             Cài đặt
