@@ -2,6 +2,8 @@ import {
   IonBackButton,
   IonButtons,
   IonContent,
+  IonFab,
+  IonFabButton,
   IonHeader,
   IonIcon,
   IonItem,
@@ -16,7 +18,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { checkmarkCircle, chevronBack, ticket } from "ionicons/icons";
+import { checkmarkCircle, chevronBack, qrCode, ticket } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
@@ -32,7 +34,7 @@ interface RouteParams {
 const EventRegisterList: React.FC = () => {
   const { id } = useParams<RouteParams>();
   const locationRef = useLocation<Events>();
-  const slidingEl = useRef<HTMLIonItemSlidingElement>(null);
+  const slidingEl = useRef<(HTMLIonItemSlidingElement | null)[]>([]);
 
   const [events, setEvents] = useState<Events>();
   const [tickets, setTickets] = useState<
@@ -91,7 +93,7 @@ const EventRegisterList: React.FC = () => {
   }, [userInfo]);
 
   const handleCheckin = (index: number) => {
-    slidingEl.current.close();
+    slidingEl.current[index].close();
     firestore
       .collection("eventsTicket")
       .doc(`${id}_${tickets[index].userId}`)
@@ -99,7 +101,7 @@ const EventRegisterList: React.FC = () => {
   };
 
   const handleUnCheckin = (index: number) => {
-    slidingEl.current.close();
+    slidingEl.current[index].close();
     firestore
       .collection("eventsTicket")
       .doc(`${id}_${tickets[index].userId}`)
@@ -158,7 +160,12 @@ const EventRegisterList: React.FC = () => {
                 );
               })
               .map((user, index) => (
-                <IonItemSliding key={index} ref={slidingEl}>
+                <IonItemSliding
+                  key={index}
+                  ref={(ref) => {
+                    slidingEl.current[index] = ref;
+                  }}
+                >
                   <IonItem lines="full" detail={true} detailIcon={chevronBack}>
                     <IonIcon
                       icon={checkmarkCircle}
@@ -201,6 +208,12 @@ const EventRegisterList: React.FC = () => {
             <EmptyUI />
           )}
         </IonList>
+
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton onClick={() => {}}>
+            <IonIcon icon={qrCode} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );

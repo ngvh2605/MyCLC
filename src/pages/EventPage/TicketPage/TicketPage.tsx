@@ -8,7 +8,6 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonImg,
   IonItem,
   IonLabel,
   IonListHeader,
@@ -20,13 +19,13 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { close, qrCodeOutline, ticket, time, trashBin } from "ionicons/icons";
+import { close, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../auth";
 import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
 import { Events } from "../../../models";
-import { cancelTicket, getEventTicketByUserId } from "../../HomePage/services";
+import { getEventTicketByUserId } from "../../HomePage/services";
 import TicketCard from "./TicketCard";
 
 const TicketPage: React.FC = () => {
