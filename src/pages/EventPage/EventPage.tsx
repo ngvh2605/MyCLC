@@ -18,7 +18,6 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
-import { UnAuth } from "../../components/CommonUI/UnAuth";
 import { Events } from "../../models";
 import EventCard from "./EventCard";
 import { EventSkeleton } from "./EventCard/EventCard";

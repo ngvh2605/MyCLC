@@ -34,12 +34,12 @@ import {
   useIonAlert,
 } from "@ionic/react";
 
+import { Storage } from "@capacitor/storage";
+import Autolinker from "autolinker";
 import { useAuth } from "../../../auth";
+import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
 import { buyTicket, getInfoByUserId } from "../../HomePage/services";
-import Autolinker from "autolinker";
-import { database, firestore } from "../../../firebase";
-import { Storage } from "@capacitor/storage";
 
 interface stateType {
   isVerify: boolean;

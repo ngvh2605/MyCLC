@@ -91,6 +91,24 @@ export const getInfoByUserId = async (id: string) => {
   return info.val();
 };
 
+export const getNameAndMailByUserId = async (userId: string) => {
+  const fullName = await database
+    .ref()
+    .child("users")
+    .child(userId)
+    .child("personal")
+    .child("fullName")
+    .get();
+  const email = await database
+    .ref()
+    .child("users")
+    .child(userId)
+    .child("personal")
+    .child("email")
+    .get();
+  return { fullName: fullName.val(), email: email.val() };
+};
+
 export const likeNews = async (userId: string, newId: string) => {
   const currentLikes = (
     await firestore.collection("news").doc(newId).get()
