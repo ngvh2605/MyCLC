@@ -9,6 +9,7 @@ import {
   IonItem,
   IonLabel,
   IonSkeletonText,
+  IonSpinner,
   IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
@@ -66,6 +67,7 @@ const EventCard: React.FC<Props> = (props) => {
 
   const [authorInfo, setAuthorInfo] = useState<any>({});
   const [isBuy, setIsBuy] = useState(false);
+  const [isBuyLoaded, setIsBuyLoaded] = useState(false);
 
   const [presentAlert] = useIonAlert();
 
@@ -85,10 +87,11 @@ const EventCard: React.FC<Props> = (props) => {
       .onSnapshot((doc) => {
         if (doc.empty) setIsBuy(false);
         else setIsBuy(true);
+        setIsBuyLoaded(true);
       });
 
     return () => {
-      checkIsBuy();
+      if (isVerify) checkIsBuy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
@@ -205,43 +208,54 @@ const EventCard: React.FC<Props> = (props) => {
                     <>
                       {(!event.totalBuy ||
                         (event.totalBuy &&
-                          event.totalBuy < event.totalTicket)) && (
-                        <IonButton
-                          color="primary"
-                          expand="block"
-                          shape="round"
-                          onClick={() => {
-                            if (isVerify) {
-                              presentAlert({
-                                header: event.title,
-                                message:
-                                  "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
-                                buttons: [
-                                  "Huỷ",
-                                  {
-                                    text: "Đồng ý",
-                                    handler: (d) => {
-                                      buyTicket(userId, event.id);
+                          event.totalBuy < event.totalTicket)) &&
+                        (isBuyLoaded ? (
+                          <IonButton
+                            color="primary"
+                            expand="block"
+                            shape="round"
+                            onClick={() => {
+                              if (isVerify) {
+                                presentAlert({
+                                  header: event.title,
+                                  message:
+                                    "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                                  buttons: [
+                                    "Huỷ",
+                                    {
+                                      text: "Đồng ý",
+                                      handler: (d) => {
+                                        buyTicket(userId, event.id);
+                                      },
                                     },
-                                  },
-                                ],
-                              });
-                            } else {
-                              presentAlert({
-                                header: "Lưu ý",
-                                message:
-                                  "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
-                                buttons: [{ text: "OK" }],
-                              });
-                              history.push("/my/profile");
-                            }
-                          }}
-                          hidden={isBuy}
-                        >
-                          <IonIcon icon={ticket} slot="start" />
-                          <IonLabel>Đăng ký</IonLabel>
-                        </IonButton>
-                      )}
+                                  ],
+                                });
+                              } else {
+                                presentAlert({
+                                  header: "Lưu ý",
+                                  message:
+                                    "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
+                                  buttons: [{ text: "OK" }],
+                                });
+                                history.push("/my/profile");
+                              }
+                            }}
+                            hidden={isBuy}
+                          >
+                            <IonIcon icon={ticket} slot="start" />
+                            <IonLabel>Đăng ký</IonLabel>
+                          </IonButton>
+                        ) : (
+                          <IonButton
+                            color="primary"
+                            expand="block"
+                            shape="round"
+                            fill="clear"
+                            hidden={isBuy}
+                          >
+                            <IonSpinner />
+                          </IonButton>
+                        ))}
 
                       <IonButton
                         color="primary"

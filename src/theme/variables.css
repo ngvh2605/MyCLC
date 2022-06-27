@@ -261,3 +261,8 @@ hr {
   border-bottom: 1px solid;
   opacity: 0.2;
 }
+
+.item-no-inner {
+  --padding-end: 0px;
+  --inner-padding-end: 0px;
+}
