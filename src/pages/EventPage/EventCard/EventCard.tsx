@@ -91,7 +91,7 @@ const EventCard: React.FC<Props> = (props) => {
       });
 
     return () => {
-      if (isVerify) checkIsBuy();
+      checkIsBuy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
@@ -208,8 +208,8 @@ const EventCard: React.FC<Props> = (props) => {
                     <>
                       {(!event.totalBuy ||
                         (event.totalBuy &&
-                          event.totalBuy < event.totalTicket)) &&
-                        (isBuyLoaded ? (
+                          event.totalBuy < event.totalTicket)) && (
+                        <>
                           <IonButton
                             color="primary"
                             expand="block"
@@ -240,22 +240,23 @@ const EventCard: React.FC<Props> = (props) => {
                                 history.push("/my/profile");
                               }
                             }}
-                            hidden={isBuy}
+                            hidden={isBuy || !isBuyLoaded}
                           >
                             <IonIcon icon={ticket} slot="start" />
                             <IonLabel>Đăng ký</IonLabel>
                           </IonButton>
-                        ) : (
+
                           <IonButton
                             color="primary"
                             expand="block"
                             shape="round"
                             fill="clear"
-                            hidden={isBuy}
+                            hidden={isBuy || isBuyLoaded}
                           >
                             <IonSpinner />
                           </IonButton>
-                        ))}
+                        </>
+                      )}
 
                       <IonButton
                         color="primary"

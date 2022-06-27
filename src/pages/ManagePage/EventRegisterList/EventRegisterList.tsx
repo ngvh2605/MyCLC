@@ -93,7 +93,7 @@ const EventRegisterList: React.FC = () => {
       setUserInfo(tempInfo);
       setTotalTickets(tempInfo.length);
     };
-    if (tickets && tickets.length > 0 && tickets.length > totalTickets) {
+    if (tickets && tickets.length > 0 && tickets.length !== totalTickets) {
       fetchUserInfo().then(() => {
         setIsLoading(false);
       });
@@ -102,19 +102,39 @@ const EventRegisterList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets]);
 
-  const handleCheckin = (index: number) => {
+  const filterUser = () => {
+    if (tickets && tickets.length > 0 && userInfo && userInfo.length > 0)
+      return userInfo.filter((user) => {
+        if (!!search) {
+          return (
+            user.fullName.toLowerCase().includes(search.toLowerCase()) ||
+            user.email.toLowerCase().includes(search.toLowerCase()) ||
+            user.userId === search.replace(/\s/g, "").toLowerCase()
+          );
+        } else return user;
+      });
+    else return [];
+  };
+
+  const findTicket = (userId: string) => {
+    return tickets.find((item) => {
+      return item.userId === userId;
+    });
+  };
+
+  const handleCheckin = (index: number, userId: string) => {
     slidingEl.current[index].close();
     firestore
       .collection("eventsTicket")
-      .doc(`${id}_${tickets[index].userId}`)
+      .doc(`${id}_${userId}`)
       .update({ status: "checkin" });
   };
 
-  const handleUnCheckin = (index: number) => {
+  const handleUnCheckin = (index: number, userId: string) => {
     slidingEl.current[index].close();
     firestore
       .collection("eventsTicket")
-      .doc(`${id}_${tickets[index].userId}`)
+      .doc(`${id}_${userId}`)
       .update({ status: "register" });
   };
 
@@ -132,7 +152,7 @@ const EventRegisterList: React.FC = () => {
         icon={ticket}
         text="Check in"
         note={
-          tickets && tickets.length
+          !isLoading && tickets && tickets.length
             ? `${
                 tickets.filter((item) => {
                   return item.status === "checkin";
@@ -161,28 +181,9 @@ const EventRegisterList: React.FC = () => {
           </IonList>
         ) : (
           <IonList>
-            {tickets &&
-            tickets.length > 0 &&
-            userInfo &&
-            userInfo.length > 0 &&
-            userInfo.filter((user) => {
-              if (!!search) {
-                return (
-                  user.fullName.toLowerCase().includes(search.toLowerCase()) ||
-                  user.email.toLowerCase().includes(search.toLowerCase())
-                );
-              } else return user;
-            }).length > 0 ? (
-              userInfo
+            {filterUser().length > 0 ? (
+              filterUser()
                 .slice(0, limit)
-                .filter(function (user) {
-                  return (
-                    user.fullName
-                      .toLowerCase()
-                      .includes(search.toLowerCase()) ||
-                    user.email.toLowerCase().includes(search.toLowerCase())
-                  );
-                })
                 .map((user, index) => (
                   <IonItemSliding
                     key={index}
@@ -200,7 +201,10 @@ const EventRegisterList: React.FC = () => {
                         color="success"
                         slot="start"
                         style={{
-                          opacity: tickets[index].status === "checkin" ? 1 : 0,
+                          opacity:
+                            findTicket(user.userId).status === "checkin"
+                              ? 1
+                              : 0,
                         }}
                       />
                       <IonLabel
@@ -220,17 +224,17 @@ const EventRegisterList: React.FC = () => {
                     <IonItemOptions side="end">
                       <IonItemOption
                         color={
-                          tickets[index].status === "checkin"
+                          findTicket(user.userId).status === "checkin"
                             ? "danger"
                             : "success"
                         }
                         onClick={() => {
-                          if (tickets[index].status === "checkin") {
-                            handleUnCheckin(index);
-                          } else handleCheckin(index);
+                          if (findTicket(user.userId).status === "checkin") {
+                            handleUnCheckin(index, user.userId);
+                          } else handleCheckin(index, user.userId);
                         }}
                       >
-                        {tickets[index].status === "checkin"
+                        {findTicket(user.userId).status === "checkin"
                           ? "Huỷ check in"
                           : "Check in"}
                       </IonItemOption>
