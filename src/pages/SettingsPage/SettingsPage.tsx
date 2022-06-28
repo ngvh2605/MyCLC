@@ -10,23 +10,29 @@ import {
   IonListHeader,
   IonMenuButton,
   IonPage,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import i18next from "i18next";
 import {
   cameraOutline,
   chatbubbleOutline,
   homeOutline,
   imageOutline,
+  languageOutline,
   logoFacebook,
   personOutline,
   sendOutline,
 } from "ionicons/icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 
 const SettingsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const history = useHistory();
   const location = useLocation<{ isBack: boolean }>();
@@ -42,12 +48,12 @@ const SettingsPage: React.FC = () => {
               <IonMenuButton />
             )}
           </IonButtons>
-          <IonTitle>Cài đặt</IonTitle>
+          <IonTitle>{t("Settings")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
         <br />
-        <IonListHeader>Cài đặt tài khoản</IonListHeader>
+        <IonListHeader>{t("Account settings")}</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             onClick={() => {
@@ -55,7 +61,7 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <IonIcon icon={cameraOutline} slot="start" color="primary" />
-            <IonLabel>Sửa ảnh đại diện</IonLabel>
+            <IonLabel>{t("Change avatar")}</IonLabel>
           </IonItem>
           <IonItem
             onClick={() => {
@@ -63,7 +69,7 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <IonIcon icon={personOutline} slot="start" color="primary" />
-            <IonLabel>Sửa thông tin cá nhân</IonLabel>
+            <IonLabel>{t("Edit personal information")}</IonLabel>
           </IonItem>
           <IonItem
             onClick={() => {
@@ -76,12 +82,32 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <IonIcon icon={homeOutline} slot="start" color="primary" />
-            <IonLabel>Sửa trang cá nhân</IonLabel>
+            <IonLabel>{t("Edit home page")}</IonLabel>
           </IonItem>
         </IonList>
 
         <hr />
-        <IonListHeader>Tiện ích</IonListHeader>
+        <IonListHeader>{t("Application settings")}</IonListHeader>
+        <IonList lines="none" className="ion-padding">
+          <IonItem onClick={() => {}}>
+            <IonIcon icon={languageOutline} slot="start" color="primary" />
+            <IonLabel>{t("Language")}</IonLabel>
+            <IonSelect
+              interface="popover"
+              onIonChange={(e) => {
+                i18next.changeLanguage(e.detail.value);
+                localStorage.setItem("i18nLanguage", e.detail.value);
+              }}
+              value={i18next.language}
+            >
+              <IonSelectOption value="en">English</IonSelectOption>
+              <IonSelectOption value="vi">Tiếng Việt</IonSelectOption>
+            </IonSelect>
+          </IonItem>
+        </IonList>
+
+        <hr />
+        <IonListHeader>{t("Extensions")}</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             onClick={() => {
@@ -89,12 +115,12 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <IonIcon icon={imageOutline} slot="start" color="primary" />
-            <IonLabel>Thêm khung ảnh đại diện</IonLabel>
+            <IonLabel>{t("Add avatar frame")}</IonLabel>
           </IonItem>
         </IonList>
 
         <hr />
-        <IonListHeader>Trợ giúp & hỗ trợ</IonListHeader>
+        <IonListHeader>{t("Help & support")}</IonListHeader>
         <IonList lines="none" className="ion-padding">
           <IonItem
             href="https://m.me/CLCMultimedia"
@@ -102,7 +128,7 @@ const SettingsPage: React.FC = () => {
             detail={false}
           >
             <IonIcon icon={sendOutline} slot="start" color="primary" />
-            <IonLabel>Liên hệ</IonLabel>
+            <IonLabel>{t("Contact")}</IonLabel>
             <IonIcon
               icon={logoFacebook}
               color="medium"
@@ -118,7 +144,7 @@ const SettingsPage: React.FC = () => {
             detail={false}
           >
             <IonIcon icon={chatbubbleOutline} color="primary" slot="start" />
-            <IonLabel>Thảo luận</IonLabel>
+            <IonLabel>{t("Discussion")}</IonLabel>
             <IonIcon
               icon={logoFacebook}
               color="medium"

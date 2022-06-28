@@ -23,6 +23,7 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
+import "./i18n";
 
 ReactDOM.render(<App />, document.getElementById("root"));
 SplashScreen.hide();
