@@ -15,10 +15,12 @@ import {
   IonLoading,
   IonPage,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import { closeCircle, eye, eyeOff, logoGoogle } from "ionicons/icons";
 import moment from "moment";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth, database } from "../../firebase";
@@ -26,6 +28,7 @@ import { handleGoogleLogin } from "../LoginPage/GoogleLogin";
 import "./RegisterPage.scss";
 
 const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
   const { loggedIn } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -40,27 +43,33 @@ const RegisterPage: React.FC = () => {
 
   const [status, setStatus] = useState({ loading: false, error: false });
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [presentAlert] = useIonAlert();
 
   const handleRegister = async () => {
     if (email.includes("@") === false || email.includes(".") === false) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Định dạng email không hợp lệ");
-      setShowAlert(true);
+      presentAlert({
+        header: t("Error"),
+        message: t("Invalid email format"),
+        buttons: ["OK"],
+      });
     } else if (password.length < 8 || passwordRe.length < 8) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Mật khẩu tối thiểu 8 ký tự");
-      setShowAlert(true);
+      presentAlert({
+        header: t("Error"),
+        message: t("Password needs at least 8 characters"),
+        buttons: ["OK"],
+      });
     } else if (email.toLowerCase() !== emailRe.toLowerCase()) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Email nhập lại không khớp");
-      setShowAlert(true);
+      presentAlert({
+        header: t("Error"),
+        message: t("Re-entered email does not match"),
+        buttons: ["OK"],
+      });
     } else if (password !== passwordRe) {
-      setAlertHeader("Lỗi!");
-      setAlertMessage("Mật khẩu nhập lại không khớp");
-      setShowAlert(true);
+      presentAlert({
+        header: t("Error"),
+        message: t("Re-entered password does not match"),
+        buttons: ["OK"],
+      });
     } else {
       try {
         setStatus({ loading: true, error: false });
@@ -70,31 +79,27 @@ const RegisterPage: React.FC = () => {
           .then((userInfo) => {
             //add welcome message to mailbox
             //console.log("userid", userInfo.user.uid);
-            database.ref().child("mailbox").child(userInfo.user.uid).push({
-              sender: "CLC Multimedia",
-              message:
-                "Chúc mừng bạn đã đăng ký tài khoản thành công! Hãy vào Hồ sơ và thực hiện đủ 3 bước xác minh để có thể sử dụng các chức năng khác của MyCLC nhé!",
-              timestamp: moment().valueOf(),
-            });
+            database
+              .ref()
+              .child("mailbox")
+              .child(userInfo.user.uid)
+              .push({
+                sender: "CLC Multimedia",
+                message: t("Register congratulations"),
+                timestamp: moment().valueOf(),
+              });
           });
         console.log("credential:", credential);
       } catch (error) {
         setStatus({ loading: false, error: true });
         console.log("error:", error);
-        if (
-          error.message ===
-          "The email address is already in use by another account."
-        ) {
-          setAlertHeader("Lỗi!");
-          setAlertMessage("Email này đã được sử dụng");
-          setShowAlert(true);
-        } else {
-          setAlertHeader("Lỗi!");
-          setAlertMessage(
-            "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ"
-          );
-          setShowAlert(true);
-        }
+        presentAlert({
+          header: t("Error"),
+          message:
+            error.message ||
+            t("Please try again later or contact CLC Multimedia for support"),
+          buttons: ["OK"],
+        });
       }
     }
   };
@@ -107,7 +112,7 @@ const RegisterPage: React.FC = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Quay lại" defaultHref="/index" />
+            <IonBackButton text={t("Back")} defaultHref="/index" />
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -131,7 +136,7 @@ const RegisterPage: React.FC = () => {
               type="email"
               value={email}
               onIonChange={(event) => setEmail(event.detail.value)}
-              placeholder="clbclcmultimedia@gmail.com"
+              placeholder={t("Enter your email")}
               autocomplete="off"
             />
             <IonIcon
@@ -146,12 +151,12 @@ const RegisterPage: React.FC = () => {
           </IonItem>
 
           <IonItem>
-            <IonLabel position="stacked">Nhập lại Email</IonLabel>
+            <IonLabel position="stacked">{t("Confirm email")}</IonLabel>
             <IonInput
               type="email"
               value={emailRe}
               onIonChange={(event) => setEmailRe(event.detail.value)}
-              placeholder="clbclcmultimedia@gmail.com"
+              placeholder={t("Enter your email")}
               autocomplete="off"
             />
             <IonIcon
@@ -166,12 +171,12 @@ const RegisterPage: React.FC = () => {
           </IonItem>
 
           <IonItem>
-            <IonLabel position="stacked">Mật khẩu</IonLabel>
+            <IonLabel position="stacked">{t("Password")}</IonLabel>
             <IonInput
               type={passwordType}
               value={password}
               onIonChange={(event) => setPassword(event.detail.value)}
-              placeholder="Tối thiểu 8 ký tự"
+              placeholder={t("At least 8 characters")}
               autocomplete="off"
             />
             <IonIcon
@@ -194,7 +199,7 @@ const RegisterPage: React.FC = () => {
           </IonItem>
 
           <IonItem>
-            <IonLabel position="stacked">Nhập lại mật khẩu</IonLabel>
+            <IonLabel position="stacked">{t("Confirm password")}</IonLabel>
             <IonInput
               type={passwordTypeRe}
               value={passwordRe}
@@ -202,7 +207,7 @@ const RegisterPage: React.FC = () => {
               onKeyPress={(event) => {
                 if (event.key === "Enter") handleRegister();
               }}
-              placeholder="Tối thiểu 8 ký tự"
+              placeholder={t("At least 8 characters")}
               autocomplete="off"
             />
             <IonIcon
@@ -226,14 +231,6 @@ const RegisterPage: React.FC = () => {
         </IonList>
 
         <IonLoading isOpen={status.loading} />
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter className="ion-no-border">
         <IonToolbar>
@@ -246,7 +243,7 @@ const RegisterPage: React.FC = () => {
               disabled={!(email && emailRe && password && passwordRe)}
               style={{ marginTop: 10, marginBottom: 10 }}
             >
-              Tạo tài khoản
+              {t("Create account")}
             </IonButton>
             <IonButton
               expand="block"
@@ -256,16 +253,19 @@ const RegisterPage: React.FC = () => {
                 setStatus({ loading: true, error: false });
                 await handleGoogleLogin(() => {
                   setStatus({ loading: false, error: true });
-                  setAlertHeader("Lỗi!");
-                  setAlertMessage(
-                    "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ"
-                  );
-                  setShowAlert(true);
+                  presentAlert({
+                    header: t("Error"),
+                    message: t(
+                      "Please try again later or contact CLC Multimedia for support"
+                    ),
+                    buttons: ["OK"],
+                  });
                 });
               }}
               style={{ marginTop: 10, marginBottom: 10, fontSize: 16 }}
             >
-              <IonIcon icon={logoGoogle} slot="start" /> Tiếp tục với Google
+              <IonIcon icon={logoGoogle} slot="start" />{" "}
+              {t("Continue with Google")}
             </IonButton>
           </div>
         </IonToolbar>

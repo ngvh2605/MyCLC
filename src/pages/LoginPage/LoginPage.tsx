@@ -19,6 +19,7 @@ import {
 } from "@ionic/react";
 import { closeCircle, eye, eyeOff, logoGoogle } from "ionicons/icons";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Redirect } from "react-router";
 import { useAuth } from "../../auth";
 import { auth } from "../../firebase";
@@ -26,6 +27,7 @@ import { handleGoogleLogin } from "./GoogleLogin";
 import "./LoginPage.scss";
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
   const { loggedIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,14 +40,14 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     if (email.includes("@") === false || email.includes(".") === false) {
       presentAlert({
-        header: "Lỗi!",
-        message: "Định dạng email không hợp lệ",
+        header: t("Error"),
+        message: t("Invalid email format"),
         buttons: ["OK"],
       });
     } else if (password.length < 8) {
       presentAlert({
-        header: "Lỗi!",
-        message: "Mật khẩu tối thiểu 8 ký tự",
+        header: t("Error"),
+        message: t("Password needs at least 8 characters"),
         buttons: ["OK"],
       });
     } else {
@@ -61,8 +63,8 @@ const LoginPage: React.FC = () => {
         console.log("error:", error);
 
         presentAlert({
-          header: "Lỗi!",
-          message: "Email hoặc mật khẩu không đúng",
+          header: t("Error"),
+          message: error.message || t("Email or password is incorrect"),
           buttons: ["OK"],
         });
       }
@@ -79,23 +81,24 @@ const LoginPage: React.FC = () => {
           .sendPasswordResetEmail(userEmail)
           .then(function () {
             presentAlert({
-              header: "Đã gửi email đặt lại mặt khẩu!",
-              message:
-                "Vui lòng kiểm tra hộp thư đến hoặc hộp thư rác và làm theo hướng dẫn",
+              header: t("Password reset email is sent!"),
+              message: t(
+                "Please check your inbox or spam and follow the instructions"
+              ),
               buttons: ["OK"],
             });
           })
           .catch(function (error) {
             presentAlert({
-              header: "Lỗi!",
+              header: t("Error"),
               message: error,
               buttons: ["OK"],
             });
           });
       } else {
         presentAlert({
-          header: "Lỗi!",
-          message: "Địa chỉ email không hợp lệ",
+          header: t("Error"),
+          message: t("Invalid email format"),
           buttons: ["OK"],
         });
       }
@@ -105,7 +108,7 @@ const LoginPage: React.FC = () => {
   const getUserEmail = async () => {
     return new Promise(async (resolve) => {
       const confirm = await alertController.create({
-        header: "Nhập emaill của bạn",
+        header: t("Enter your email"),
         backdropDismiss: false,
         inputs: [
           {
@@ -115,7 +118,7 @@ const LoginPage: React.FC = () => {
           },
         ],
         buttons: [
-          { text: "Huỷ" },
+          { text: t("Cancel") },
           {
             text: "OK",
             handler: (data) => {
@@ -138,7 +141,7 @@ const LoginPage: React.FC = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Quay lại" defaultHref="/index" />
+            <IonBackButton text={t("Back")} defaultHref="/index" />
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -162,7 +165,7 @@ const LoginPage: React.FC = () => {
                 type="email"
                 value={email}
                 autocomplete="on"
-                placeholder="Nhập email"
+                placeholder={t("Enter your email")}
                 onIonChange={(event) => setEmail(event.detail.value)}
               />
               <IonIcon
@@ -177,12 +180,12 @@ const LoginPage: React.FC = () => {
             </IonItem>
 
             <IonItem>
-              <IonLabel position="stacked">Mật khẩu</IonLabel>
+              <IonLabel position="stacked">{t("Password")}</IonLabel>
               <IonInput
                 type={passwordType}
                 value={password}
                 autocomplete="on"
-                placeholder="Nhập mật khẩu"
+                placeholder={t("Enter your password")}
                 onIonChange={(event) => setPassword(event.detail.value)}
                 onKeyPress={(event) => {
                   if (event.key === "Enter") handleLogin();
@@ -219,7 +222,7 @@ const LoginPage: React.FC = () => {
                     handleForgotPassword();
                   }}
                 >
-                  Quên mật khẩu?
+                  {t("Forgot password?")}
                 </IonLabel>
               </div>
             </IonItem>
@@ -237,7 +240,7 @@ const LoginPage: React.FC = () => {
               onClick={handleLogin}
               disabled={email && password ? false : true}
             >
-              Đăng nhập
+              {t("Log in")}
             </IonButton>
             <IonButton
               expand="block"
@@ -248,16 +251,18 @@ const LoginPage: React.FC = () => {
                 await handleGoogleLogin(() => {
                   setStatus({ loading: false, error: true });
                   presentAlert({
-                    header: "Lỗi!",
-                    message:
-                      "Vui lòng thử lại sau hoặc liên hệ CLC Multimedia để được hỗ trợ",
+                    header: t("Error"),
+                    message: t(
+                      "Please try again later or contact CLC Multimedia for support"
+                    ),
                     buttons: ["OK"],
                   });
                 });
               }}
               style={{ marginTop: 10, marginBottom: 10, fontSize: 16 }}
             >
-              <IonIcon icon={logoGoogle} slot="start" /> Tiếp tục với Google
+              <IonIcon icon={logoGoogle} slot="start" />{" "}
+              {t("Continue with Google")}
             </IonButton>
           </div>
         </IonToolbar>

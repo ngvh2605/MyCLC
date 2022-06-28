@@ -23,6 +23,7 @@ import {
 import { image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
@@ -32,6 +33,7 @@ import { resizeImage } from "../../../utils/helpers/helpers";
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 const AddNewsPage: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation<News>();
   const { userId } = useAuth();
   const history = useHistory();
@@ -223,7 +225,7 @@ const AddNewsPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/my/home" />
+            <IonBackButton text={t("Cancel")} defaultHref="/my/home" />
           </IonButtons>
           <IonButtons slot="end">
             <IonButton
@@ -233,31 +235,31 @@ const AddNewsPage: React.FC = () => {
                 else handlePost();
               }}
             >
-              <b>Đăng</b>
+              <b>{t("Post")}</b>
             </IonButton>
           </IonButtons>
-          <IonTitle>{news ? "Sửa News" : "Tạo News"}</IonTitle>
+          <IonTitle>{news ? t("Edit News") : t("Create News")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <IonList>
           <IonItem>
-            <IonLabel position="floating">Tiêu đề </IonLabel>
+            <IonLabel position="stacked">{t("Title")}</IonLabel>
             <IonInput
               type="text"
               maxlength={50}
               value={title}
               onIonChange={(e) => setTitle(e.detail.value)}
-              placeholder="Không bắt buộc, tối đa 50 chữ cái"
+              placeholder={t("Optional, up to 50 characters")}
             />
           </IonItem>
 
           <IonItem>
-            <IonLabel position="floating">
-              Nội dung <span style={{ color: "red" }}>*</span>
+            <IonLabel position="stacked">
+              {t("Content")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonTextarea
-              placeholder={"Tối thiểu 50 chữ cái"}
+              placeholder={t("Minimum 50 characters")}
               autoGrow
               cols={5}
               value={body}
@@ -294,7 +296,7 @@ const AddNewsPage: React.FC = () => {
               }}
             >
               <IonIcon icon={image} slot="start" />
-              {pictureUrl ? "Đổi ảnh khác" : "Thêm hình ảnh"}
+              {pictureUrl ? t("Change image") : t("Add image")}
             </IonButton>
           </div>
         </IonToolbar>

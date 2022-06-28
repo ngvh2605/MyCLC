@@ -11,10 +11,12 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React, { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Redirect, useHistory } from "react-router";
 import { useAuth } from "../../auth";
 
 const SplashPage: React.FC = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const slidesRef = useRef<any>();
 
@@ -53,7 +55,7 @@ const SplashPage: React.FC = () => {
                   lineHeight: "40px",
                 }}
               >
-                <b>Cập nhập những tin tức mới nhất tại Chuyên Lào Cai</b>
+                <b>{t("Update the latest news about Chuyen Lao Cai")}</b>
               </IonLabel>
             </div>
           </IonSlide>
@@ -70,7 +72,7 @@ const SplashPage: React.FC = () => {
                   lineHeight: "40px",
                 }}
               >
-                <b>Lịch hoạt động nhà trường và sự kiện các câu lạc bộ</b>
+                <b>{t("Up-to-date with school activities and club events")}</b>
               </IonLabel>
             </div>
           </IonSlide>
@@ -87,7 +89,7 @@ const SplashPage: React.FC = () => {
                   lineHeight: "40px",
                 }}
               >
-                <b>Kết nối học sinh và cựu học sinh khắp nơi trên thế giới</b>
+                <b>{t("Connect students and alumni around the world")}</b>
               </IonLabel>
             </div>
           </IonSlide>
@@ -103,7 +105,7 @@ const SplashPage: React.FC = () => {
                 history.push("/register");
               }}
             >
-              Đăng ký
+              {t("Register")}
             </IonButton>
 
             <IonButton
@@ -115,7 +117,7 @@ const SplashPage: React.FC = () => {
                 history.push("/login");
               }}
             >
-              Đăng nhập
+              {t("Log in")}
             </IonButton>
           </div>
         </IonToolbar>
