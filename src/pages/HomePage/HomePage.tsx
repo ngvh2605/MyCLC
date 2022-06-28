@@ -297,7 +297,7 @@ const HomePage: React.FC = () => {
             }}
           >
             <IonIcon icon={arrowUp} slot="start" />
-            <IonLabel>Có tin mới</IonLabel>
+            <IonLabel>{t("New news")}</IonLabel>
           </IonButton>
         </IonFab>
 
@@ -438,7 +438,7 @@ const HomePage: React.FC = () => {
                 <IonIcon icon={close} color="primary" />
               </IonButton>
             </IonButtons>
-            <IonTitle>Hòm thư</IonTitle>
+            <IonTitle>{t("Mailbox")}</IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent>
@@ -450,25 +450,25 @@ const HomePage: React.FC = () => {
               style={{ marginInlineStart: "-100px" }}
               onClick={() => {
                 presentAlert({
-                  header: "Bạn có chắc?",
-                  message:
-                    "Tất cả các thư sẽ bị xoá vĩnh viễn và bạn không thể xem lại chúng",
+                  header: t("Are you sure?"),
+                  message: t(
+                    "All messages will be permanently deleted and you can’t recover them"
+                  ),
                   buttons: [
-                    "Huỷ",
+                    t("Cancel"),
                     {
-                      text: "Đồng ý",
+                      text: "OK",
                       handler: (d) => {
                         clearMailbox();
                       },
                     },
                   ],
-                  onDidDismiss: (e) => console.log("did dismiss"),
                 });
               }}
             >
               <IonButton shape="round" onClick={() => {}}>
                 <IonIcon icon={checkmark} slot="start" />
-                <IonLabel>Làm trống hòm thư</IonLabel>
+                <IonLabel>{t("Empty the mailbox")}</IonLabel>
               </IonButton>
             </IonFab>
           )}
@@ -503,7 +503,7 @@ const HomePage: React.FC = () => {
                 <IonItem color="light">
                   <div className="ion-padding-vertical">
                     <IonLabel text-wrap>
-                      <i>Hòm thư trống</i>
+                      <i>{t("Mailbox is empty")}</i>
                     </IonLabel>
                   </div>
                 </IonItem>

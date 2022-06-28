@@ -45,6 +45,7 @@ import {
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
@@ -62,6 +63,7 @@ interface RouteParams {
 }
 
 const ViewNewsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
   const { isVerify } = useCheckUserInfo(userId);
@@ -311,8 +313,8 @@ const ViewNewsPage: React.FC = () => {
                       />
 
                       <IonLabel color="primary" style={{ fontSize: "small" }}>
-                        {news.totalComments > 0 ? news.totalComments : ""} Bình
-                        luận
+                        {news.totalComments > 0 ? news.totalComments : ""}{" "}
+                        {t("Comment")}
                       </IonLabel>
                     </IonButton>
                   </IonCol>
@@ -338,7 +340,7 @@ const ViewNewsPage: React.FC = () => {
                         />
 
                         <IonLabel color="danger" style={{ fontSize: "small" }}>
-                          {news.totalLikes} Yêu thích
+                          {news.totalLikes} {t("Love")}
                         </IonLabel>
                       </IonButton>
                     ) : (
@@ -359,7 +361,8 @@ const ViewNewsPage: React.FC = () => {
                         />
 
                         <IonLabel color="dark" style={{ fontSize: "small" }}>
-                          {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
+                          {news.totalLikes > 0 ? news.totalLikes : ""}{" "}
+                          {t("Love")}
                         </IonLabel>
                       </IonButton>
                     )}
@@ -480,7 +483,7 @@ const ViewNewsPage: React.FC = () => {
                 }}
               >
                 <IonLabel>
-                  Đọc thêm
+                  {t("Read more")}
                   <br />
                   <IonIcon icon={chevronDown} />
                 </IonLabel>
@@ -494,22 +497,22 @@ const ViewNewsPage: React.FC = () => {
               cssClass="my-custom-class"
               buttons={[
                 {
-                  text: "Chỉnh sửa",
+                  text: t("Edit"),
                   icon: brush,
                   handler: () => {
                     presentAlert({
-                      header: "Sửa bình luận",
+                      header: t("Edit"),
                       inputs: [
                         {
-                          placeholder: "Nhập bình luận mới",
+                          placeholder: t("Enter text"),
                           name: "text",
                           type: "text",
                         },
                       ],
                       buttons: [
-                        "Huỷ",
+                        t("Cancel"),
                         {
-                          text: "Xong",
+                          text: t("Done"),
                           handler: async (d) => {
                             await firestore
                               .collection("news")
@@ -531,18 +534,17 @@ const ViewNewsPage: React.FC = () => {
                   },
                 },
                 {
-                  text: "Xoá",
+                  text: t("Delete"),
                   role: "destructive",
                   icon: trash,
                   handler: () => {
                     presentAlert({
-                      header: "Xoá bình luận",
-                      message:
-                        "Bạn có chắc chắn xoá vĩnh viễn bình luận này khỏi MyCLC không?",
+                      header: t("Are you sure?"),
+                      message: t("This will be permanently deleted"),
                       buttons: [
-                        "Huỷ",
+                        t("Cancel"),
                         {
-                          text: "Xoá",
+                          text: t("Delete"),
                           handler: (d) => {
                             firestore
                               .collection("news")
@@ -568,7 +570,7 @@ const ViewNewsPage: React.FC = () => {
                   },
                 },
                 {
-                  text: "Cancel",
+                  text: t("Cancel"),
                   icon: close,
                   role: "cancel",
                   handler: () => {
@@ -584,7 +586,7 @@ const ViewNewsPage: React.FC = () => {
               cssClass="my-custom-class"
               buttons={[
                 {
-                  text: "Chỉnh sửa",
+                  text: t("Edit"),
                   icon: brush,
                   handler: () => {
                     history.push({
@@ -594,18 +596,17 @@ const ViewNewsPage: React.FC = () => {
                   },
                 },
                 {
-                  text: "Xoá",
+                  text: t("Delete"),
                   role: "destructive",
                   icon: trash,
                   handler: () => {
                     presentAlert({
-                      header: "Xoá bài viết",
-                      message:
-                        "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
+                      header: t("Are you sure?"),
+                      message: t("This will be permanently deleted"),
                       buttons: [
-                        "Huỷ",
+                        t("Cancel"),
                         {
-                          text: "Xoá",
+                          text: t("Delete"),
                           handler: (d) => {
                             setNews({ ...news, body: "" });
                             deleteNews(news);
@@ -618,7 +619,7 @@ const ViewNewsPage: React.FC = () => {
                   },
                 },
                 {
-                  text: "Cancel",
+                  text: t("Cancel"),
                   icon: close,
                   role: "cancel",
                   handler: () => {
@@ -627,7 +628,7 @@ const ViewNewsPage: React.FC = () => {
                 },
               ]}
             ></IonActionSheet>
-          </div>{" "}
+          </div>
         </IonContent>
       ) : (
         <IonContent></IonContent>
@@ -649,7 +650,7 @@ const ViewNewsPage: React.FC = () => {
               <IonInput
                 type="text"
                 color="dark"
-                placeholder="Nhập bình luận (tối thiểu 30 chữ cái)"
+                placeholder={t("Enter text (minimum 30 characters)")}
                 autocapitalize="sentences"
                 minlength={30}
                 value={text}
@@ -696,7 +697,9 @@ const ViewNewsPage: React.FC = () => {
             hidden={isVerify}
           >
             <IonLabel text-wrap className="ion-padding">
-              Bạn cần thực hiện đủ 3 bước xác minh để có thể bình luận!
+              {t(
+                "You need to complete 3 verification steps to be able to comment!"
+              )}
             </IonLabel>
           </IonChip>
         </IonToolbar>

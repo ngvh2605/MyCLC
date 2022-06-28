@@ -32,6 +32,7 @@ import {
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
 import { firestore } from "../../../firebase";
@@ -45,6 +46,7 @@ import {
 import "./NewsCard.scss";
 
 const NewsCard: React.FC<any> = (props) => {
+  const { t } = useTranslation();
   const history = useHistory();
   const { userId } = useAuth();
 
@@ -249,8 +251,8 @@ const NewsCard: React.FC<any> = (props) => {
                     />
 
                     <IonLabel color="primary" style={{ fontSize: "small" }}>
-                      {news.totalComments > 0 ? news.totalComments : ""} Bình
-                      luận
+                      {news.totalComments > 0 ? news.totalComments : ""}{" "}
+                      {t("Comment")}
                     </IonLabel>
                   </IonButton>
                 </IonCol>
@@ -275,7 +277,7 @@ const NewsCard: React.FC<any> = (props) => {
                       />
 
                       <IonLabel color="danger" style={{ fontSize: "small" }}>
-                        {news.totalLikes} Yêu thích
+                        {news.totalLikes} {t("Love")}
                       </IonLabel>
                     </IonButton>
                   ) : (
@@ -294,7 +296,7 @@ const NewsCard: React.FC<any> = (props) => {
                         slot="start"
                       />
                       <IonLabel color="dark" style={{ fontSize: "small" }}>
-                        {news.totalLikes > 0 ? news.totalLikes : ""} Yêu thích
+                        {news.totalLikes > 0 ? news.totalLikes : ""} {t("Love")}
                       </IonLabel>
                     </IonButton>
                   )}
@@ -308,7 +310,7 @@ const NewsCard: React.FC<any> = (props) => {
               cssClass="my-custom-class"
               buttons={[
                 {
-                  text: "Chỉnh sửa",
+                  text: t("Edit"),
                   icon: brush,
                   handler: () => {
                     history.push({
@@ -318,18 +320,17 @@ const NewsCard: React.FC<any> = (props) => {
                   },
                 },
                 {
-                  text: "Xoá",
+                  text: t("Delete"),
                   role: "destructive",
                   icon: trash,
                   handler: () => {
                     presentAlert({
-                      header: "Xoá bài viết",
-                      message:
-                        "Bạn có chắc chắn xoá vĩnh viễn bài viết này khỏi MyCLC không?",
+                      header: t("Are you sure?"),
+                      message: t("This will be permanently deleted"),
                       buttons: [
-                        "Huỷ",
+                        t("Cancel"),
                         {
-                          text: "Xoá",
+                          text: t("Delete"),
                           handler: (d) => {
                             // setNews(undefined);
                             handleDelete(news.id);
@@ -342,7 +343,7 @@ const NewsCard: React.FC<any> = (props) => {
                   },
                 },
                 {
-                  text: "Cancel",
+                  text: t("Cancel"),
                   icon: close,
                   role: "cancel",
                   handler: () => {

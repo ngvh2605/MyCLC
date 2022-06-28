@@ -32,6 +32,7 @@ import {
   sparklesOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
@@ -39,6 +40,7 @@ import { auth, database, remoteConfig } from "../../firebase";
 import "./MenuPage.scss";
 
 const MenuPage = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
 
   const history = useHistory();
@@ -64,14 +66,14 @@ const MenuPage = () => {
       isShown: true,
     },
     {
-      text: "Hồ sơ",
+      text: t("Profile"),
       url: "profile",
       icon: personOutline,
       requireVerify: false,
       isShown: true,
     },
     {
-      text: "Sự kiện",
+      text: t("Events"),
       url: "event",
       icon: calendarOutline,
       requireVerify: false,
@@ -79,7 +81,7 @@ const MenuPage = () => {
     },
 
     {
-      text: "Câu lạc bộ",
+      text: t("Clubs"),
       url: "club",
       icon: planetOutline,
       requireVerify: false,
@@ -104,28 +106,28 @@ const MenuPage = () => {
       isShown: remoteConfig.getBoolean("showIn2CLC"),
     },
     {
-      text: "Phòng chat",
+      text: t("Chat rooms"),
       url: "chat",
       icon: chatbubbleEllipsesOutline,
       requireVerify: true,
       isShown: true,
     },
     {
-      text: "Certificate",
+      text: "Certificates",
       url: "certi",
       icon: folderOutline,
       requireVerify: true,
       isShown: true,
     },
     {
-      text: "Giới thiệu",
+      text: t("About"),
       url: "about",
       icon: sparklesOutline,
       requireVerify: false,
       isShown: true,
     },
     {
-      text: "Cài đặt",
+      text: t("Settings"),
       url: "settings",
       icon: settingsOutline,
       requireVerify: false,
@@ -149,8 +151,8 @@ const MenuPage = () => {
           console.log("database appVersion", snapshot.val());
           if (snapshot.val() !== pjson.version) {
             presentAlert({
-              header: `Đã có phiên bản ${snapshot.val()}`,
-              message: "Vui lòng tải lại trang để cập nhật phiên bản mới",
+              header: `${t("New version")} ${snapshot.val()}`,
+              message: t("Please update to the newest version!"),
               buttons: [{ text: "OK" }],
             });
           }
@@ -166,9 +168,10 @@ const MenuPage = () => {
       menuClose();
     } else {
       presentAlert({
-        header: "Lưu ý",
-        message:
-          "Bạn cần hoàn thành 3 bước xác minh để có thể sử dụng tính năng này!",
+        header: t("Warning"),
+        message: t(
+          "You need to complete 3 verification steps to be able to use this feature!"
+        ),
         buttons: [{ text: "OK" }],
       });
       history.push("/my/profile");
@@ -236,7 +239,7 @@ const MenuPage = () => {
               <IonCol>
                 <IonLabel>
                   <b>
-                    {fullName || <i>Tên bạn là gì?</i>}
+                    {fullName || <i>{t("Your name?")}</i>}
                     {isVerify && (
                       <>
                         {" "}
@@ -249,7 +252,7 @@ const MenuPage = () => {
                     )}
                   </b>
 
-                  <p style={{ paddingTop: 3 }}>Xem trang cá nhân</p>
+                  <p style={{ paddingTop: 3 }}>{t("See your home page")}</p>
                 </IonLabel>
               </IonCol>
             </IonRow>
@@ -277,7 +280,7 @@ const MenuPage = () => {
           <IonList lines="none">
             <IonItem>
               <IonLabel style={{ marginLeft: 16 }}>
-                Phiên bản: {appVersion}
+                {t("Version")}: {appVersion}
               </IonLabel>
             </IonItem>
             {allowCreateEvent && (
@@ -294,7 +297,7 @@ const MenuPage = () => {
                   color={location.pathname !== "/my/manage" ? "primary" : ""}
                   slot="start"
                 />
-                <IonLabel>Quản lý</IonLabel>
+                <IonLabel>{t("Manage")}</IonLabel>
               </IonItem>
             )}
             <IonItem
@@ -304,7 +307,7 @@ const MenuPage = () => {
               }}
             >
               <IonIcon icon={logOutOutline} color="primary" slot="start" />
-              <IonLabel>Đăng xuất</IonLabel>
+              <IonLabel>{t("Sign out")}</IonLabel>
             </IonItem>
           </IonList>
         </IonToolbar>
