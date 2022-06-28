@@ -22,6 +22,7 @@ import {
 } from "@ionic/react";
 import { camera, createOutline, settingsOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
@@ -30,6 +31,7 @@ import { VerifyStatus } from "../../models";
 import "./ProfilePage.scss";
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId, emailVerified } = useAuth();
   const history = useHistory();
   const [verifyStatus, setVerifyStatus] = useState<VerifyStatus>({
@@ -96,7 +98,7 @@ const ProfilePage: React.FC = () => {
               <IonIcon icon={createOutline} color="primary" />
             </IonButton>
           </IonButtons>
-          <IonTitle>Hồ sơ</IonTitle>
+          <IonTitle>{t("Profile")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding-vertical">
@@ -128,7 +130,7 @@ const ProfilePage: React.FC = () => {
           </IonAvatar>
 
           <p style={{ textAlign: "center", fontSize: "large" }}>
-            <b>{fullName || <i>Tên bạn là gì?</i>}</b>
+            <b>{fullName || <i>{t("Your name?")}</i>}</b>
           </p>
         </div>
 
@@ -149,7 +151,7 @@ const ProfilePage: React.FC = () => {
             }}
           >
             <IonIcon icon={settingsOutline} slot="start" />
-            Cài đặt
+            {t("Settings")}
           </IonButton>
         </>
 
@@ -163,7 +165,7 @@ const ProfilePage: React.FC = () => {
         </IonItemDivider> */}
 
         <hr style={{ paddingTop: 16 }} />
-        <IonListHeader>Xác minh 3 bước</IonListHeader>
+        <IonListHeader>{t("3 verification steps")}</IonListHeader>
         <div className="ion-padding">
           <IonChip
             color="primary"
@@ -171,9 +173,7 @@ const ProfilePage: React.FC = () => {
             className="ion-margin"
           >
             <IonLabel text-wrap className="ion-padding">
-              Để cùng xây dựng một cộng đồng kết nối Chuyên Lào Cai - MyCLC an
-              toàn và bền vững. Bạn cần thực hiện đủ 3 bước xác minh để có thể
-              sử dụng được các chức năng khác!
+              {t("3 verification steps introduce")}
             </IonLabel>
           </IonChip>
           <IonList lines="none">
@@ -189,7 +189,7 @@ const ProfilePage: React.FC = () => {
                 hidden={!emailVerified}
                 slot="end"
               />
-              <IonLabel>Xác minh Email</IonLabel>
+              <IonLabel>{t("Email verification")}</IonLabel>
             </IonItem>
             <IonItem
               detail={!verifyStatus?.phoneVerify}
@@ -203,7 +203,7 @@ const ProfilePage: React.FC = () => {
                 hidden={!verifyStatus?.phoneVerify}
                 slot="end"
               />
-              <IonLabel>Xác minh Số điện thoại</IonLabel>
+              <IonLabel>{t("Phone verification")}</IonLabel>
             </IonItem>
             <IonItem
               detail={!verifyStatus?.personalInfo}
@@ -217,7 +217,7 @@ const ProfilePage: React.FC = () => {
                 hidden={!verifyStatus?.personalInfo}
                 slot="end"
               />
-              <IonLabel>Xác thực danh tính</IonLabel>
+              <IonLabel>{t("Identity verification")}</IonLabel>
             </IonItem>
           </IonList>
         </div>
@@ -229,7 +229,7 @@ const ProfilePage: React.FC = () => {
           <IonLabel className="ion-padding-horizontal">Mã QR của bạn</IonLabel>
         </IonItemDivider> */}
         <hr />
-        <IonListHeader>Mã QR của bạn</IonListHeader>
+        <IonListHeader>{t("Your QR code")}</IonListHeader>
 
         <div className="ion-padding">
           <IonChip
@@ -238,8 +238,7 @@ const ProfilePage: React.FC = () => {
             className="ion-margin"
           >
             <IonLabel text-wrap className="ion-padding">
-              Mã QR này sử dụng cho các tính năng kết nối và check in khi tham
-              gia các sự kiện sẽ được ra mắt trong thời gian tới
+              {t("QR code introduce")}
             </IonLabel>
           </IonChip>
           <br />

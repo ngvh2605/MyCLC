@@ -22,11 +22,13 @@ import {
 } from "@ionic/react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import { database } from "../../../firebase";
 
 const PersonalInfo: React.FC = () => {
+  const { t } = useTranslation();
   const { userId, userEmail } = useAuth();
   const history = useHistory();
 
@@ -66,7 +68,7 @@ const PersonalInfo: React.FC = () => {
   useEffect(() => {
     if (grade && gradeStart) {
       let gen = parseInt(gradeStart) - 2002;
-      setGradeClass(grade + " K" + gen);
+      setGradeClass("CLC K" + gen);
     }
   }, [grade, gradeStart]);
 
@@ -170,8 +172,8 @@ const PersonalInfo: React.FC = () => {
     setLoading(false);
 
     presentAlert({
-      header: "Hoàn thành!",
-      message: "Thông tin của bạn đã được lưu thành công",
+      header: t("Done"),
+      message: t("Your information has been saved successfully"),
       buttons: [
         {
           text: "OK",
@@ -238,8 +240,8 @@ const PersonalInfo: React.FC = () => {
           successAlert();
         } else {
           presentAlert({
-            header: "Lỗi!",
-            message: "Mã giới thiệu không chính xác. Vui lòng thử lại",
+            header: t("Error"),
+            message: t("The referral code is incorrect. Please try again"),
             buttons: [{ text: "OK" }],
           });
         }
@@ -273,7 +275,7 @@ const PersonalInfo: React.FC = () => {
             <IonBackButton text="Huỷ" defaultHref="/my/profile" />
           </IonButtons>
 
-          <IonTitle>Thông tin cá nhân</IonTitle>
+          <IonTitle>{t("Personal information")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -282,8 +284,8 @@ const PersonalInfo: React.FC = () => {
         </IonItem>
         <IonItem detail={false} lines="none">
           <IonLabel color="medium">
-            Số điện thoại:{" "}
-            {phone.includes("undefined") ? <i>Chưa xác minh</i> : phone}
+            {t("Phone number")}:{" "}
+            {phone.includes("undefined") ? <i>{t("Unverified")}</i> : phone}
           </IonLabel>
         </IonItem>
 
@@ -293,13 +295,13 @@ const PersonalInfo: React.FC = () => {
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Bạn cần trả lời hết tất cả các câu hỏi
+            {t("You need to answer all the questions")}
           </IonLabel>
         </IonChip>
 
         <IonList>
           <IonItem>
-            <IonLabel position="floating">Họ và tên</IonLabel>
+            <IonLabel position="floating">{t("Full name")}</IonLabel>
             <IonInput
               autocapitalize="words"
               type="text"
@@ -310,7 +312,7 @@ const PersonalInfo: React.FC = () => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Ngày sinh</IonLabel>
+            <IonLabel position="floating">{t("Date of birth")}</IonLabel>
             <IonDatetime
               displayFormat="DD/MM/YYYY"
               value={birth}
@@ -320,7 +322,7 @@ const PersonalInfo: React.FC = () => {
             ></IonDatetime>
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Giới tính</IonLabel>
+            <IonLabel position="floating">{t("Gender")}</IonLabel>
             <IonSelect
               interface="action-sheet"
               value={gender}
@@ -328,13 +330,13 @@ const PersonalInfo: React.FC = () => {
                 setGender(e.detail.value);
               }}
             >
-              <IonSelectOption value="Nam">Nam</IonSelectOption>
-              <IonSelectOption value="Nữ">Nữ</IonSelectOption>
-              <IonSelectOption value="Khác">Khác</IonSelectOption>
+              <IonSelectOption value="Nam">{t("Male")}</IonSelectOption>
+              <IonSelectOption value="Nữ">{t("Female")}</IonSelectOption>
+              <IonSelectOption value="Khác">{t("Other")}</IonSelectOption>
             </IonSelect>
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Chọn đối tượng</IonLabel>
+            <IonLabel position="floating">{t("Select type")}</IonLabel>
             <IonSelect
               interface="action-sheet"
               value={role}
@@ -344,20 +346,24 @@ const PersonalInfo: React.FC = () => {
               disabled={userInfo && userInfo.role && userInfo.role === "club"}
             >
               <IonSelectOption value="student">
-                Học sinh/Cựu học sinh
+                {t("Student/Alumni")}
               </IonSelectOption>
               <IonSelectOption value="teacher">
-                Giáo viên/Nhân viên
+                {t("Teacher/Staff")}
               </IonSelectOption>
               <IonSelectOption value="parent">
-                Phụ huynh/Người giám hộ
+                {t("Parent/Guardian")}
               </IonSelectOption>
-              <IonSelectOption value="club">Câu lạc bộ/Tổ chức</IonSelectOption>
-              <IonSelectOption value="other">Khác</IonSelectOption>
+              <IonSelectOption value="club">
+                {t("Club/Organization")}
+              </IonSelectOption>
+              <IonSelectOption value="other">{t("Other")}</IonSelectOption>
             </IonSelect>
           </IonItem>
           <IonItem hidden={role !== "other"}>
-            <IonLabel position="floating">Hãy nêu rõ bạn là ai</IonLabel>
+            <IonLabel position="floating">
+              {t("Please state your type")}
+            </IonLabel>
             <IonInput
               type="text"
               value={other}
@@ -366,7 +372,7 @@ const PersonalInfo: React.FC = () => {
           </IonItem>
           <IonItem hidden={role !== "other"}>
             <IonLabel position="floating">
-              Mục đích bạn sử dụng app này
+              {t("Your purpose when using this application")}
             </IonLabel>
             <IonInput
               type="text"
@@ -383,15 +389,14 @@ const PersonalInfo: React.FC = () => {
           hidden={role !== "club"}
         >
           <IonLabel text-wrap className="ion-padding">
-            LƯU Ý: Để tạo tài khoản Câu lạc bộ/Tổ chức cần có mã giới thiệu từ
-            CLC Multimedia. Nếu chưa có hãy liên hệ với CLB để được hỗ trợ!
+            {t("Create club warning message")}
           </IonLabel>
         </IonChip>
 
         {/* Câu lạc bộ */}
         <IonList hidden={role !== "club"}>
           <IonItem>
-            <IonLabel position="floating">Mã giới thiệu</IonLabel>
+            <IonLabel position="floating">{t("Referral code")}</IonLabel>
             <IonInput
               type="text"
               value={clubCode}
@@ -401,7 +406,7 @@ const PersonalInfo: React.FC = () => {
           </IonItem>
 
           <IonItem>
-            <IonLabel position="floating">Số điện thoại liên hệ</IonLabel>
+            <IonLabel position="floating">{t("Contact phone number")}</IonLabel>
             <IonInput
               type="url"
               value={clubContact}
@@ -415,7 +420,7 @@ const PersonalInfo: React.FC = () => {
         {/* Học sinh/Cựu học sinh */}
         <IonList hidden={role !== "student"}>
           <IonItem>
-            <IonLabel position="floating">Khối chuyên</IonLabel>
+            <IonLabel position="floating">{t("Specialized grade")}</IonLabel>
             <IonSelect
               interface="action-sheet"
               value={grade}
@@ -424,19 +429,35 @@ const PersonalInfo: React.FC = () => {
               }}
             >
               <IonSelectOption value="A1">A1</IonSelectOption>
-              <IonSelectOption value="Anh">Anh</IonSelectOption>
-              <IonSelectOption value="Hoá">Hoá</IonSelectOption>
-              <IonSelectOption value="Lý">Lý</IonSelectOption>
-              <IonSelectOption value="Sinh">Sinh</IonSelectOption>
-              <IonSelectOption value="Sử Địa">Sử Địa</IonSelectOption>
-              <IonSelectOption value="Toán">Toán</IonSelectOption>
-              <IonSelectOption value="Toán Tin">Toán Tin</IonSelectOption>
-              <IonSelectOption value="Trung">Trung</IonSelectOption>
-              <IonSelectOption value="Văn">Văn</IonSelectOption>
+              <IonSelectOption value="Anh">
+                {t("English grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Hoá">
+                {t("Chemistry grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Lý">{t("Physics grade")}</IonSelectOption>
+              <IonSelectOption value="Sinh">
+                {t("Biology grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Sử Địa">
+                {t("History Geography grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Toán">
+                {t("Mathematics grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Toán Tin">
+                {t("Mathematics Informatics grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Trung">
+                {t("Chinese grade")}
+              </IonSelectOption>
+              <IonSelectOption value="Văn">
+                {t("Literature grade")}
+              </IonSelectOption>
             </IonSelect>
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Năm vào trường</IonLabel>
+            <IonLabel position="floating">{t("Enrollment year")}</IonLabel>
             <IonDatetime
               min="2003"
               displayFormat="YYYY"
@@ -447,7 +468,7 @@ const PersonalInfo: React.FC = () => {
             ></IonDatetime>
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Năm ra trường</IonLabel>
+            <IonLabel position="floating">{t("Graduation year")}</IonLabel>
             <IonDatetime
               displayFormat="YYYY"
               min={gradeStart ? (parseInt(gradeStart) + 1).toString() : "2004"}
@@ -471,7 +492,7 @@ const PersonalInfo: React.FC = () => {
           hidden={!gradeClass || role !== "student"}
         >
           <IonLabel text-wrap className="ion-padding">
-            {"Bạn là học sinh lớp: " + gradeClass}
+            {t("You are a student of") + " " + gradeClass}
           </IonLabel>
         </IonChip>
 
@@ -479,7 +500,7 @@ const PersonalInfo: React.FC = () => {
         <IonList hidden={role !== "teacher"}>
           <IonItem>
             <IonLabel position="floating">
-              Vị trí/Chức vụ/Môn học giảng dạy
+              {t("Position/Title/Teaching Subjects")}
             </IonLabel>
             <IonInput
               type="text"
@@ -488,7 +509,9 @@ const PersonalInfo: React.FC = () => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Lớp chủ nhiệm (nếu có)</IonLabel>
+            <IonLabel position="floating">
+              {t("Homeroom class (if any)")}
+            </IonLabel>
             <IonInput
               type="text"
               value={teacherClass}
@@ -500,7 +523,7 @@ const PersonalInfo: React.FC = () => {
         {/* Phụ huynh/Người giám hộ */}
         <IonList hidden={role !== "parent"}>
           <IonItem>
-            <IonLabel position="floating">Họ và tên Con</IonLabel>
+            <IonLabel position="floating">{t("Child's full name")}</IonLabel>
             <IonInput
               type="text"
               value={childName}
@@ -508,7 +531,7 @@ const PersonalInfo: React.FC = () => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Lớp của Con</IonLabel>
+            <IonLabel position="floating">{t("Child's class")}</IonLabel>
             <IonInput
               type="text"
               value={childClass}
@@ -532,7 +555,7 @@ const PersonalInfo: React.FC = () => {
               }}
               disabled={buttonDisabled}
             >
-              Lưu thông tin
+              {t("Save information")}
             </IonButton>
           </div>
         </IonToolbar>
