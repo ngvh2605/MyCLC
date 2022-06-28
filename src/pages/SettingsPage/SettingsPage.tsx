@@ -26,6 +26,8 @@ import {
   personOutline,
   sendOutline,
 } from "ionicons/icons";
+import "moment/locale/en-au";
+import "moment/locale/vi";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";

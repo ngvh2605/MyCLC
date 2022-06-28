@@ -49,6 +49,8 @@ import { auth as firebaseAuth, database, firestore } from "../../firebase";
 import "./HomePage.scss";
 import NewsCard from "./NewsCard";
 import { getNew, getNextNews } from "./services";
+import i18next from "./../../i18n";
+import { useTranslation } from "react-i18next";
 
 interface Mail {
   sender: string;
@@ -70,14 +72,16 @@ interface Weather {
 }
 
 function getUVdiv(uv: number) {
-  if (uv >= 11) return <IonText color="danger">[Nguy hiểm]</IonText>;
-  else if (uv >= 8) return <IonText color="danger">[Rất cao]</IonText>;
-  else if (uv >= 6) return <IonText color="warning">[Cao]</IonText>;
-  else if (uv >= 3) return <IonText color="warning">[Trung bình]</IonText>;
-  else return <IonText color="success">[Thấp]</IonText>;
+  const t = i18next.t;
+  if (uv >= 11) return <IonText color="danger">[{t("Extreme")}]</IonText>;
+  else if (uv >= 8) return <IonText color="danger">[{t("Very high")}]</IonText>;
+  else if (uv >= 6) return <IonText color="warning">[{t("High")}]</IonText>;
+  else if (uv >= 3) return <IonText color="warning">[{t("Moderate")}]</IonText>;
+  else return <IonText color="success">[{t("Low")}]</IonText>;
 }
 
 const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId, userEmail } = useAuth();
   const { allowCreateNews } = useCheckUserInfo(userId);
 
@@ -329,11 +333,11 @@ const HomePage: React.FC = () => {
                   <IonRow>
                     <IonCol>
                       <IonLabel color="dark" text-wrap>
-                        Cảm giác: <b>{weatherData.likeTemp}°C</b>
+                        {t("Feels like")}: <b>{weatherData.likeTemp}°C</b>
                         <br />
-                        Độ ẩm: <b>{weatherData.humidity}%</b>
+                        {t("Humidity")}: <b>{weatherData.humidity}%</b>
                         <br />
-                        Tỉ lệ mưa: <b>{weatherData.chanceRain}%</b>
+                        {t("Precipitation")}: <b>{weatherData.chanceRain}%</b>
                         <br />
                       </IonLabel>
                     </IonCol>
@@ -349,7 +353,7 @@ const HomePage: React.FC = () => {
                           {getUVdiv(weatherData.uv)}
                         </b>
                         <br />
-                        Sức gió:{" "}
+                        {t("Wind")}:{" "}
                         <b>
                           {Intl.NumberFormat("en", {
                             maximumFractionDigits: 2,
@@ -358,7 +362,7 @@ const HomePage: React.FC = () => {
                           km/s
                         </b>
                         <br />
-                        Tầm nhìn:{" "}
+                        {t("Visibility")}:{" "}
                         <b>
                           {Intl.NumberFormat("en", {
                             maximumFractionDigits: 2,

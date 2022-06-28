@@ -1,4 +1,15 @@
 {
+  "Extreme": "Extreme",
+  "Very high": "Very high",
+  "High": "High",
+  "Moderate": "Moderate",
+  "Low": "Low",
+  "Feels like": "Feels like",
+  "Humidity": "Humidity",
+  "Wind": "Wind",
+  "Precipitation": "Precipitation",
+  "Visibility": "Visibility",
+
   "Settings": "Settings",
   "Account settings": "Account settings",
   "Change avatar": "Change avatar",
