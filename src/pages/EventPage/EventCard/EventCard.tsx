@@ -178,15 +178,17 @@ const EventCard: React.FC<Props> = (props) => {
                 >
                   <IonCardSubtitle color="primary">
                     {moment(event.startDate)
-                      .locale("vi")
+                      .locale(localStorage.getItem("i18nLanguage") || "vi")
                       .format("dddd, Do MMMM, H:mm")}
                     {moment(event.startDate).isSame(
                       moment(event.endDate),
                       "day"
                     )
-                      ? moment(event.endDate).locale("vi").format(" - H:mm")
+                      ? moment(event.endDate)
+                          .locale(localStorage.getItem("i18nLanguage") || "vi")
+                          .format(" - H:mm")
                       : moment(event.endDate)
-                          .locale("vi")
+                          .locale(localStorage.getItem("i18nLanguage") || "vi")
                           .format(" - dddd, Do MMMM, H:mm")}
                   </IonCardSubtitle>
 

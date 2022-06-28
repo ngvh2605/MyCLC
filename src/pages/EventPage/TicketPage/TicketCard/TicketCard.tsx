@@ -83,15 +83,21 @@ const TicketCard: React.FC<Props> = (props) => {
                       <IonIcon icon={time} slot="start" />
                       {"  "}
                       {moment(event.startDate)
-                        .locale("vi")
+                        .locale(localStorage.getItem("i18nLanguage") || "vi")
                         .format("dddd, Do MMMM, H:mm")}
                       {moment(event.startDate).isSame(
                         moment(event.endDate),
                         "day"
                       )
-                        ? moment(event.endDate).locale("vi").format(" - H:mm")
+                        ? moment(event.endDate)
+                            .locale(
+                              localStorage.getItem("i18nLanguage") || "vi"
+                            )
+                            .format(" - H:mm")
                         : moment(event.endDate)
-                            .locale("vi")
+                            .locale(
+                              localStorage.getItem("i18nLanguage") || "vi"
+                            )
                             .format(" - dddd, Do MMMM, H:mm")}
                     </p>
                   </IonLabel>

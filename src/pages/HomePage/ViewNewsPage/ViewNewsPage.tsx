@@ -262,7 +262,7 @@ const ViewNewsPage: React.FC = () => {
                       {" · "}
                       <i>
                         {moment(news.timestamp)
-                          .locale("vi")
+                          .locale(localStorage.getItem("i18nLanguage") || "vi")
                           .format("Do MMM, H:mm")}
                       </i>
                     </IonText>
@@ -449,7 +449,11 @@ const ViewNewsPage: React.FC = () => {
                             <b>#{comment.order}</b>
                             {" · "}
                             <i>
-                              {moment(comment.timestamp).locale("vi").fromNow()}
+                              {moment(comment.timestamp)
+                                .locale(
+                                  localStorage.getItem("i18nLanguage") || "vi"
+                                )
+                                .fromNow()}
                             </i>
                           </IonLabel>
                         </IonNote>

@@ -184,7 +184,7 @@ const NewsCard: React.FC<any> = (props) => {
                     {" · "}
                     <i>
                       {moment(news.timestamp)
-                        .locale("vi")
+                        .locale(localStorage.getItem("i18nLanguage") || "vi")
                         .format("Do MMM, H:mm")}
                     </i>
                   </IonText>

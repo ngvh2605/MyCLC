@@ -184,12 +184,14 @@ const ViewEventPage: React.FC = () => {
               <IonIcon icon={time} color="medium" slot="start" />
               <IonLabel text-wrap style={{ textTransform: "capitalize" }}>
                 {moment(event.startDate)
-                  .locale("vi")
+                  .locale(localStorage.getItem("i18nLanguage") || "vi")
                   .format("dddd, Do MMMM, H:mm")}
                 {moment(event.startDate).isSame(moment(event.endDate), "day")
-                  ? moment(event.endDate).locale("vi").format(" - H:mm")
+                  ? moment(event.endDate)
+                      .locale(localStorage.getItem("i18nLanguage") || "vi")
+                      .format(" - H:mm")
                   : moment(event.endDate)
-                      .locale("vi")
+                      .locale(localStorage.getItem("i18nLanguage") || "vi")
                       .format(" - dddd, Do MMMM, H:mm")}
               </IonLabel>
             </IonItem>

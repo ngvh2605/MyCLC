@@ -223,7 +223,7 @@ const AddEventPage: React.FC = () => {
               Ngày và giờ bắt đầu <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
-              displayFormat="DD/MM/YYYY lúc HH:mm"
+              displayFormat="DD/MM/YYYY - HH:mm"
               minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
               min={moment().toISOString()}
               cancelText="Huỷ"
@@ -239,7 +239,7 @@ const AddEventPage: React.FC = () => {
               Ngày và giờ kết thúc <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
-              displayFormat="DD/MM/YYYY lúc HH:mm"
+              displayFormat="DD/MM/YYYY - HH:mm"
               minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
               min={
                 startDate > 0
