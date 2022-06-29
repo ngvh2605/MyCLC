@@ -31,6 +31,7 @@ import {
   calImgScale,
   EventSkeleton,
 } from "../../EventPage/EventCard/EventCard";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   event: Events;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 const ManageCard: React.FC<Props> = (props) => {
+  const { t } = useTranslation();
   const history = useHistory();
 
   const { event, allowEdit } = props;
@@ -134,7 +136,7 @@ const ManageCard: React.FC<Props> = (props) => {
                     }}
                   >
                     <IonIcon icon={list} slot="start" />
-                    <IonLabel>Danh sách đăng ký</IonLabel>
+                    <IonLabel>{t("Registration list")}</IonLabel>
                   </IonButton>
                 </div>
               </IonCardContent>
@@ -145,7 +147,7 @@ const ManageCard: React.FC<Props> = (props) => {
                 cssClass="my-custom-class"
                 buttons={[
                   {
-                    text: "Chỉnh sửa",
+                    text: t("Edit"),
                     icon: brush,
                     handler: () => {
                       history.push({
@@ -155,18 +157,17 @@ const ManageCard: React.FC<Props> = (props) => {
                     },
                   },
                   {
-                    text: "Xoá",
+                    text: t("Delete"),
                     role: "destructive",
                     icon: trash,
                     handler: () => {
                       presentAlert({
-                        header: "Xoá bài viết",
-                        message:
-                          "Bạn có chắc chắn xoá vĩnh viễn sự kiện này khỏi MyCLC không?",
+                        header: t("Are you sure?"),
+                        message: t("This will be permanently deleted"),
                         buttons: [
-                          "Huỷ",
+                          t("Cancel"),
                           {
-                            text: "Xoá",
+                            text: t("Delete"),
                             handler: (d) => {
                               //setNews({ ...news, body: "" });
                               //deleteNews(news);
@@ -178,7 +179,7 @@ const ManageCard: React.FC<Props> = (props) => {
                     },
                   },
                   {
-                    text: "Cancel",
+                    text: t("Cancel"),
                     icon: close,
                     role: "cancel",
                     handler: () => {

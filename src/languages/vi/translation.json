@@ -1,4 +1,6 @@
 {
+  "Pull down to refresh": "Kéo xuống để làm mới",
+
   "3 verification steps": "Xác minh 3 bước",
   "3 verification steps introduce": "Để cùng xây dựng một cộng đồng kết nối Chuyên Lào Cai - MyCLC an toàn và bền vững. Bạn cần thực hiện đủ 3 bước xác minh để có thể sử dụng được các chức năng khác!",
   "Email verification": "Xác minh Email",
@@ -205,6 +207,7 @@
   "Registration link": "Liên kết đăng ký",
   "You should choose a 16:9 aspect ratio or pre-cropped cover photo": "Nên chọn ảnh bìa tỷ lệ khung hình 16:9 hoặc đã được cắt sẵn",
   "Maximum 80 characters": "Tối đa 80 ký tự",
+  "Registration list": "Danh sách đăng ký",
 
   "Settings": "Cài đặt",
   "Account settings": "Cài đặt tài khoản",

@@ -249,7 +249,7 @@ const EventCard: React.FC<Props> = (props) => {
                             hidden={isBuy || !isBuyLoaded}
                           >
                             <IonIcon icon={ticket} slot="start" />
-                            <IonLabel>{t("Registered")}</IonLabel>
+                            <IonLabel>{t("Register")}</IonLabel>
                           </IonButton>
 
                           <IonButton

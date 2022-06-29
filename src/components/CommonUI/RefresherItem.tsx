@@ -1,5 +1,6 @@
 import { RefresherEventDetail } from "@ionic/core";
 import { IonRefresher, IonRefresherContent } from "@ionic/react";
+import { t } from "i18next";
 import { chevronDown } from "ionicons/icons";
 import React from "react";
 import { setTimeout } from "timers";
@@ -21,7 +22,7 @@ const RefresherItem: React.FC<{
       <IonRefresherContent
         style={{ marginTop: 10 }}
         pullingIcon={chevronDown}
-        pullingText="Kéo xuống để làm mới"
+        pullingText={t("Pull down to refresh")}
       ></IonRefresherContent>
     </IonRefresher>
   );
