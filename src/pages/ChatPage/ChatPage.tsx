@@ -10,6 +10,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import { DefaultGenerics, StreamChat } from "stream-chat";
 import {
@@ -37,6 +38,7 @@ interface stateType {
 }
 
 const ChatPage: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation<stateType>();
   const history = useHistory();
   const contentRef = useRef<any>();
@@ -106,7 +108,7 @@ const ChatPage: React.FC = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/my/chat" text="" />
           </IonButtons>
-          <IonTitle>Phòng chat</IonTitle>
+          <IonTitle>{t("Chat rooms")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent ref={contentRef} scrollY={false}>

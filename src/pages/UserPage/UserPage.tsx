@@ -36,9 +36,11 @@ import {
   personRemoveOutline,
   school,
   settingsOutline,
+  star,
 } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import { database, firestore } from "../../firebase";
@@ -64,6 +66,7 @@ interface User {
   teacherSubject?: string;
   teacherClass?: string;
   clubContact?: string;
+  clubTeacher?: string;
   childName?: string;
   childClass?: string;
   otherSpecify?: string;
@@ -94,6 +97,7 @@ interface UserCustom {
 }
 
 const UserPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
   const history = useHistory();
@@ -304,7 +308,7 @@ const UserPage: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={personAdd} slot="start" />
-                      Theo dõi
+                      {t("Follow")}
                     </IonButton>
                   )}
                   {!!isFollow && (
@@ -321,7 +325,7 @@ const UserPage: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={personRemoveOutline} slot="start" />
-                      Huỷ theo dõi
+                      {t("Unfollow")}
                     </IonButton>
                   )}
                 </>
@@ -356,7 +360,7 @@ const UserPage: React.FC = () => {
               }}
             >
               <IonIcon icon={settingsOutline} slot="start" />
-              Cài đặt
+              {t("Settings")}
             </IonButton>
             <br />
           </>
@@ -365,26 +369,26 @@ const UserPage: React.FC = () => {
         {userInfo && (
           <>
             <hr />
-            <IonListHeader>Thông tin</IonListHeader>
+            <IonListHeader>{t("Information")}</IonListHeader>
             <div className="ion-padding">
               <IonList lines="none">
                 {userInfo.role && (
                   <IonItem>
                     <IonIcon icon={person} slot="start" color="medium" />
                     {userInfo.role === "student" && (
-                      <IonLabel text-wrap>Học sinh / Cựu học sinh</IonLabel>
+                      <IonLabel text-wrap>{t("Student/Alumni")}</IonLabel>
                     )}
                     {userInfo.role === "teacher" && (
-                      <IonLabel text-wrap>Giáo viên / Nhân viên</IonLabel>
+                      <IonLabel text-wrap>{t("Teacher/Staff")}</IonLabel>
                     )}
                     {userInfo.role === "parent" && (
-                      <IonLabel text-wrap>Phụ huynh / Người giám hộ</IonLabel>
+                      <IonLabel text-wrap>{t("Parent/Guardian")}</IonLabel>
                     )}
                     {userInfo.role === "club" && (
-                      <IonLabel text-wrap>Câu lạc bộ / Tổ chức</IonLabel>
+                      <IonLabel text-wrap>{t("Club/Organization")}</IonLabel>
                     )}
                     {userInfo.role === "other" && (
-                      <IonLabel text-wrap>Đối tượng khác</IonLabel>
+                      <IonLabel text-wrap>{t("Visitor")}</IonLabel>
                     )}
                   </IonItem>
                 )}
@@ -392,7 +396,7 @@ const UserPage: React.FC = () => {
                   <IonItem>
                     <IonIcon icon={school} slot="start" color="medium" />
                     <IonLabel text-wrap>
-                      Lớp {userInfo.studentClass} Khoá{" "}
+                      Lớp {userInfo.studentClass} - CLC Khoá{" "}
                       {parseInt(userInfo.studentStart) - 2002}
                     </IonLabel>
                   </IonItem>
@@ -401,7 +405,7 @@ const UserPage: React.FC = () => {
                   <IonItem>
                     <IonIcon icon={school} slot="start" color="medium" />
                     <IonLabel text-wrap>
-                      Chuyên môn: {userInfo.teacherSubject}
+                      {t("Expertise")}: {userInfo.teacherSubject}
                     </IonLabel>
                   </IonItem>
                 )}
@@ -409,7 +413,7 @@ const UserPage: React.FC = () => {
                   <IonItem>
                     <IonIcon icon={school} slot="start" color="medium" />
                     <IonLabel text-wrap>
-                      Chủ nhiệm: {userInfo.teacherClass}
+                      {t("Homeroom")}: {userInfo.teacherClass}
                     </IonLabel>
                   </IonItem>
                 )}
@@ -418,12 +422,16 @@ const UserPage: React.FC = () => {
                     <IonIcon icon={balloon} slot="start" color="medium" />
                     <IonLabel text-wrap>
                       {userInfo.role && userInfo.role === "club"
-                        ? moment(userInfo.birth).format(
-                            "[Thành lập] D [tháng] M, YYYY"
-                          )
-                        : moment(userInfo.birth).format(
-                            "[Sinh ngày] D [tháng] M, YYYY"
-                          )}
+                        ? moment(userInfo.birth)
+                            .locale(
+                              localStorage.getItem("i18nLanguage") || "vi"
+                            )
+                            .format(`[${t("Established")}] D MMMM, YYYY`)
+                        : moment(userInfo.birth)
+                            .locale(
+                              localStorage.getItem("i18nLanguage") || "vi"
+                            )
+                            .format(`[${t("Birth date")}] D MMMM, YYYY`)}
                     </IonLabel>
                   </IonItem>
                 )}
@@ -457,6 +465,15 @@ const UserPage: React.FC = () => {
                         </IonLabel>
                       </IonItem>
                     )}
+
+                {userInfo.role &&
+                  userInfo.role === "club" &&
+                  userInfo.clubTeacher && (
+                    <IonItem>
+                      <IonIcon icon={star} slot="start" color="medium" />
+                      <IonLabel text-wrap>{userInfo.clubTeacher}</IonLabel>
+                    </IonItem>
+                  )}
 
                 {(userInfo.facebook ||
                   userInfo.instagram ||
@@ -529,7 +546,7 @@ const UserPage: React.FC = () => {
         {badges && badges.length > 0 && badges[0] !== null && (
           <>
             <hr />
-            <IonListHeader>Huy hiệu</IonListHeader>
+            <IonListHeader>{t("Badges")}</IonListHeader>
 
             <div className="ion-padding">
               <IonList lines="none">
@@ -553,7 +570,7 @@ const UserPage: React.FC = () => {
           newsList.length > 0 && (
             <>
               <hr />
-              <IonListHeader>News gần đây</IonListHeader>
+              <IonListHeader>{t("Recent News")}</IonListHeader>
               {newsList.map((item, index) => (
                 <NewsCard
                   newId={item}
@@ -574,13 +591,13 @@ const UserPage: React.FC = () => {
           <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
             <IonHeader>
               <IonToolbar>
-                <IonTitle>Trang cá nhân</IonTitle>
+                <IonTitle>{t("Home page")}</IonTitle>
                 <IonButtons slot="start" onClick={() => handleCancel()}>
-                  <IonButton>Huỷ</IonButton>
+                  <IonButton>{t("Cancel")}</IonButton>
                 </IonButtons>
                 <IonButtons slot="end" onClick={() => handleSave()}>
                   <IonButton>
-                    <b>Lưu</b>
+                    <b>{t("Save")}</b>
                   </IonButton>
                 </IonButtons>
               </IonToolbar>
@@ -598,9 +615,9 @@ const UserPage: React.FC = () => {
               <br />
               <IonList lines="full">
                 <IonItem>
-                  <IonLabel position="fixed">Giới thiệu</IonLabel>
+                  <IonLabel position="fixed">{t("Intro")}</IonLabel>
                   <IonInput
-                    placeholder="Tối đa 160 chữ cái"
+                    placeholder={t("Maxium 160 characters")}
                     value={userCustom.intro}
                     type="text"
                     autoCapitalize="sentences"
@@ -671,7 +688,7 @@ const UserPage: React.FC = () => {
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="fixed">Ẩn Email</IonLabel>
+                  <IonLabel position="fixed">{t("Hide email")}</IonLabel>
                   <IonToggle
                     checked={!userCustom.showEmail}
                     onIonChange={(e) => {
@@ -683,7 +700,7 @@ const UserPage: React.FC = () => {
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="fixed">Ẩn SĐT</IonLabel>
+                  <IonLabel position="fixed">{t("Hide phone")}</IonLabel>
                   <IonToggle
                     checked={!userCustom.showPhoneNumber}
                     onIonChange={(e) => {

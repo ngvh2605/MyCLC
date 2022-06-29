@@ -22,6 +22,7 @@ import {
 import { useAuth } from "../../../../auth";
 import { Events } from "../../../../models";
 import { cancelTicket } from "../../../HomePage/services";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   event: Events;
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const TicketCard: React.FC<Props> = (props) => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
 
   const { event, status, isPast, handleCancel } = props;
@@ -104,8 +106,7 @@ const TicketCard: React.FC<Props> = (props) => {
                   <IonLabel color="medium" text-wrap>
                     <p>
                       <IonIcon icon={ticket} slot="start" />
-                      {"  "}
-                      Trạng thái:{" "}
+                      {t("Status")}:{" "}
                       <IonText
                         color={
                           status === "register"
@@ -119,11 +120,11 @@ const TicketCard: React.FC<Props> = (props) => {
                       >
                         <b>
                           {status === "register"
-                            ? "Đã đăng ký"
+                            ? t("Registered")
                             : status === "checkin"
-                            ? "Đã check in"
+                            ? t("Checked in")
                             : status === "wishlist"
-                            ? "Danh sách chờ"
+                            ? t("Wait list")
                             : ""}
                         </b>
                       </IonText>
@@ -140,12 +141,13 @@ const TicketCard: React.FC<Props> = (props) => {
                     onClick={() => {
                       presentAlert({
                         header: event.title,
-                        message:
-                          "Bạn có chắc chắn huỷ đăng ký tham gia sự kiện này không?",
+                        message: t(
+                          "Are you sure you want to cancel registration for this event?"
+                        ),
                         buttons: [
-                          "Huỷ",
+                          t("Cancel"),
                           {
-                            text: "Đồng ý",
+                            text: "OK",
                             handler: (d) => {
                               cancelTicket(userId, event.id);
                               handleCancel();
@@ -156,7 +158,7 @@ const TicketCard: React.FC<Props> = (props) => {
                     }}
                   >
                     <IonIcon icon={trashBin} slot="start" size="small" />
-                    Huỷ đăng ký
+                    {t("Cancel registration")}
                   </IonButton>
                 </div>
               </IonItem>

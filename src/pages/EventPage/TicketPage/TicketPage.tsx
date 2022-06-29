@@ -22,6 +22,7 @@ import {
 import { close, qrCodeOutline } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../auth";
 import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
 import { Events } from "../../../models";
@@ -29,6 +30,7 @@ import { getEventTicketByUserId } from "../../HomePage/services";
 import TicketCard from "./TicketCard";
 
 const TicketPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   var QRCode = require("qrcode.react");
 
@@ -70,11 +72,11 @@ const TicketPage: React.FC = () => {
               <IonIcon icon={qrCodeOutline} color="primary" />
             </IonButton>
           </IonButtons>
-          <IonTitle>Sự kiện của bạn</IonTitle>
+          <IonTitle>{t("My events")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonListHeader>Sự kiện sắp tới</IonListHeader>
+        <IonListHeader>{t("Upcoming events")}</IonListHeader>
 
         {isLoading ? (
           <TicketSkeleton />
@@ -107,7 +109,7 @@ const TicketPage: React.FC = () => {
         <br />
         <hr />
 
-        <IonListHeader>Sự kiện đã qua</IonListHeader>
+        <IonListHeader>{t("Past events")}</IonListHeader>
         {isLoading ? (
           <TicketSkeleton />
         ) : (
@@ -145,7 +147,7 @@ const TicketPage: React.FC = () => {
         >
           <IonHeader>
             <IonToolbar>
-              <IonTitle>Mã QR của bạn</IonTitle>
+              <IonTitle>{t("Your QR code")}</IonTitle>
               <IonButtons slot="end" onClick={() => setShowModal(false)}>
                 <IonButton>
                   <IonIcon icon={close} color="primary" />

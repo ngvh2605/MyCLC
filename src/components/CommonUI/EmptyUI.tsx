@@ -1,4 +1,5 @@
 import { IonIcon, IonLabel } from "@ionic/react";
+import { t } from "i18next";
 import { fileTray } from "ionicons/icons";
 import React from "react";
 
@@ -24,7 +25,7 @@ export const EmptyUI = () => (
       }}
       color="medium"
     >
-      <p>Trống</p>
+      <p>{t("Empty")}</p>
     </IonLabel>
   </div>
 );

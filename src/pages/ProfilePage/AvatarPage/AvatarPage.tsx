@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import {
-  IonAlert,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -18,9 +17,11 @@ import {
   IonTitle,
   IonToolbar,
   isPlatform,
+  useIonAlert,
 } from "@ionic/react";
 import { image } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
@@ -29,6 +30,7 @@ import { database } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AvatarPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const { avatarUrl: userAvatarUrl } = useCheckUserInfo(userId);
   const history = useHistory();
@@ -37,9 +39,7 @@ const AvatarPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>();
 
   const [isDisabled, setIsDisabled] = useState(true);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [presentAlert] = useIonAlert();
 
   const { handleUploadImage } = useUploadFile(userId);
 
@@ -109,9 +109,14 @@ const AvatarPage: React.FC = () => {
       })
       .then(() => {
         setStatus({ loading: false, error: false });
-        setAlertHeader("Chúc mừng!");
-        setAlertMessage("Ảnh đại diện của bạn đã được cập nhật thành công");
-        setShowAlert(true);
+        presentAlert({
+          header: t("Done"),
+          message: t("Your avatar has been successfully updated"),
+          buttons: [{ text: "OK" }],
+          onDidDismiss: () => {
+            history.push("/my/profile");
+          },
+        });
       });
   };
 
@@ -120,9 +125,9 @@ const AvatarPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/my/profile" />
+            <IonBackButton text={t("Cancel")} defaultHref="/my/profile" />
           </IonButtons>
-          <IonTitle>Sửa ảnh đại diện</IonTitle>
+          <IonTitle>{t("Avatar")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -159,8 +164,8 @@ const AvatarPage: React.FC = () => {
         >
           <IonIcon icon={image} slot="start" />
           {avatarUrl && avatarUrl !== "/assets/image/placeholder.png"
-            ? "Đổi ảnh khác"
-            : "Thêm hình ảnh"}
+            ? t("Change image")
+            : t("Add image")}
         </IonButton>
         <IonChip
           color="primary"
@@ -168,23 +173,11 @@ const AvatarPage: React.FC = () => {
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Nên chọn ảnh đại diện hình vuông hoặc đã được crop sẵn
+            {t("You should choose a square or pre-cropped avatar")}
           </IonLabel>
         </IonChip>
         <br />
         <IonLoading isOpen={status.loading} />
-
-        <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => {
-            setShowAlert(false);
-            history.replace("/my/profile");
-          }}
-          cssClass="my-custom-class"
-          header={alertHeader}
-          message={alertMessage}
-          buttons={["OK"]}
-        />
       </IonContent>
       <IonFooter>
         <IonToolbar>
@@ -198,7 +191,7 @@ const AvatarPage: React.FC = () => {
               }}
               disabled={isDisabled}
             >
-              Áp dụng
+              {t("Save")}
             </IonButton>
           </div>
         </IonToolbar>

@@ -49,6 +49,7 @@ const PersonalInfo: React.FC = () => {
 
   const [clubCode, setClubCode] = useState("");
   const [clubContact, setClubContact] = useState("");
+  const [clubTeacher, setClubTeacher] = useState("");
 
   const [grade, setGrade] = useState("");
   const [gradeStart, setGradeStart] = useState("");
@@ -123,6 +124,7 @@ const PersonalInfo: React.FC = () => {
             case "club":
               setClubCode(data.clubCode);
               setClubContact(data.clubContact);
+              setClubTeacher(data.clubTeacher);
               break;
             case "parent":
               setChildName(data.childName);
@@ -219,6 +221,7 @@ const PersonalInfo: React.FC = () => {
           await userData.child("users").child(userId).child("personal").update({
             clubCode: clubCode,
             clubContact: clubContact,
+            clubTeacher: clubTeacher,
           });
 
           await userData
@@ -412,6 +415,17 @@ const PersonalInfo: React.FC = () => {
               value={clubContact}
               onIonChange={(e) => {
                 setClubContact(e.detail.value);
+              }}
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel position="floating">{t("Teacher in charge")}</IonLabel>
+            <IonInput
+              type="text"
+              value={clubTeacher}
+              onIonChange={(e) => {
+                setClubTeacher(e.detail.value);
               }}
             />
           </IonItem>

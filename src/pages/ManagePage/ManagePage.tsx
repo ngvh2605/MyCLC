@@ -17,6 +17,7 @@ import { add } from "ionicons/icons";
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
@@ -26,6 +27,7 @@ import ManageCard from "./ManageCard";
 import "./ManagePage.scss";
 
 const ManagePage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
 
   const [events, setEvents] = useState<Events[]>();
@@ -62,7 +64,7 @@ const ManagePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Quản lý sự kiện</IonTitle>
+          <IonTitle>{t("Manage events")}</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -79,8 +81,10 @@ const ManagePage: React.FC = () => {
             onIonChange={(e) => setSegment(e.detail.value)}
             color="primary"
           >
-            <IonSegmentButton value="new">Sự kiện sắp tới</IonSegmentButton>
-            <IonSegmentButton value="old">Sự kiện đã qua</IonSegmentButton>
+            <IonSegmentButton value="new">
+              {t("Upcoming events")}
+            </IonSegmentButton>
+            <IonSegmentButton value="old">{t("Past events")}</IonSegmentButton>
           </IonSegment>
         </div>
         {segment === "new" ? (

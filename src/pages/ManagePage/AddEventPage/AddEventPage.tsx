@@ -28,6 +28,7 @@ import {
 import { image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../../auth";
 import useUploadFile from "../../../common/useUploadFile";
@@ -36,6 +37,7 @@ import { Events } from "../../../models";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AddEventPage: React.FC = () => {
+  const { t } = useTranslation();
   const locationRef = useLocation<Events>();
   const { userId } = useAuth();
   const history = useHistory();
@@ -180,7 +182,7 @@ const AddEventPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton text="Huỷ" defaultHref="/my/manage" />
+            <IonBackButton text={t("Cancel")} defaultHref="/my/manage" />
           </IonButtons>
           <IonButtons slot="end">
             <IonButton
@@ -190,10 +192,10 @@ const AddEventPage: React.FC = () => {
                 else handlePost();
               }}
             >
-              <b>Đăng</b>
+              <b>{t("Post")}</b>
             </IonButton>
           </IonButtons>
-          <IonTitle>{events ? "Sửa sự kiện" : "Tạo sự kiện"}</IonTitle>
+          <IonTitle>{events ? t("Edit event") : t("Create event")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -208,26 +210,26 @@ const AddEventPage: React.FC = () => {
         <IonList>
           <IonItem>
             <IonLabel position="floating">
-              Tên sự kiện <span style={{ color: "red" }}>*</span>
+              {t("Event name")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
               type="text"
               maxlength={80}
               value={title}
               onIonChange={(e) => setTitle(e.detail.value)}
-              placeholder="Tối đa 80 chữ cái"
+              placeholder={t("Maximum 80 characters")}
             />
           </IonItem>
           <IonItem>
             <IonLabel position="floating">
-              Ngày và giờ bắt đầu <span style={{ color: "red" }}>*</span>
+              {t("Start date and time")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
               displayFormat="DD/MM/YYYY - HH:mm"
               minuteValues="0,05,10,15,20,25,30,35,40,45,50,55"
               min={moment().toISOString()}
-              cancelText="Huỷ"
-              doneText="Xác nhận"
+              cancelText={t("Cancel")}
+              doneText={t("Done")}
               value={startDate ? moment(startDate).toISOString() : ""}
               onIonChange={(e) =>
                 setStartDate(moment(e.detail.value).valueOf())
@@ -236,7 +238,7 @@ const AddEventPage: React.FC = () => {
           </IonItem>
           <IonItem>
             <IonLabel position="floating">
-              Ngày và giờ kết thúc <span style={{ color: "red" }}>*</span>
+              {t("End date and time")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
               displayFormat="DD/MM/YYYY - HH:mm"
@@ -246,41 +248,40 @@ const AddEventPage: React.FC = () => {
                   ? moment(startDate).toISOString()
                   : moment().toISOString()
               }
-              cancelText="Huỷ"
-              doneText="Xác nhận"
+              cancelText={t("Cancel")}
+              doneText={t("Done")}
               value={endDate ? moment(endDate).toISOString() : ""}
               onIonChange={(e) => setEndDate(moment(e.detail.value).valueOf())}
             />
           </IonItem>
           <IonItem>
             <IonLabel position="floating">
-              Địa điểm tổ chức
-              <span style={{ color: "red" }}>*</span>
+              {t("Event location")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
               type="text"
-              maxlength={140}
-              placeholder="Tối đa 140 chữ cái"
+              maxlength={160}
+              placeholder={t("Maximum 160 characters")}
               value={location}
               onIonChange={(e) => setLocation(e.detail.value)}
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">Mô tả ngắn</IonLabel>
+            <IonLabel position="floating">{t("Short description")}</IonLabel>
             <IonInput
               type="text"
               maxlength={140}
-              placeholder={"Không bắt buộc, tối đa 140 chữ cái"}
+              placeholder={t("Maximum 160 characters")}
               value={description}
               onIonChange={(e) => setDescription(e.detail.value)}
             />
           </IonItem>
           <IonItem>
             <IonLabel position="floating">
-              Mô tả chi tiết <span style={{ color: "red" }}>*</span>
+              {t("Detail description")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonTextarea
-              placeholder={"Tối thiểu 50 chữ cái"}
+              placeholder={t("Minimum 50 characters")}
               autoGrow
               cols={5}
               value={body}
@@ -289,7 +290,7 @@ const AddEventPage: React.FC = () => {
           </IonItem>
           <IonItem>
             <IonLabel position="floating">
-              Sự kiện có cho đăng ký không?{" "}
+              {t("Is the event open to registration?")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonSelect
@@ -302,13 +303,13 @@ const AddEventPage: React.FC = () => {
               }}
               value={!!sellTicket ? "Yes" : "No"}
             >
-              <IonSelectOption value="Yes">Có</IonSelectOption>
-              <IonSelectOption value="No">Không</IonSelectOption>
+              <IonSelectOption value="Yes">{t("Yes")}</IonSelectOption>
+              <IonSelectOption value="No">{t("No")}</IonSelectOption>
             </IonSelect>
           </IonItem>
           <IonItem hidden={!sellTicket}>
             <IonLabel position="floating">
-              Cách đăng ký tham gia sự kiện{" "}
+              {t("How to register for the event?")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonSelect
@@ -320,32 +321,32 @@ const AddEventPage: React.FC = () => {
               value={sellInApp ? "Yes" : "No"}
             >
               <IonSelectOption value="Yes">
-                Qua ứng dụng MyCLC 💙
+                {t("Register via MyCLC")}
               </IonSelectOption>
               <IonSelectOption value="No">
-                Qua liên kết bên ngoài
+                {t("Register via external link")}
               </IonSelectOption>
             </IonSelect>
           </IonItem>
           <IonItem hidden={!sellTicket || (sellTicket && !sellInApp)}>
             <IonLabel position="floating">
-              Tổng số lượng đăng ký tối đa{" "}
+              {t("Maximum number of registrations")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
               type="number"
-              placeholder={"Chỉ nhập chữ số. Tối thiểu 10 người"}
+              placeholder={t("Enter number only. Minimum 10")}
               value={totalTicket}
               onIonChange={(e) => setTotalTicket(parseInt(e.detail.value))}
             />
           </IonItem>
           <IonItem hidden={!sellTicket || (sellTicket && sellInApp)}>
             <IonLabel position="floating">
-              Liên kết đăng ký <span style={{ color: "red" }}>*</span>
+              {t("Registration link")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
               type="url"
-              placeholder="Ví dụ: https://myclcproject.web.app"
+              placeholder="https://myclcproject.web.app"
               value={externalLink}
               onIonChange={(e) => setExternalLink(e.detail.value)}
             />
@@ -368,7 +369,9 @@ const AddEventPage: React.FC = () => {
           className="ion-margin"
         >
           <IonLabel text-wrap className="ion-padding">
-            Nên chọn ảnh bìa tỷ lệ khung hình 16:9 hoặc đã được crop sẵn
+            {t(
+              "You should choose a 16:9 aspect ratio or pre-cropped cover photo"
+            )}
           </IonLabel>
         </IonChip>
         <IonCard hidden={!pictureUrl}>
@@ -398,7 +401,9 @@ const AddEventPage: React.FC = () => {
               }}
             >
               <IonIcon icon={image} slot="start" />
-              <IonText>{pictureUrl ? "Đổi ảnh bìa " : "Thêm ảnh bìa "}</IonText>
+              <IonText>
+                {pictureUrl ? t("Change image") : t("Add image")}
+              </IonText>
             </IonButton>
           </div>
         </IonToolbar>

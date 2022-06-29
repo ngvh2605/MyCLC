@@ -17,6 +17,7 @@ import { linkOutline, location, ticket } from "ionicons/icons";
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../../auth";
 import { firestore } from "../../../firebase";
@@ -60,6 +61,7 @@ export const EventSkeleton = () => (
 );
 
 const EventCard: React.FC<Props> = (props) => {
+  const { t } = useTranslation();
   const history = useHistory();
   const { userId } = useAuth();
 
@@ -220,12 +222,13 @@ const EventCard: React.FC<Props> = (props) => {
                               if (isVerify) {
                                 presentAlert({
                                   header: event.title,
-                                  message:
-                                    "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                                  message: t(
+                                    "Are you sure you want to register for this event?"
+                                  ),
                                   buttons: [
-                                    "Huỷ",
+                                    `${t("Cancel")}`,
                                     {
-                                      text: "Đồng ý",
+                                      text: "OK",
                                       handler: (d) => {
                                         buyTicket(userId, event.id);
                                       },
@@ -234,9 +237,10 @@ const EventCard: React.FC<Props> = (props) => {
                                 });
                               } else {
                                 presentAlert({
-                                  header: "Lưu ý",
-                                  message:
-                                    "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
+                                  header: t("Warning"),
+                                  message: t(
+                                    "You need to complete 3 verification steps to be able to register!"
+                                  ),
                                   buttons: [{ text: "OK" }],
                                 });
                                 history.push("/my/profile");
@@ -245,7 +249,7 @@ const EventCard: React.FC<Props> = (props) => {
                             hidden={isBuy || !isBuyLoaded}
                           >
                             <IonIcon icon={ticket} slot="start" />
-                            <IonLabel>Đăng ký</IonLabel>
+                            <IonLabel>{t("Registered")}</IonLabel>
                           </IonButton>
 
                           <IonButton
@@ -272,7 +276,7 @@ const EventCard: React.FC<Props> = (props) => {
                         disabled
                       >
                         <IonIcon icon={ticket} slot="start" />
-                        <IonLabel>Đã đăng ký</IonLabel>
+                        <IonLabel>{t("Registered")}</IonLabel>
                       </IonButton>
                     </>
                   )}
@@ -289,7 +293,7 @@ const EventCard: React.FC<Props> = (props) => {
                         target="_blank"
                       >
                         <IonIcon icon={linkOutline} slot="start" />
-                        <IonLabel>Truy cập liên kết</IonLabel>
+                        <IonLabel>{t("Visit link")}</IonLabel>
                       </IonButton>
                     )}
                 </div>

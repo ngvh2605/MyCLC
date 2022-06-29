@@ -17,6 +17,7 @@ import {
 } from "@ionic/react";
 import { person } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { database } from "../../firebase";
@@ -37,6 +38,7 @@ interface Club {
 }
 
 const ClubPage: React.FC = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const [clubs, setClubs] = useState<Club[]>([]);
 
@@ -77,7 +79,7 @@ const ClubPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Câu lạc bộ</IonTitle>
+          <IonTitle>{t("Clubs")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -110,7 +112,7 @@ const ClubPage: React.FC = () => {
                         />
                       </IonAvatar>
                       <IonLabel className="ion-no-margin">
-                        <b>{club.fullName || "Tên Câu lạc bộ"}</b>
+                        <b>{club.fullName || t("Club's name")}</b>
 
                         {club.intro && (
                           <IonLabel text-wrap style={{ marginBottom: 3 }}>
@@ -123,7 +125,7 @@ const ClubPage: React.FC = () => {
                             icon={person}
                             style={{ verticalAlign: -2 }}
                           />{" "}
-                          Người theo dõi: {club.followers}
+                          {t("Followers")}: {club.followers}
                         </IonLabel>
                       </IonLabel>
                     </IonItem>

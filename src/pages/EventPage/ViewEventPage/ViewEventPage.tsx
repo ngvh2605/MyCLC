@@ -40,6 +40,7 @@ import { useAuth } from "../../../auth";
 import { firestore } from "../../../firebase";
 import { Events } from "../../../models";
 import { buyTicket, getInfoByUserId } from "../../HomePage/services";
+import { useTranslation } from "react-i18next";
 
 interface stateType {
   isVerify: boolean;
@@ -49,6 +50,7 @@ interface stateType {
 }
 
 const ViewEventPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const history = useHistory();
   const locationRef = useLocation<stateType>();
@@ -123,7 +125,7 @@ const ViewEventPage: React.FC = () => {
             <IonBackButton text="" defaultHref="/my/event" />
           </IonButtons>
           <IonButtons slot="end"></IonButtons>
-          <IonTitle>Sự kiện</IonTitle>
+          <IonTitle>{t("Event")}</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -210,14 +212,16 @@ const ViewEventPage: React.FC = () => {
               <IonLabel text-wrap>
                 {event.sellTicket
                   ? event.sellInApp
-                    ? "Đăng ký qua ứng dụng MyCLC"
-                    : "Đăng ký qua liên kết bên ngoài"
-                  : "Sự kiện không cần đăng ký"}
+                    ? t("Register via MyCLC")
+                    : t("Register via external link")
+                  : t("No registration required")}
               </IonLabel>
             </IonItem>
           </IonList>
           <IonCardContent>
-            <IonCardSubtitle color="primary">Chi tiết sự kiện</IonCardSubtitle>
+            <IonCardSubtitle color="primary">
+              {t("Event details")}
+            </IonCardSubtitle>
             <IonLabel color="dark" text-wrap style={{ whiteSpace: "pre-wrap" }}>
               <div
                 dangerouslySetInnerHTML={{
@@ -241,12 +245,13 @@ const ViewEventPage: React.FC = () => {
                         if (isVerify) {
                           presentAlert({
                             header: event.title,
-                            message:
-                              "Bạn có chắc chắn đăng ký tham gia sự kiện này không?",
+                            message: t(
+                              "Are you sure you want to register for this event?"
+                            ),
                             buttons: [
-                              "Huỷ",
+                              t("Cancel"),
                               {
-                                text: "Đồng ý",
+                                text: "OK",
                                 handler: (d) => {
                                   buyTicket(userId, event.id);
                                   setIsBuy(true);
@@ -256,9 +261,10 @@ const ViewEventPage: React.FC = () => {
                           });
                         } else {
                           presentAlert({
-                            header: "Lưu ý",
-                            message:
-                              "Bạn cần hoàn thành 3 bước xác minh để có thể đăng ký tham gia!",
+                            header: t("Warning"),
+                            message: t(
+                              "You need to complete 3 verification steps to be able to register!"
+                            ),
                             buttons: [{ text: "OK" }],
                           });
                           history.push("/my/profile");
@@ -267,7 +273,7 @@ const ViewEventPage: React.FC = () => {
                       hidden={isBuy}
                     >
                       <IonIcon icon={ticket} slot="start" />
-                      <IonLabel>Đăng ký</IonLabel>
+                      <IonLabel>{t("Register")}</IonLabel>
                     </IonButton>
                   ) : (
                     <IonChip
@@ -279,9 +285,7 @@ const ViewEventPage: React.FC = () => {
                       hidden={!isBuy}
                     >
                       <IonLabel text-wrap className="ion-padding">
-                        Số lượng đăng ký cho phép đã đạt tối đa. Vui lòng liên
-                        hệ trực tiếp với ban tổ chức để được hỗ trợ nếu cần
-                        thiết
+                        {t("Event maximum registration message")}
                       </IonLabel>
                     </IonChip>
                   )}
@@ -295,9 +299,7 @@ const ViewEventPage: React.FC = () => {
                     hidden={!isBuy}
                   >
                     <IonLabel text-wrap className="ion-padding">
-                      Để huỷ đăng ký, bạn cần vào mục <b>Sự kiện của bạn</b>{" "}
-                      (biểu tượng <IonIcon icon={ticket} />) ở góc phải trên của
-                      trang <b>Sự kiện</b>
+                      {t("Cancel event message")}
                     </IonLabel>
                   </IonChip>
                   <IonButton
@@ -312,7 +314,7 @@ const ViewEventPage: React.FC = () => {
                     disabled
                   >
                     <IonIcon icon={ticket} slot="start" />
-                    <IonLabel>Đã đăng ký</IonLabel>
+                    <IonLabel>{t("Registered")}</IonLabel>
                   </IonButton>
                 </>
               )}
@@ -329,7 +331,7 @@ const ViewEventPage: React.FC = () => {
                     target="_blank"
                   >
                     <IonIcon icon={linkOutline} slot="start" />
-                    <IonLabel>Truy cập liên kết</IonLabel>
+                    <IonLabel>{t("Visit link")}</IonLabel>
                   </IonButton>
                 )}
             </div>

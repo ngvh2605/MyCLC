@@ -28,6 +28,7 @@ import {
   logoYoutube,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { database } from "../../firebase";
 import "./AboutPage.scss";
 
@@ -39,6 +40,7 @@ interface Sponsor {
 }
 
 const AboutPage: React.FC = () => {
+  const { t } = useTranslation();
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -70,7 +72,7 @@ const AboutPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Giới thiệu</IonTitle>
+          <IonTitle>{t("About")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -83,7 +85,7 @@ const AboutPage: React.FC = () => {
             {sponsors.length > 0 && (
               <>
                 <br />
-                <IonListHeader>Nhà tài trợ</IonListHeader>
+                <IonListHeader>{t("Sponsors")}</IonListHeader>
 
                 {sponsors
                   .sort((a, b) => {
@@ -123,7 +125,7 @@ const AboutPage: React.FC = () => {
               </>
             )}
 
-            <IonListHeader>Về chúng tôi</IonListHeader>
+            <IonListHeader>{t("About us")}</IonListHeader>
             <div style={{ maxWidth: 680, margin: "0 auto" }}>
               <IonCard>
                 <IonItem

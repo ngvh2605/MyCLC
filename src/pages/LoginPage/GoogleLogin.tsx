@@ -71,7 +71,6 @@ export const handleGoogleLogin = async (onError: () => void) => {
             if (!snapshot.exists()) {
               database
                 .ref()
-
                 .child("users")
                 .child(user.uid)
                 .child("personal")

@@ -14,6 +14,7 @@ import {
 } from "@ionic/react";
 import { ticketOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
@@ -24,6 +25,7 @@ import { EventSkeleton } from "./EventCard/EventCard";
 import { getEvent } from "./services";
 
 const EventPage: React.FC = () => {
+  const { t } = useTranslation();
   const { userId } = useAuth();
   const { isVerify } = useCheckUserInfo(userId);
   const history = useHistory();
@@ -53,7 +55,7 @@ const EventPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Sự kiện</IonTitle>
+          <IonTitle>{t("Events")}</IonTitle>
           {isVerify && (
             <IonButtons
               slot="end"
@@ -99,7 +101,7 @@ const EventPage: React.FC = () => {
                       lineHeight: "40px",
                     }}
                   >
-                    <b>Các sự kiện sắp tới sẽ xuất hiện tại đây</b>
+                    <b>{t("Upcoming events will appear here")}</b>
                   </IonLabel>
                 </div>
               </IonSlide>

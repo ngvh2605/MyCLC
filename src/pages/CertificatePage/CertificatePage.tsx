@@ -30,6 +30,7 @@ import {
 import { add, close, image } from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth";
 import useAddImage from "../../common/useAddImage";
 import useUploadFile from "../../common/useUploadFile";
@@ -57,6 +58,7 @@ export interface Certificate {
 }
 
 const CertificatePage: React.FC = () => {
+  const { t } = useTranslation();
   const { userEmail, userId } = useAuth();
   const { isAdmin } = useCheckUserInfo(userId);
 
@@ -178,7 +180,7 @@ const CertificatePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Certificate</IonTitle>
+          <IonTitle>Certificates</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -190,8 +192,8 @@ const CertificatePage: React.FC = () => {
             }}
             color="primary"
           >
-            <IonSegmentButton value="grid">Dạng lưới</IonSegmentButton>
-            <IonSegmentButton value="list">Danh sách</IonSegmentButton>
+            <IonSegmentButton value="grid">{t("Grid")}</IonSegmentButton>
+            <IonSegmentButton value="list">{t("List")}</IonSegmentButton>
           </IonSegment>
         </div>
 

@@ -4,19 +4,18 @@ import {
   IonButtons,
   IonCard,
   IonCardContent,
-  IonChip,
   IonContent,
   IonHeader,
   IonImg,
   IonItem,
   IonLabel,
-  IonListHeader,
   IonMenuButton,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
@@ -24,6 +23,7 @@ import useIn2CLCCheck from "../../In2CLC/useIn2CLCCheck";
 import { UnAuth } from "./../../../components/CommonUI/UnAuth";
 
 const ChatHomePage: React.FC = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const { userId, userEmail } = useAuth();
   const { isVerify } = useCheckUserInfo(userId);
@@ -36,7 +36,7 @@ const ChatHomePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Phòng chat</IonTitle>
+          <IonTitle>{t("Chat rooms")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       {isVerify ? (
@@ -45,7 +45,6 @@ const ChatHomePage: React.FC = () => {
             Debug
           </IonButton>
 
-          <IonListHeader color="primary">Thử nghiệm</IonListHeader>
           <IonCard
             onClick={() => {
               history.push({
@@ -94,18 +93,6 @@ const ChatHomePage: React.FC = () => {
           )}
 
           <div className="ion-padding">
-            <IonChip
-              color="warning"
-              style={{ height: "max-content", marginBottom: 10 }}
-            >
-              <IonLabel text-wrap className="ion-padding">
-                Lưu ý: Chức năng Chat đang trong quá trình thử nghiệm. Nếu bạn
-                gặp bất kỳ lỗi gì vui lòng liên hệ với Facebook Page CLC
-                Multimedia để đóng góp cho dự án. Xin chân thành cảm ơn!
-              </IonLabel>
-            </IonChip>
-            <br />
-            <br />
             <br />
             <IonImg
               src="/assets/image/construction.svg"

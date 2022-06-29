@@ -30,6 +30,7 @@ import { default as Jimp, default as jimp } from "jimp";
 import mergeImages from "merge-images";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import { database } from "../../firebase";
@@ -42,6 +43,7 @@ interface Frame {
 }
 
 const FramePage: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const history = useHistory();
   const { userId } = useAuth();
@@ -62,13 +64,15 @@ const FramePage: React.FC = () => {
   useEffect(() => {
     if (uploadUrl) {
       presentAlert({
-        header: "Ảnh đã xử lý xong",
-        message: "Hãy tải ảnh về và đặt làm ảnh đại diện Facebook nhé!",
+        header: t("Done"),
+        message: t(
+          "Please download the photo and set it as your Facebook avatar!"
+        ),
         buttons: [
           {
-            text: "Tải ảnh",
+            text: t("Download"),
             handler: () => {
-              window.open(uploadUrl);
+              window.open(uploadUrl, "_blank");
               if (userId) history.push("/my/home");
               else history.push("/index");
             },
@@ -212,12 +216,12 @@ const FramePage: React.FC = () => {
               </IonButton>
             )}
           </IonButtons>
-          <IonTitle>Thêm khung</IonTitle>
+          <IonTitle>{t("Add avatar frame")}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent ref={contentRef}>
         <IonListHeader style={{ marginBottom: 8 }} color="black">
-          Chọn khung
+          {t("Choose frame")}
         </IonListHeader>
         {frameList && chosenFrame && frameList.length > 0 && (
           <IonSlides
@@ -296,7 +300,7 @@ const FramePage: React.FC = () => {
             }}
           >
             <IonIcon icon={camera} slot="start" />
-            {mergeUrl ? "Chọn ảnh khác" : "Chọn ảnh"}
+            {mergeUrl ? t("Change image") : t("Choose image")}
           </IonButton>
 
           <br />
@@ -348,7 +352,7 @@ const FramePage: React.FC = () => {
                 }}
               >
                 <IonIcon icon={logoFacebook} slot="start" />
-                Đặt làm ảnh đại diện
+                {t("Set as avatar")}
               </IonButton>
 
               <br />
@@ -357,8 +361,9 @@ const FramePage: React.FC = () => {
                 style={{ height: "max-content", marginBottom: 10 }}
               >
                 <IonLabel text-wrap className="ion-padding">
-                  Sau khi tải ảnh xuống, bạn có thể vào Facebook và tải ảnh lên
-                  để làm ảnh đại diện
+                  {t(
+                    "After downloading the photo, you can go to Facebook and upload it as your avatar"
+                  )}
                 </IonLabel>
               </IonChip>
             </>
@@ -369,7 +374,7 @@ const FramePage: React.FC = () => {
                 style={{ height: "max-content", marginBottom: 10 }}
               >
                 <IonLabel text-wrap className="ion-padding">
-                  Nên chọn ảnh hình vuông hoặc đã được crop sẵn để thêm khung
+                  {t("You should choose a square or pre-cropped avatar")}
                 </IonLabel>
               </IonChip>
               <br />
