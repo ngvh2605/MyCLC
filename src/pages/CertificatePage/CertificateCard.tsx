@@ -13,7 +13,7 @@ interface Props {
   certi: Certificate;
 }
 
-function calImgScale() {
+export function calImgScale() {
   const width = window.screen.width - 62;
   const height = (width * 9) / 16;
   return { width: width / 2, height: height / 2 };
@@ -55,12 +55,36 @@ const CertificateCard: React.FC<Props> = (props) => {
         />
       </IonThumbnail>
       <IonItem lines="none">
-        <IonLabel style={{ fontSize: 14, textAlign: "center" }}>
+        <IonLabel style={{ fontSize: 14, textAlign: "center", margin: 10 }}>
           {certi.name}
         </IonLabel>
       </IonItem>
     </IonCard>
   );
 };
+
+export const CertificateCardSkeleton = () => (
+  <IonCard className="ion-no-margin" style={{ margin: 8 }}>
+    <IonThumbnail
+      style={{
+        height: calImgScale().height,
+        width: calImgScale().width,
+      }}
+    >
+      <IonSkeletonText
+        animated
+        style={{
+          height: calImgScale().height,
+          width: calImgScale().width,
+          margin: 0,
+        }}
+      />
+      <IonSkeletonText animated />
+    </IonThumbnail>
+    <IonItem lines="none">
+      <IonSkeletonText animated style={{ width: "70%", margin: "auto" }} />
+    </IonItem>
+  </IonCard>
+);
 
 export default CertificateCard;

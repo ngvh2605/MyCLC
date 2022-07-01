@@ -48,10 +48,28 @@ const CertificateItem: React.FC<Props> = (props) => {
           />
         </IonThumbnail>
 
-        <IonLabel style={{ fontSize: 14 }}>{certi.name}</IonLabel>
+        <IonLabel text-wrap style={{ fontSize: 14, margin: 0 }}>
+          {certi.name}
+        </IonLabel>
       </IonItem>
     </IonCard>
   );
 };
 
+export const CertificateItemSkeleton = () => (
+  <IonCard style={{ margin: 18 }}>
+    <IonItem
+      lines="none"
+      className="ion-no-padding ion-no-margin"
+      style={{ padding: 16 }}
+    >
+      <IonThumbnail slot="start">
+        <IonSkeletonText animated style={{ borderRadius: 10 }} />
+      </IonThumbnail>
+      <IonLabel text-wrap style={{ fontSize: 14, margin: 0 }}>
+        <IonSkeletonText animated style={{ width: "70%" }} />
+      </IonLabel>
+    </IonItem>
+  </IonCard>
+);
 export default CertificateItem;

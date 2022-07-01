@@ -25,6 +25,7 @@ import {
   IonTextarea,
   IonTitle,
   IonToolbar,
+  useIonAlert,
   useIonToast,
 } from "@ionic/react";
 import { add, close, image } from "ionicons/icons";
@@ -37,24 +38,20 @@ import useCheckUserPermission from "../../common/useCheckUserPermission";
 import useUploadFile from "../../common/useUploadFile";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
-import { database } from "../../firebase";
-import CertificateCard from "./CertificateCard";
-import CertificateItem from "./CertificateItem";
+import { database, firestore } from "../../firebase";
+import CertificateCard, { CertificateCardSkeleton } from "./CertificateCard";
+import CertificateItem, { CertificateItemSkeleton } from "./CertificateItem";
 import "./CertificatePage.scss";
 interface CertiRaw {
   email: string;
   url: string;
 }
 
-interface CertiData {
-  name: string;
-  image: string;
-}
-
 export interface Certificate {
   name: string;
   url: string;
   image: string;
+  timestamp: number;
 }
 
 const CertificatePage: React.FC = () => {
@@ -75,96 +72,101 @@ const CertificatePage: React.FC = () => {
     useAddImage(800, fileInputRef);
   const { handleUploadImage } = useUploadFile();
 
+  const [isFetching, setIsFetching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
 
   useEffect(() => {
-    const fetchCerti = async () => {
-      try {
-        const temp: Certificate[] = [];
-        const email = userEmail
-          .replace(/[^a-zA-Z0-9 ]/g, "")
-          .replace(/\s/g, "")
-          .toLowerCase();
-        const snapshot = await database
-          .ref()
-          .child("certi")
-          .child(email)
-          .once("value");
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          for (var prop in data) {
-            // if (data.hasOwnProperty(prop)) {
-            //   temp.push(data[prop]);
-            // }
+    fetchCerti();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userEmail]);
 
-            const propSnapshot = await database
+  const fetchCerti = async () => {
+    setIsFetching(true);
+    try {
+      const temp: Certificate[] = [];
+
+      const { docs } = await firestore
+        .collection("certificates")
+        .where("email", "==", userEmail.replace(/\s/g, "").toLowerCase())
+        .get();
+
+      for (let i = 0; i < docs.length; i++) {
+        let doc = docs[i];
+        if (doc.data() && doc.data().id) {
+          const certiData = (
+            await database
               .ref()
               .child("certiDatabase")
-              .child(prop)
-              .once("value");
-
-            if (propSnapshot.exists()) {
-              const certiData: CertiData = propSnapshot.val();
-
-              temp.push({
-                name: certiData.name,
-                url: data[prop],
-                image: certiData.image,
-              });
-            }
-          }
+              .child(doc.data().id)
+              .once("value")
+          ).val();
+          temp.push({
+            ...doc.data(),
+            ...certiData,
+            timestamp: parseInt(doc.data().id),
+          });
         }
-        setCertificate(temp);
-      } catch (error) {
-        console.log(error);
       }
-    };
+      console.log("certificates", temp);
 
-    fetchCerti();
-  }, [userEmail]);
+      setCertificate(
+        temp.sort((a, b) => {
+          return b.timestamp - a.timestamp;
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    setIsFetching(false);
+  };
 
   const addBulkCerti = async () => {
     setIsLoading(true);
     try {
       const data: CertiRaw[] = formatCsv(addCertiText);
-      const certi = addCertiName
-        .replace(/[^a-zA-Z0-9 ]/g, "")
-        .replace(/\s/g, "")
-        .toLowerCase();
 
-      if (data && data.length > 0) {
+      if (
+        data &&
+        data.length > 0 &&
+        data.every((item) => item.email && item.url)
+      ) {
+        const timestamp = moment().valueOf().toString();
+
         //add certi infor
         let image = "";
         if (imageUrl) {
-          image = await handleUploadImage(
-            imageUrl,
-            "certiDatabase",
-            `${addCertiName}.png`
-          );
+          image = await handleUploadImage(imageUrl, "certiDatabase", timestamp);
         }
-        database.ref().child("certiDatabase").child(certi).update({
-          name: "In2CLC 2022",
+        database.ref().child("certiDatabase").child(timestamp).update({
+          name: addCertiName,
           image: image,
-          timestamp: moment().valueOf(),
         });
 
         //add personal certi
         data.forEach((item) => {
-          const email = item.email
-            .replace(/[^a-zA-Z0-9 ]/g, "")
-            .replace(/\s/g, "")
-            .toLowerCase();
-          database.ref().child("certi").child(email).child(certi).set(item.url);
+          firestore.collection("certificates").add({
+            email: item.email.replace(/\s/g, "").toLowerCase(),
+            url: item.url.replace(/\s/g, ""),
+            id: timestamp,
+          });
         });
-      }
 
-      presentToast({
-        message: "Đã thêm certificate thành công!",
-        color: "success",
-        duration: 3000,
-      });
-      setShowAddModal(false);
+        presentToast({
+          message: "Đã thêm certificate thành công!",
+          color: "success",
+          duration: 3000,
+        });
+
+        setShowAddModal(false);
+      } else
+        presentAlert({
+          header: t("Error"),
+          message: "Vui lòng kiểm tra lại csv",
+          buttons: [{ text: "OK" }],
+        });
+
       setIsLoading(false);
     } catch (err) {
       console.log(err);
@@ -197,9 +199,32 @@ const CertificatePage: React.FC = () => {
           </IonSegment>
         </div>
 
-        <RefresherItem handleRefresh={() => {}} />
+        <RefresherItem
+          handleRefresh={() => {
+            fetchCerti();
+          }}
+        />
 
-        {certificate && certificate.length > 0 ? (
+        {isFetching ? (
+          displayType === "grid" ? (
+            <IonGrid>
+              <IonRow>
+                <IonCol size="6">
+                  <CertificateCardSkeleton />
+                </IonCol>
+                <IonCol size="6">
+                  <CertificateCardSkeleton />
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          ) : (
+            <>
+              <CertificateItemSkeleton />
+              <CertificateItemSkeleton />
+              <CertificateItemSkeleton />
+            </>
+          )
+        ) : certificate && certificate.length > 0 ? (
           displayType === "grid" ? (
             <IonGrid>
               <IonRow>
@@ -250,7 +275,7 @@ const CertificatePage: React.FC = () => {
                     addBulkCerti();
                   }}
                 >
-                  <b>Đăng</b>
+                  <b>{t("Post")}</b>
                 </IonButton>
               </IonButtons>
               <IonTitle>Thêm Certificate</IonTitle>
@@ -268,7 +293,7 @@ const CertificatePage: React.FC = () => {
             <br />
             <IonList>
               <IonItem>
-                <IonLabel position="stacked">Certificate Code</IonLabel>
+                <IonLabel position="stacked">Tên Certificate</IonLabel>
                 <IonInput
                   placeholder="Viết thường, không dấu, không cách"
                   onIonChange={(e) => {
@@ -310,7 +335,7 @@ const CertificatePage: React.FC = () => {
               }}
             >
               <IonIcon icon={image} slot="start" />
-              <IonText>{imageUrl ? "Đổi ảnh khác" : "Thêm hình ảnh"}</IonText>
+              <IonText>{imageUrl ? t("Change image") : t("Add image")}</IonText>
             </IonButton>
 
             <IonCard hidden={!imageUrl}>
