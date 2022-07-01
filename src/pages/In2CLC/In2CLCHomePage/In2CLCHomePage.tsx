@@ -30,7 +30,7 @@ import moment from "moment";
 import React, { useState } from "react";
 import Countdown from "react-countdown";
 import { useAuth } from "../../../auth";
-import useCheckUserInfo from "../../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../../common/useCheckUserVerify";
 import { database, firestore } from "../../../firebase";
 import { Match } from "../model";
 import useIn2CLCCheck from "../useIn2CLCCheck";
@@ -38,7 +38,7 @@ import useIn2CLCCheck from "../useIn2CLCCheck";
 const In2CLCHomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { userId, userEmail } = useAuth();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
   const { matchInfo, updateMatchInfo } = useIn2CLCCheck(userId, userEmail);
 
   const [presentAlert] = useIonAlert();

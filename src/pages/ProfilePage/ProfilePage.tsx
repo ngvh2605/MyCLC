@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../common/useCheckUserVerify";
 import { database } from "../../firebase";
 import { VerifyStatus } from "../../models";
 import "./ProfilePage.scss";
@@ -43,8 +44,8 @@ const ProfilePage: React.FC = () => {
 
   var QRCode = require("qrcode.react");
 
-  const { isVerify, avatarVerify, fullName, avatarUrl } =
-    useCheckUserInfo(userId);
+  const { fullName, avatarUrl } = useCheckUserInfo(userId);
+  const { isVerify, avatarVerify } = useCheckUserVerify(userId);
 
   useEffect(() => {
     console.log("verify", isVerify);

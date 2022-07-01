@@ -18,7 +18,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import useCheckUserInfo from "../../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../../common/useCheckUserVerify";
 import useIn2CLCCheck from "../../In2CLC/useIn2CLCCheck";
 import { UnAuth } from "./../../../components/CommonUI/UnAuth";
 
@@ -26,7 +26,7 @@ const ChatHomePage: React.FC = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const { userId, userEmail } = useAuth();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
   const { matchInfo } = useIn2CLCCheck(userId, userEmail);
 
   return (

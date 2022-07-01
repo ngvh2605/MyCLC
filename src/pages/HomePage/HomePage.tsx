@@ -42,15 +42,15 @@ import {
 import moment from "moment";
 import "moment/locale/vi";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth";
-import useCheckUserInfo from "../../common/useCheckUserInfo";
+import useCheckUserPermission from "../../common/useCheckUserPermission";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { auth as firebaseAuth, database, firestore } from "../../firebase";
+import i18next from "./../../i18n";
 import "./HomePage.scss";
 import NewsCard from "./NewsCard";
 import { getNew, getNextNews } from "./services";
-import i18next from "./../../i18n";
-import { useTranslation } from "react-i18next";
 
 interface Mail {
   sender: string;
@@ -83,7 +83,7 @@ function getUVdiv(uv: number) {
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const { userId, userEmail } = useAuth();
-  const { allowCreateNews } = useCheckUserInfo(userId);
+  const { allowCreateNews } = useCheckUserPermission(userId);
 
   const [lastKey, setLastKey] = useState<string | number | null>(null);
   const [newsList, setNewsList] = useState<string[]>([]);

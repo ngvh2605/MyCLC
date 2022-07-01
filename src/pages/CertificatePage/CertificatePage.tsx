@@ -33,11 +33,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth";
 import useAddImage from "../../common/useAddImage";
+import useCheckUserPermission from "../../common/useCheckUserPermission";
 import useUploadFile from "../../common/useUploadFile";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { database } from "../../firebase";
-import useCheckUserInfo from "./../../common/useCheckUserInfo";
 import CertificateCard from "./CertificateCard";
 import CertificateItem from "./CertificateItem";
 import "./CertificatePage.scss";
@@ -60,7 +60,7 @@ export interface Certificate {
 const CertificatePage: React.FC = () => {
   const { t } = useTranslation();
   const { userEmail, userId } = useAuth();
-  const { isAdmin } = useCheckUserInfo(userId);
+  const { isAdmin } = useCheckUserPermission(userId);
 
   const [showAddModal, setShowAddModal] = useState(false);
 

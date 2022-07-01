@@ -17,7 +17,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth";
-import useCheckUserInfo from "../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../common/useCheckUserVerify";
 import RefresherItem from "../../components/CommonUI/RefresherItem";
 import { Events } from "../../models";
 import EventCard from "./EventCard";
@@ -27,7 +27,7 @@ import { getEvent } from "./services";
 const EventPage: React.FC = () => {
   const { t } = useTranslation();
   const { userId } = useAuth();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
   const history = useHistory();
 
   const [eventsList, setEventsList] = useState<Events[]>([]);

@@ -43,7 +43,7 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../auth";
-import useCheckUserInfo from "../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../common/useCheckUserVerify";
 import { database } from "../../firebase";
 import { getInfoByUserId } from "../HomePage/services";
 import { UnAuth } from "./../../components/CommonUI/UnAuth";
@@ -85,7 +85,7 @@ function findUserInfo(userId: string, list: any[]) {
 const TimetablePage: React.FC = () => {
   const { userId } = useAuth();
   const history = useHistory();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
 
   const [color, setColor] = useState([
     "lovewins1",

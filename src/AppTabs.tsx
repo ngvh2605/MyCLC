@@ -2,16 +2,21 @@ import { IonRouterOutlet } from "@ionic/react";
 import React from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAuth } from "./auth";
-import useCheckUserInfo from "./common/useCheckUserInfo";
+import useCheckUserPermission from "./common/useCheckUserPermission";
 import AboutPage from "./pages/AboutPage";
 import AddEntryPage from "./pages/AddEntryPage";
 import AdventurePage from "./pages/AdventurePage";
 import AllEntryPage from "./pages/AllEntryPage";
+import CertificatePage from "./pages/CertificatePage/CertificatePage";
+import ChatHomePage from "./pages/ChatPage/ChatHomePage";
+import ChatPage from "./pages/ChatPage/index";
 import CLC2UniPage from "./pages/CLC2UniPage";
+import ClubPage from "./pages/ClubPage";
 import EntryPage from "./pages/EntryPage";
 import EventPage from "./pages/EventPage";
 import TicketPage from "./pages/EventPage/TicketPage";
 import ViewEventPage from "./pages/EventPage/ViewEventPage";
+import FramePage from "./pages/FramePage";
 import HomePage from "./pages/HomePage";
 import AddNewsPage from "./pages/HomePage/AddNewsPage";
 import ViewNewsPage from "./pages/HomePage/ViewNewsPage";
@@ -28,15 +33,10 @@ import PhoneVerify from "./pages/ProfilePage/PhoneVerify";
 import SettingsPage from "./pages/SettingsPage";
 import TimetablePage from "./pages/TimetablePage";
 import UserPage from "./pages/UserPage";
-import ChatPage from "./pages/ChatPage/index";
-import ChatHomePage from "./pages/ChatPage/ChatHomePage";
-import FramePage from "./pages/FramePage";
-import CertificatePage from "./pages/CertificatePage/CertificatePage";
-import ClubPage from "./pages/ClubPage";
 
 const AppTabs: React.FC = () => {
   const { loggedIn, userId } = useAuth();
-  const { allowCreateNews, allowCreateEvent } = useCheckUserInfo(userId);
+  const { allowCreateNews, allowCreateEvent } = useCheckUserPermission(userId);
 
   if (!loggedIn) {
     return <Redirect to="/index" />;

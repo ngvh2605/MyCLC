@@ -40,7 +40,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import useCheckUserInfo from "../../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../../common/useCheckUserVerify";
 import useUploadFile from "../../../common/useUploadFile";
 import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { UnAuth } from "../../../components/CommonUI/UnAuth";
@@ -62,7 +62,7 @@ function shuffleArray(missions: Mission[]) {
 const AdventureTeamPage: React.FC = () => {
   const history = useHistory();
   const { userId } = useAuth();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
   const { teamId, teamInfo, teamAnswers } = useAdventureCheck(userId);
   const { handleUploadImage } = useUploadFile();
 

@@ -48,7 +48,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import { useAuth } from "../../../auth";
-import useCheckUserInfo from "../../../common/useCheckUserInfo";
+import useCheckUserVerify from "../../../common/useCheckUserVerify";
 import { firestore } from "../../../firebase";
 import { deleteNews, getInfoByUserId, likeNews, unlikeNews } from "../services";
 import { Comment, News, toComment } from "./../../../models";
@@ -66,7 +66,7 @@ const ViewNewsPage: React.FC = () => {
   const { t } = useTranslation();
   const { userId } = useAuth();
   const { id } = useParams<RouteParams>();
-  const { isVerify } = useCheckUserInfo(userId);
+  const { isVerify } = useCheckUserVerify(userId);
 
   const location = useLocation<stateType>();
 

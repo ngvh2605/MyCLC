@@ -36,6 +36,8 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserInfo from "../../common/useCheckUserInfo";
+import useCheckUserPermission from "../../common/useCheckUserPermission";
+import useCheckUserVerify from "../../common/useCheckUserVerify";
 import { auth, database, remoteConfig } from "../../firebase";
 import "./MenuPage.scss";
 
@@ -50,8 +52,9 @@ const MenuPage = () => {
   const [presentAlert] = useIonAlert();
   const [appVersion, setAppVersion] = useState("");
 
-  const { isVerify, avatarVerify, fullName, avatarUrl, allowCreateEvent } =
-    useCheckUserInfo(userId);
+  const { isVerify, avatarVerify } = useCheckUserVerify(userId);
+  const { fullName, avatarUrl } = useCheckUserInfo(userId);
+  const { allowCreateEvent } = useCheckUserPermission(userId);
 
   const menuClose = () => {
     menuEl.current.close();
