@@ -80,7 +80,7 @@ const CertificatePage: React.FC = () => {
   useEffect(() => {
     fetchCerti();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userEmail]);
+  }, [userId]);
 
   const fetchCerti = async () => {
     setIsFetching(true);

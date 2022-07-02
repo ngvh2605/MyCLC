@@ -247,14 +247,22 @@ const In2CLCMissionPage: React.FC = () => {
                           {moment(
                             mission.deadline.toString(),
                             "HH:mm DD/MM/YYYY"
-                          ).fromNow()}{" "}
+                          )
+                            .locale(
+                              localStorage.getItem("i18nLanguage") || "vi"
+                            )
+                            .fromNow()}{" "}
                           <IonText color="dark">
                             <i>
                               (
                               {moment(
                                 mission.deadline.toString(),
                                 "HH:mm DD/MM/YYYY"
-                              ).format("H:mm, D/M/YYYY")}
+                              )
+                                .locale(
+                                  localStorage.getItem("i18nLanguage") || "vi"
+                                )
+                                .format("H:mm, D/M/YYYY")}
                               )
                             </i>
                           </IonText>
