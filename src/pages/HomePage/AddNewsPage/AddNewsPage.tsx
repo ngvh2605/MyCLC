@@ -13,6 +13,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonListHeader,
   IonLoading,
   IonPage,
   IonTextarea,
@@ -241,8 +242,36 @@ const AddNewsPage: React.FC = () => {
           <IonTitle>{news ? t("Edit News") : t("Create News")}</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <IonList>
+      <IonContent>
+        <IonList lines="full">
+          <IonListHeader>{t("Image")}</IonListHeader>
+          <IonButton
+            className="ion-margin"
+            expand="block"
+            color="primary"
+            onClick={() => {
+              handlePictureClick();
+            }}
+          >
+            <IonIcon icon={image} slot="start" />
+            {pictureUrl ? t("Change image") : t("Add image")}
+          </IonButton>
+          <input
+            type="file"
+            id="upload"
+            accept="image/*"
+            hidden
+            multiple={false}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+
+          <IonCard hidden={!pictureUrl}>
+            <IonImg src={pictureUrl} onClick={handlePictureClick} />
+          </IonCard>
+
+          <IonListHeader>{t("Details")}</IonListHeader>
+
           <IonItem>
             <IonLabel position="stacked">{t("Title")}</IonLabel>
             <IonInput
@@ -267,24 +296,11 @@ const AddNewsPage: React.FC = () => {
             />
           </IonItem>
         </IonList>
-
-        <input
-          type="file"
-          id="upload"
-          accept="image/*"
-          hidden
-          multiple={false}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
-
-        <IonCard hidden={!pictureUrl}>
-          <IonImg src={pictureUrl} onClick={handlePictureClick} />
-        </IonCard>
-
+        <br />
+        <br />
         <IonLoading isOpen={status.loading} />
       </IonContent>
-      <IonFooter className="ion-no-border">
+      {/* <IonFooter className="ion-no-border">
         <IonToolbar>
           <div className="ion-margin">
             <IonButton
@@ -300,7 +316,7 @@ const AddNewsPage: React.FC = () => {
             </IonButton>
           </div>
         </IonToolbar>
-      </IonFooter>
+      </IonFooter> */}
     </IonPage>
   );
 };

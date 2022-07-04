@@ -157,6 +157,8 @@
   "Post": "Post",
   "Optional, up to 50 characters": "Optional, up to 50 characters",
   "Minimum 50 characters": "Minimum 50 characters",
+  "Image": "Image",
+  "Details": "Details",
 
   "Event": "Event",
   "Upcoming events will appear here": "Upcoming events will appear here",
@@ -179,6 +181,10 @@
   "Cancel registration": "Cancel registration",
   "Status": "Status",
   "Empty": "Empty",
+  "Please select": "Please select",
+  "Event cover": "Event cover",
+  "Description": "Description",
+  "Registration": "Registration",
 
   "Club's name": "Club's name",
   "Followers": "Followers",

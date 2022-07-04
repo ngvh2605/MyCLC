@@ -55,7 +55,7 @@ const CertificateCard: React.FC<Props> = (props) => {
         />
       </IonThumbnail>
       <IonItem lines="none">
-        <IonLabel style={{ fontSize: 14, textAlign: "center", margin: 10 }}>
+        <IonLabel style={{ fontSize: 14, textAlign: "center", margin: 20 }}>
           {certi.name}
         </IonLabel>
       </IonItem>
@@ -82,7 +82,9 @@ export const CertificateCardSkeleton = () => (
       <IonSkeletonText animated />
     </IonThumbnail>
     <IonItem lines="none">
-      <IonSkeletonText animated style={{ width: "70%", margin: "auto" }} />
+      <IonLabel style={{ textAlign: "center", margin: 20 }}>
+        <IonSkeletonText animated style={{ width: "100%", margin: "auto" }} />
+      </IonLabel>
     </IonItem>
   </IonCard>
 );

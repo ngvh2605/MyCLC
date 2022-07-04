@@ -87,8 +87,8 @@ const ManagePage: React.FC = () => {
             <IonSegmentButton value="old">{t("Past events")}</IonSegmentButton>
           </IonSegment>
         </div>
-        {segment === "new" ? (
-          events && events.length > 0 ? (
+        {segment === "new" &&
+          (events && events.length > 0 ? (
             events
               .sort((a, b) => a.startDate - b.startDate)
               .map((item, index) => (
@@ -96,16 +96,17 @@ const ManagePage: React.FC = () => {
               ))
           ) : (
             <EmptyUI />
-          )
-        ) : oldEvents && oldEvents.length > 0 ? (
-          oldEvents
-            .sort((a, b) => b.startDate - a.startDate)
-            .map((item, index) => (
-              <ManageCard event={item} key={index} allowEdit={false} />
-            ))
-        ) : (
-          <EmptyUI />
-        )}
+          ))}
+        {segment === "old" &&
+          (oldEvents && oldEvents.length > 0 ? (
+            oldEvents
+              .sort((a, b) => b.startDate - a.startDate)
+              .map((item, index) => (
+                <ManageCard event={item} key={index} allowEdit={false} />
+              ))
+          ) : (
+            <EmptyUI />
+          ))}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton routerLink="/my/manage/add">

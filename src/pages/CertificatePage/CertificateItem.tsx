@@ -27,7 +27,7 @@ const CertificateItem: React.FC<Props> = (props) => {
       <IonItem
         lines="none"
         className="ion-no-padding ion-no-margin"
-        style={{ padding: 16 }}
+        style={{ padding: 20 }}
       >
         <IonThumbnail slot="start">
           {imgLoaded ? null : (
@@ -61,7 +61,7 @@ export const CertificateItemSkeleton = () => (
     <IonItem
       lines="none"
       className="ion-no-padding ion-no-margin"
-      style={{ padding: 16 }}
+      style={{ padding: 20 }}
     >
       <IonThumbnail slot="start">
         <IonSkeletonText animated style={{ borderRadius: 10 }} />

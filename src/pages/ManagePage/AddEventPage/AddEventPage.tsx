@@ -15,6 +15,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonListHeader,
   IonLoading,
   IonPage,
   IonSelect,
@@ -198,7 +199,7 @@ const AddEventPage: React.FC = () => {
           <IonTitle>{events ? t("Edit event") : t("Create event")}</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent>
         <IonButton
           hidden
           onClick={() => {
@@ -207,9 +208,56 @@ const AddEventPage: React.FC = () => {
         >
           Debug
         </IonButton>
-        <IonList>
+        <IonList lines="full">
+          <IonListHeader>{t("Event cover")}</IonListHeader>
+          <input
+            type="file"
+            id="upload"
+            accept="image/*"
+            hidden
+            multiple={false}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+
+          <IonButton
+            className="ion-margin"
+            expand="block"
+            color="primary"
+            onClick={() => {
+              handlePictureClick();
+            }}
+          >
+            <IonIcon icon={image} slot="start" />
+            <IonText>{pictureUrl ? t("Change image") : t("Add image")}</IonText>
+          </IonButton>
+          <IonCard hidden={!pictureUrl}>
+            <IonImg
+              src={pictureUrl}
+              style={{
+                width: window.screen.width - 32,
+                height: ((window.screen.width - 32) * 9) / 16,
+                margin: 0,
+                objectFit: "cover",
+              }}
+              onClick={handlePictureClick}
+            />
+          </IonCard>
+          <IonChip
+            color="primary"
+            style={{ height: "max-content", marginTop: 10 }}
+            className="ion-margin"
+          >
+            <IonLabel text-wrap className="ion-padding">
+              {t(
+                "You should choose a 16:9 aspect ratio or pre-cropped cover photo"
+              )}
+            </IonLabel>
+          </IonChip>
+
+          <IonListHeader>{t("Event details")}</IonListHeader>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Event name")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
@@ -221,7 +269,7 @@ const AddEventPage: React.FC = () => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Start date and time")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
@@ -234,10 +282,11 @@ const AddEventPage: React.FC = () => {
               onIonChange={(e) =>
                 setStartDate(moment(e.detail.value).valueOf())
               }
+              placeholder={t("Please select")}
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("End date and time")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonDatetime
@@ -252,10 +301,11 @@ const AddEventPage: React.FC = () => {
               doneText={t("Done")}
               value={endDate ? moment(endDate).toISOString() : ""}
               onIonChange={(e) => setEndDate(moment(e.detail.value).valueOf())}
+              placeholder={t("Please select")}
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Event location")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
@@ -266,8 +316,11 @@ const AddEventPage: React.FC = () => {
               onIonChange={(e) => setLocation(e.detail.value)}
             />
           </IonItem>
+
+          <br />
+          <IonListHeader>{t("Description")}</IonListHeader>
           <IonItem>
-            <IonLabel position="floating">{t("Short description")}</IonLabel>
+            <IonLabel position="stacked">{t("Short description")}</IonLabel>
             <IonInput
               type="text"
               maxlength={140}
@@ -277,7 +330,7 @@ const AddEventPage: React.FC = () => {
             />
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Detail description")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonTextarea
@@ -288,8 +341,11 @@ const AddEventPage: React.FC = () => {
               onIonChange={(e) => setBody(e.detail.value)}
             />
           </IonItem>
+
+          <br />
+          <IonListHeader>{t("Registration")}</IonListHeader>
           <IonItem>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Is the event open to registration?")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
@@ -308,7 +364,7 @@ const AddEventPage: React.FC = () => {
             </IonSelect>
           </IonItem>
           <IonItem hidden={!sellTicket}>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("How to register for the event?")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
@@ -329,7 +385,7 @@ const AddEventPage: React.FC = () => {
             </IonSelect>
           </IonItem>
           <IonItem hidden={!sellTicket || (sellTicket && !sellInApp)}>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Maximum number of registrations")}{" "}
               <span style={{ color: "red" }}>*</span>
             </IonLabel>
@@ -341,7 +397,7 @@ const AddEventPage: React.FC = () => {
             />
           </IonItem>
           <IonItem hidden={!sellTicket || (sellTicket && sellInApp)}>
-            <IonLabel position="floating">
+            <IonLabel position="stacked">
               {t("Registration link")} <span style={{ color: "red" }}>*</span>
             </IonLabel>
             <IonInput
@@ -352,44 +408,11 @@ const AddEventPage: React.FC = () => {
             />
           </IonItem>
         </IonList>
-
-        <input
-          type="file"
-          id="upload"
-          accept="image/*"
-          hidden
-          multiple={false}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
         <br />
-        <IonChip
-          color="primary"
-          style={{ height: "max-content", marginBottom: 10 }}
-          className="ion-margin"
-        >
-          <IonLabel text-wrap className="ion-padding">
-            {t(
-              "You should choose a 16:9 aspect ratio or pre-cropped cover photo"
-            )}
-          </IonLabel>
-        </IonChip>
-        <IonCard hidden={!pictureUrl}>
-          <IonImg
-            src={pictureUrl}
-            style={{
-              width: window.screen.width - 32,
-              height: ((window.screen.width - 32) * 9) / 16,
-              margin: 0,
-              objectFit: "cover",
-            }}
-            onClick={handlePictureClick}
-          />
-        </IonCard>
-
+        <br />
         <IonLoading isOpen={status.loading} />
       </IonContent>
-      <IonFooter className="ion-no-border">
+      <IonFooter className="ion-no-border" hidden>
         <IonToolbar>
           <div className="ion-margin">
             <IonButton

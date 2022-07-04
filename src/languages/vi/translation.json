@@ -157,6 +157,8 @@
   "Post": "Đăng",
   "Optional, up to 50 characters": "Không bắt buộc, tối đa 50 ký tự",
   "Minimum 50 characters": "Tối thiểu 50 ký tự",
+  "Image": "Hình ảnh",
+  "Details": "Chi tiết",
 
   "Event": "Sự kiện",
   "Upcoming events will appear here": "Các sự kiện sắp tới sẽ xuất hiện tại đây",
@@ -179,6 +181,10 @@
   "Cancel registration": "Huỷ đăng ký",
   "Status": "Trạng thái",
   "Empty": "Trống",
+  "Please select": "Vui lòng chọn",
+  "Event cover": "Ảnh bìa sự kiện",
+  "Description": "Mô tả",
+  "Registration": "Đăng ký",
 
   "Club's name": "Tên câu lạc bộ",
   "Followers": "Người theo dõi",
