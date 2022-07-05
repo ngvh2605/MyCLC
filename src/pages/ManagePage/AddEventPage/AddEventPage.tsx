@@ -7,7 +7,6 @@ import {
   IonChip,
   IonContent,
   IonDatetime,
-  IonFooter,
   IonHeader,
   IonIcon,
   IonImg,
@@ -412,25 +411,6 @@ const AddEventPage: React.FC = () => {
         <br />
         <IonLoading isOpen={status.loading} />
       </IonContent>
-      <IonFooter className="ion-no-border" hidden>
-        <IonToolbar>
-          <div className="ion-margin">
-            <IonButton
-              className="ion-margin"
-              expand="block"
-              fill="clear"
-              onClick={() => {
-                handlePictureClick();
-              }}
-            >
-              <IonIcon icon={image} slot="start" />
-              <IonText>
-                {pictureUrl ? t("Change image") : t("Add image")}
-              </IonText>
-            </IonButton>
-          </div>
-        </IonToolbar>
-      </IonFooter>
     </IonPage>
   );
 };
