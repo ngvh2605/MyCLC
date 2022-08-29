@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function calImgScale() {
-  const width = window.screen.width - 62;
+  const width = window.screen.width - 62 > 618 ? 618 : window.screen.width - 62;
   const height = (width * 9) / 16;
   return { width: width / 2, height: height / 2 };
 }
@@ -83,7 +83,10 @@ export const CertificateCardSkeleton = () => (
     </IonThumbnail>
     <IonItem lines="none">
       <IonLabel style={{ textAlign: "center", margin: 20 }}>
-        <IonSkeletonText animated style={{ width: "100%", margin: "auto" }} />
+        <IonSkeletonText
+          animated
+          style={{ width: "100%", margin: "auto", height: 14 }}
+        />
       </IonLabel>
     </IonItem>
   </IonCard>

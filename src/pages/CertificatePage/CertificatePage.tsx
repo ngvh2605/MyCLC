@@ -186,63 +186,65 @@ const CertificatePage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <div className="ion-padding-horizontal ion-padding-top">
-          <IonSegment
-            value={displayType}
-            onIonChange={(e) => {
-              setDisplayType(e.detail.value);
-            }}
-            color="primary"
-          >
-            <IonSegmentButton value="grid">{t("Grid")}</IonSegmentButton>
-            <IonSegmentButton value="list">{t("List")}</IonSegmentButton>
-          </IonSegment>
-        </div>
-
         <RefresherItem
           handleRefresh={() => {
             fetchCerti();
           }}
         />
 
-        {isFetching ? (
-          displayType === "grid" ? (
-            <IonGrid>
-              <IonRow>
-                <IonCol size="6">
-                  <CertificateCardSkeleton />
-                </IonCol>
-                <IonCol size="6">
-                  <CertificateCardSkeleton />
-                </IonCol>
-              </IonRow>
-            </IonGrid>
-          ) : (
-            <>
-              <CertificateItemSkeleton />
-              <CertificateItemSkeleton />
-              <CertificateItemSkeleton />
-            </>
-          )
-        ) : certificate && certificate.length > 0 ? (
-          displayType === "grid" ? (
-            <IonGrid>
-              <IonRow>
-                {certificate.map((certi, index) => (
-                  <IonCol size="6" key={index}>
-                    <CertificateCard certi={certi} />
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <div className="ion-padding-horizontal ion-padding-top">
+            <IonSegment
+              value={displayType}
+              onIonChange={(e) => {
+                setDisplayType(e.detail.value);
+              }}
+              color="primary"
+            >
+              <IonSegmentButton value="grid">{t("Grid")}</IonSegmentButton>
+              <IonSegmentButton value="list">{t("List")}</IonSegmentButton>
+            </IonSegment>
+          </div>
+
+          {isFetching ? (
+            displayType === "grid" ? (
+              <IonGrid>
+                <IonRow>
+                  <IonCol size="6">
+                    <CertificateCardSkeleton />
                   </IonCol>
-                ))}
-              </IonRow>
-            </IonGrid>
+                  <IonCol size="6">
+                    <CertificateCardSkeleton />
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            ) : (
+              <>
+                <CertificateItemSkeleton />
+                <CertificateItemSkeleton />
+                <CertificateItemSkeleton />
+              </>
+            )
+          ) : certificate && certificate.length > 0 ? (
+            displayType === "grid" ? (
+              <IonGrid>
+                <IonRow>
+                  {certificate.map((certi, index) => (
+                    <IonCol size="6" key={index}>
+                      <CertificateCard certi={certi} />
+                    </IonCol>
+                  ))}
+                </IonRow>
+              </IonGrid>
+            ) : (
+              certificate.map((certi, index) => (
+                <CertificateItem certi={certi} key={index} />
+              ))
+            )
           ) : (
-            certificate.map((certi, index) => (
-              <CertificateItem certi={certi} key={index} />
-            ))
-          )
-        ) : (
-          <EmptyUI />
-        )}
+            <EmptyUI />
+          )}
+        </div>
 
         {isAdmin && (
           <IonFab vertical="bottom" horizontal="end" slot="fixed">

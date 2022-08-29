@@ -14,6 +14,7 @@ import {
   IonLabel,
   IonLoading,
   IonPage,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   isPlatform,
@@ -26,22 +27,23 @@ import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
 import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useUploadFile from "../../../common/useUploadFile";
-import { database } from "../../../firebase";
+import { auth, database } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
 
 const AvatarPage: React.FC = () => {
   const { t } = useTranslation();
   const { userId } = useAuth();
-  const { avatarUrl: userAvatarUrl } = useCheckUserInfo(userId);
   const history = useHistory();
+
+  const { handleUploadImage } = useUploadFile(userId);
+
   const [avatarUrl, setAvatarUrl] = useState("");
   const [status, setStatus] = useState({ loading: false, error: false });
   const fileInputRef = useRef<HTMLInputElement>();
 
+  const [isLoaded, setIsLoaded] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const [presentAlert] = useIonAlert();
-
-  const { handleUploadImage } = useUploadFile(userId);
 
   useEffect(
     () => () => {
@@ -53,8 +55,9 @@ const AvatarPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (userAvatarUrl) setAvatarUrl(userAvatarUrl);
-  }, [userAvatarUrl]);
+    if (auth.currentUser.photoURL) setAvatarUrl(auth.currentUser.photoURL);
+    else setAvatarUrl("/assets/image/placeholder.png");
+  }, [userId]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -96,6 +99,8 @@ const AvatarPage: React.FC = () => {
   const handleUploadFile = async (url: string) => {
     setStatus({ loading: true, error: false });
     const uploadedUrl = await handleUploadImage(url, "avatar");
+    await auth.currentUser.updateProfile({ photoURL: uploadedUrl });
+
     const userData = database.ref();
     userData.child("users").child(userId).child("verify").update({
       hasAvatar: true,
@@ -131,20 +136,43 @@ const AvatarPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonAvatar
-          className="ion-margin"
-          style={{
-            width: window.screen.height / 3,
-            height: window.screen.height / 3,
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
+        <div
+          style={
+            !isLoaded ? { opacity: 0, width: 0, height: 0 } : { opacity: 1 }
+          }
         >
-          <IonImg
-            src={avatarUrl || "/assets/image/placeholder.png"}
-            onClick={handlePictureClick}
+          <IonAvatar
+            className="ion-margin"
+            style={{
+              width: window.screen.height / 3,
+              height: window.screen.height / 3,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            <IonImg
+              src={avatarUrl}
+              onClick={handlePictureClick}
+              onIonImgDidLoad={() => {
+                setIsLoaded(true);
+              }}
+            />
+          </IonAvatar>
+        </div>
+        {!isLoaded && (
+          <IonSkeletonText
+            animated
+            style={{
+              width: window.screen.height / 3,
+              height: window.screen.height / 3,
+              marginLeft: "auto",
+              marginRight: "auto",
+              borderRadius: "50%",
+              marginTop: 0,
+              marginBottom: 0,
+            }}
           />
-        </IonAvatar>
+        )}
         <input
           type="file"
           id="upload"
