@@ -1,39 +1,33 @@
 import { IonItem, IonList, IonListHeader, IonText } from "@ionic/react";
-import { t } from "i18next";
 import moment from "moment";
 import React from "react";
-import { WeekItem } from "./TimetablePage";
+import { WeekItem } from "./OldTimeTablePage";
 
 export const WeekPopover: React.FC<{
-  list: String[];
-  current: String;
-  selected: String;
+  list: WeekItem[];
+  selected?: WeekItem;
   onHide: () => void;
-  onSelect: (item: String) => void;
-}> = ({ list, current, selected, onHide, onSelect }) => (
+  onSelect: (item: WeekItem) => void;
+}> = ({ list, selected, onHide, onSelect }) => (
   <IonList>
-    <IonListHeader>{t("Select week")}</IonListHeader>
+    <IonListHeader>Chọn tuần học</IonListHeader>
     {list &&
-      list.map((item, index) => (
-        <IonItem
-          key={index}
-          button
-          onClick={() => {
-            onSelect(item);
-            onHide();
-          }}
-        >
-          <IonText color={item === selected ? "primary" : "dark"}>
-            {item === current || item === selected ? (
-              <b>{item}</b>
-            ) : (
-              <>{item}</>
-            )}
-          </IonText>
-        </IonItem>
-      ))}
+      list
+        .sort((a, b) => a.key.localeCompare(b.key))
+        .map((item, index) => (
+          <IonItem
+            key={index}
+            button
+            onClick={() => {
+              onSelect(item);
+              onHide();
+            }}
+          >
+            {item.name}
+          </IonItem>
+        ))}
     <IonItem lines="none" detail={false} button onClick={() => onHide()}>
-      <IonText color="danger">{t("Close")}</IonText>
+      <IonText color="danger">Đóng</IonText>
     </IonItem>
   </IonList>
 );

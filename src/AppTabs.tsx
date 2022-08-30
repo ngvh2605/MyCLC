@@ -25,6 +25,7 @@ import ManagePage from "./pages/ManagePage";
 import AddEventPage from "./pages/ManagePage/AddEventPage";
 import EventRegisterList from "./pages/ManagePage/EventRegisterList";
 import NotFoundPage from "./pages/NotFoundPage";
+import OldTimeTablePage from "./pages/OldTimeTablePage";
 import ProfilePage from "./pages/ProfilePage";
 import AvatarPage from "./pages/ProfilePage/AvatarPage";
 import EmailVerify from "./pages/ProfilePage/EmailVerify";
@@ -142,6 +143,10 @@ const AppTabs: React.FC = () => {
 
       <Route exact path="/my/timetable">
         <TimetablePage />
+      </Route>
+
+      <Route exact path="/my/oldtimetable">
+        <OldTimeTablePage />
       </Route>
 
       <Route exact path="/my/user">

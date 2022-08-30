@@ -1,13 +1,23 @@
-#timetable-page {
-  // ion-item {
-  //   --color: white;
-  //   p {
-  //     color: white;
-  //   }
-  //   ion-icon {
-  //     color: white;
-  //   }
-  // }
+#old-timetable-page {
+  .content {
+    ion-slide.swiper-slide {
+      align-items: flex-start;
+      overflow-y: scroll;
+      display: block;
+      overflow: hidden;
+      height: initial;
+    }
+  }
+
+  ion-item {
+    --color: white;
+    p {
+      color: white;
+    }
+    ion-icon {
+      color: white;
+    }
+  }
 
   ion-chip {
     ion-label {

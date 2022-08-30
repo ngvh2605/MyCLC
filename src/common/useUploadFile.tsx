@@ -5,6 +5,23 @@ import { deleteAllSubItemFirebase } from "../utils/helpers/helpers";
 const useUploadFile = (userId?: string) => {
   const [url, setUrl] = useState<string>("");
 
+  const handleUploadFile = async (
+    blobUrl: any,
+    file: File,
+    type: "document" | "file"
+  ) => {
+    const fileName = file.name;
+    const rootFolder = `/${userId ? `users/${userId}` : "public"}`;
+    const folderPath = `${rootFolder}/${type ? type + "/" : ""}`;
+
+    const response = await fetch(blobUrl);
+    const data = await response.blob();
+    const snapshot = await storage.ref(`${folderPath}${fileName}`).put(data);
+    const uploadedUrl = await snapshot.ref.getDownloadURL();
+    setUrl(uploadedUrl);
+    return uploadedUrl;
+  };
+
   const handleUploadImage = async (
     blobUrl: any,
     type?:
@@ -85,7 +102,7 @@ const useUploadFile = (userId?: string) => {
       });
   };
 
-  return { url, handleUploadImage };
+  return { url, handleUploadImage, handleUploadFile };
 };
 
 export default useUploadFile;

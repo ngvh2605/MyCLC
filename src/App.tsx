@@ -1,5 +1,6 @@
 import { IonApp, IonLoading, IonRouterOutlet, setupConfig } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
+import moment from "moment";
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import AppTabs from "./AppTabs";
@@ -14,6 +15,7 @@ import SplashPage from "./pages/SplashPage";
 const App: React.FC = () => {
   const { loading, auth } = useAuthInit();
   setupConfig({ mode: "ios" });
+  moment.updateLocale("vi", { week: { dow: 1 } });
 
   if (loading) {
     return <IonLoading isOpen />;
