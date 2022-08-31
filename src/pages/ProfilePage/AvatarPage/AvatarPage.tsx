@@ -25,7 +25,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
-import useCheckUserInfo from "../../../common/useCheckUserInfo";
 import useUploadFile from "../../../common/useUploadFile";
 import { auth, database } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";

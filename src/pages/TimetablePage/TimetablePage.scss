@@ -1,17 +1,19 @@
 #timetable-page {
-  // ion-item {
-  //   --color: white;
-  //   p {
-  //     color: white;
-  //   }
-  //   ion-icon {
-  //     color: white;
-  //   }
-  // }
-
-  ion-chip {
-    ion-label {
+  .event-item {
+    ion-item {
       --color: white;
+      p {
+        color: white;
+      }
+      ion-icon {
+        color: white;
+      }
+    }
+
+    ion-chip {
+      ion-label {
+        --color: white;
+      }
     }
   }
 

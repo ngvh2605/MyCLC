@@ -30,6 +30,7 @@ import {
   planetOutline,
   settingsOutline,
   sparklesOutline,
+  timeOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -82,7 +83,13 @@ const MenuPage = () => {
       requireVerify: false,
       isShown: true,
     },
-
+    {
+      text: t("Timetable"),
+      url: "timetable",
+      icon: timeOutline,
+      requireVerify: false,
+      isShown: true,
+    },
     {
       text: t("Clubs"),
       url: "club",
@@ -90,11 +97,7 @@ const MenuPage = () => {
       requireVerify: false,
       isShown: true,
     },
-    // {
-    //   text: "To Do List",
-    //   url: "timetable",
-    //   icon: timeOutline,
-    // },
+
     {
       text: "Adventure Hunt",
       url: "adventure",
