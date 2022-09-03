@@ -8,7 +8,7 @@ const useUploadFile = (userId?: string) => {
   const handleUploadFile = async (
     blobUrl: any,
     file: File,
-    type: "document" | "file"
+    type: "timetable" | "document"
   ) => {
     const fileName = file.name;
     const rootFolder = `/${userId ? `users/${userId}` : "public"}`;

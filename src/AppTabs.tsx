@@ -144,6 +144,9 @@ const AppTabs: React.FC = () => {
       <Route exact path="/my/timetable">
         <TimetablePage />
       </Route>
+      <Route exact path="/my/timetable/:id">
+        <TimetablePage />
+      </Route>
 
       <Route exact path="/my/oldtimetable">
         <OldTimeTablePage />

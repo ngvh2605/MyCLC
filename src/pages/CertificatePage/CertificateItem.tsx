@@ -5,10 +5,9 @@ import {
   IonItem,
   IonLabel,
   IonSkeletonText,
-  IonText,
   IonThumbnail,
 } from "@ionic/react";
-import { calendar, document, person } from "ionicons/icons";
+import { document } from "ionicons/icons";
 import moment from "moment";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";

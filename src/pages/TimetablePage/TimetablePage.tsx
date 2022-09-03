@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
   IonAvatar,
   IonButton,
@@ -28,6 +27,7 @@ import {
   IonSegmentButton,
   IonSelect,
   IonSelectOption,
+  IonSkeletonText,
   IonText,
   IonTitle,
   IonToolbar,
@@ -35,11 +35,18 @@ import {
   useIonPopover,
   useIonToast,
 } from "@ionic/react";
-import { add, caretDown, trashBin } from "ionicons/icons";
+import {
+  add,
+  caretDown,
+  colorWandOutline,
+  eyeOutline,
+  shareSocialOutline,
+  trashBin,
+} from "ionicons/icons";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { useAuth } from "../../auth";
 import useCheckUserVerify from "../../common/useCheckUserVerify";
 import useUploadFile from "../../common/useUploadFile";
@@ -78,6 +85,10 @@ interface EventGroup {
   date: string;
 }
 
+interface RouteParams {
+  id: string;
+}
+
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return "0 Bytes";
 
@@ -97,16 +108,16 @@ const TimetablePage: React.FC = () => {
   const history = useHistory();
   const { handleUploadFile } = useUploadFile();
   const fileInputRef = useRef<HTMLInputElement>();
+  const { id } = useParams<RouteParams>();
+
+  const [isFetching, setIsFetching] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const [documentList, setDocumentList] = useState<DocumentItem[]>();
   const [eventList, setEventList] = useState<EventGroup[]>();
 
-  const [chosenWeek, setChosenWeek] = useState<string>(
-    moment().startOf("week").format("D/M") +
-      " - " +
-      moment().endOf("week").format("D/M/YYYY")
-  );
+  const [chosenWeek, setChosenWeek] = useState<string>();
+  const [viewer, setViewer] = useState(1);
   const [weekList, setWeekList] = useState<string[]>([]);
   const [presentAlert] = useIonAlert();
   const [presentToast] = useIonToast();
@@ -133,9 +144,9 @@ const TimetablePage: React.FC = () => {
     url: string;
   }>({
     week:
-      moment().startOf("week").format("D/M") +
+      moment().add(1, "day").startOf("week").format("D/M") +
       " - " +
-      moment().endOf("week").format("D/M/YYYY"),
+      moment().add(1, "day").endOf("week").format("D/M/YYYY"),
     description: "",
     file: undefined,
     url: "",
@@ -153,7 +164,7 @@ const TimetablePage: React.FC = () => {
     title: "",
     description: "",
     location: "",
-    date: moment().format(),
+    date: moment().add(1, "day").format(),
   });
   const [color, setColor] = useState([
     "blue1",
@@ -184,22 +195,55 @@ const TimetablePage: React.FC = () => {
       let end = moment().subtract(i, "week").endOf("week");
       list.push(start.format("D/M") + " - " + end.format("D/M/YYYY"));
     }
-    console.log(list);
+
     setWeekList(list);
   }, []);
 
   useEffect(() => {
-    fetchData(chosenWeek);
+    if (chosenWeek) fetchData(chosenWeek);
   }, [chosenWeek]);
 
+  useEffect(() => {
+    if (moment(id, "DDMMYYYY").isValid()) {
+      setChosenWeek(
+        moment(id, "DDMMYYYY").startOf("week").format("D/M") +
+          " - " +
+          moment(id, "DDMMYYYY").endOf("week").format("D/M/YYYY")
+      );
+    } else {
+      setChosenWeek(
+        moment().add(1, "day").startOf("week").format("D/M") +
+          " - " +
+          moment().add(1, "day").endOf("week").format("D/M/YYYY")
+      );
+    }
+  }, [id]);
+
   const fetchData = async (chosenWeek: string) => {
+    setIsFetching(true);
     const week = chosenWeek
       .replace(/[^a-zA-Z0-9 ]/g, "")
       .replace(/\s/g, "")
       .toLowerCase();
+    //update viewer
+    const viewer = (
+      await database.ref().child("timetable").child("viewer").child(week).get()
+    ).val();
+    await database
+      .ref()
+      .child("timetable")
+      .child("viewer")
+      .child(week)
+      .set(viewer ? viewer + 1 : 1);
+    setViewer(viewer ? viewer + 1 : 1);
     //fetch documents
     const data = (
-      await database.ref().child("timetableDocument").child(week).get()
+      await database
+        .ref()
+        .child("timetable")
+        .child("document")
+        .child(week)
+        .get()
     ).val();
     if (data) {
       let temp: DocumentItem[] = [];
@@ -219,7 +263,7 @@ const TimetablePage: React.FC = () => {
     }
     //fetch events
     const events = (
-      await database.ref().child("timetableEvent").child(week).get()
+      await database.ref().child("timetable").child("event").child(week).get()
     ).val();
     if (events) {
       let list: EventItem[] = [];
@@ -262,11 +306,12 @@ const TimetablePage: React.FC = () => {
             date: list[i].date,
           });
       }
-      console.log(temp);
+
       setEventList(temp);
     } else {
       setEventList(undefined);
     }
+    setIsFetching(false);
   };
 
   const saveDocument = async () => {
@@ -278,9 +323,9 @@ const TimetablePage: React.FC = () => {
     const uploadedUrl = await handleUploadFile(
       newDocument.url,
       newDocument.file,
-      "document"
+      "timetable"
     );
-    await database.ref().child("timetableDocument").child(week).push({
+    await database.ref().child("timetable").child("document").child(week).push({
       userId: userId,
       url: uploadedUrl,
       timestamp: moment().valueOf(),
@@ -306,7 +351,8 @@ const TimetablePage: React.FC = () => {
       .toLowerCase();
     await database
       .ref()
-      .child("timetableEvent")
+      .child("timetable")
+      .child("event")
       .child(week)
       .push({
         userId: userId,
@@ -336,7 +382,8 @@ const TimetablePage: React.FC = () => {
     await storage.refFromURL(document.url).delete();
     await database
       .ref()
-      .child("timetableDocument")
+      .child("timetable")
+      .child("document")
       .child(week)
       .child(document.id)
       .remove();
@@ -352,7 +399,8 @@ const TimetablePage: React.FC = () => {
       .toLowerCase();
     await database
       .ref()
-      .child("timetableEvent")
+      .child("timetable")
+      .child("event")
       .child(week)
       .child(event.id)
       .remove();
@@ -366,6 +414,24 @@ const TimetablePage: React.FC = () => {
         <IonToolbar>
           <IonButtons slot="start">
             <IonMenuButton />
+          </IonButtons>
+          <IonButtons slot="end">
+            <IonButton
+              onClick={() => {
+                const endDate = chosenWeek.replace(/\s/g, "").split("-")[1];
+                navigator.clipboard.writeText(
+                  "https://myclcproject.web.app/my/timetable/" +
+                    moment(endDate, "D/M/YYYY").format("DDMMYYYY")
+                );
+                presentToast({
+                  message: t("Share link copied"),
+                  duration: 3000,
+                  color: "success",
+                });
+              }}
+            >
+              <IonIcon icon={shareSocialOutline} color="primary" />
+            </IonButton>
           </IonButtons>
           <IonTitle>{t("Timetable")}</IonTitle>
         </IonToolbar>
@@ -388,506 +454,614 @@ const TimetablePage: React.FC = () => {
             </IonText>
           </span>
         </IonListHeader>
-        <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          {documentList && documentList.length > 0 ? (
-            documentList
-              .sort((a, b) => {
-                return b.timestamp - a.timestamp;
-              })
-              .map((document, index) => (
-                <IonCard key={index}>
-                  <IonItem lines="none" style={{ marginTop: 10 }}>
-                    <IonAvatar
-                      slot="start"
-                      onClick={() => {
-                        history.push(`/my/user/${document.userId}`);
-                      }}
-                    >
-                      <IonImg
-                        src={
-                          document.avatar
-                            ? document.avatar
-                            : "/assets/image/placeholder.png"
-                        }
-                      />
-                    </IonAvatar>
-                    <IonLabel text-wrap color="dark">
-                      <IonIcon
-                        icon={trashBin}
-                        className="ion-float-right"
-                        color="medium"
-                        onClick={() => {
-                          //delete document
-                          presentAlert({
-                            header: t("Are you sure?"),
-                            message: t("This will be permanently deleted"),
-                            buttons: [
-                              t("Cancel"),
-                              {
-                                text: t("Delete"),
-                                handler: (d) => {
-                                  deleteDocument(document);
-                                },
-                              },
-                            ],
-                          });
-                        }}
-                        hidden={
-                          userId !== document.userId &&
-                          userEmail !== "clbclcmultimedia@gmail.com"
-                        }
-                        style={{ fontSize: "large", paddingLeft: 8 }}
-                      />
-                      <IonText color="dark">
-                        <p
+        {isFetching ? (
+          <div style={{ maxWidth: 680, margin: "0 auto" }}>
+            <IonCard>
+              <IonItem lines="none" style={{ marginTop: 10 }}>
+                <IonAvatar slot="start">
+                  <IonSkeletonText animated />
+                </IonAvatar>
+                <IonLabel text-wrap color="dark">
+                  <IonText color="dark">
+                    <p>
+                      <IonSkeletonText animated style={{ width: "50%" }} />
+                    </p>
+                  </IonText>
+                  <IonLabel>
+                    <IonText color="medium">
+                      <i>
+                        <IonSkeletonText animated style={{ width: "30%" }} />
+                      </i>
+                    </IonText>
+                  </IonLabel>
+                </IonLabel>
+              </IonItem>
+              <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
+                <IonLabel text-wrap color="dark">
+                  <IonSkeletonText animated style={{ width: "100%" }} />
+                  <IonSkeletonText animated style={{ width: "70%" }} />
+                </IonLabel>
+                <div style={{ marginTop: 16, marginBottom: 16 }}></div>
+              </IonCardContent>
+            </IonCard>
+          </div>
+        ) : (
+          <>
+            <div style={{ maxWidth: 680, margin: "0 auto" }}>
+              {documentList && documentList.length > 0 ? (
+                documentList
+                  .sort((a, b) => {
+                    return b.timestamp - a.timestamp;
+                  })
+                  .map((document, index) => (
+                    <IonCard key={index}>
+                      <IonItem lines="none" style={{ marginTop: 10 }}>
+                        <IonAvatar
+                          slot="start"
                           onClick={() => {
                             history.push(`/my/user/${document.userId}`);
                           }}
                         >
-                          <b>{document.fullName}</b>
-                        </p>
-                      </IonText>
-                      <IonLabel>
-                        <IonText color="medium">
-                          <i>
-                            {moment(document.timestamp)
-                              .locale(
-                                localStorage.getItem("i18nLanguage") || "vi"
-                              )
-                              .format("Do MMM, H:mm")}
-                          </i>
-                        </IonText>
-                      </IonLabel>
-                    </IonLabel>
-                  </IonItem>
-                  <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-                    <IonLabel text-wrap color="dark">
-                      {document.description}
-                    </IonLabel>
-                    <div style={{ marginTop: 16, marginBottom: 16 }}>
-                      <IonButton
-                        color="primary"
-                        expand="block"
-                        shape="round"
-                        onClick={() => {
-                          window.open(document.url, "_blank");
-                        }}
-                      >
-                        {t("Visit link")}
-                      </IonButton>
-                    </div>
-                  </IonCardContent>
-                </IonCard>
-              ))
-          ) : (
-            <EmptyUI />
-          )}
-        </div>
-
-        <br />
-        <hr />
-        <IonListHeader>{t("Events")}</IonListHeader>
-        {eventList && eventList.length > 0 ? (
-          eventList.map((group, index) => (
-            <div key={index} className="event-item">
-              <IonCardSubtitle
-                className="ion-margin"
-                style={{ marginTop: 26 }}
-                color="primary"
-              >
-                {moment(group.date, "D/M/YYYY")
-                  .locale(localStorage.getItem("i18nLanguage") || "vi")
-                  .format("dddd, D/M/YYYY")}
-              </IonCardSubtitle>
-              <IonList lines="none" style={{ width: "100%" }}>
-                {group.events.map((item, index) => (
-                  <IonItem className={`${color[item.index % 6]}`} key={index}>
-                    <IonNote slot="start" style={{ width: 55 }}>
-                      <IonLabel>
-                        <IonText color="light">
-                          {item.start || item.end ? (
-                            <>
-                              <p>{item.start}</p>
-                              <p>{item.end}</p>
-                            </>
-                          ) : (
-                            <p>{t("All day")}</p>
-                          )}
-                        </IonText>
-                      </IonLabel>
-                    </IonNote>
-                    <div
-                      style={{
-                        marginTop: 16,
-                        marginBottom: 16,
-                        width: "100%",
-                      }}
-                    >
-                      <IonLabel
-                        text-wrap
-                        style={{
-                          paddingBottom: 5,
-                          width: "100%",
-                        }}
-                      >
-                        <IonIcon
-                          icon={trashBin}
-                          className="ion-float-right"
-                          onClick={() => {
-                            presentAlert({
-                              header: t("Are you sure?"),
-                              message: t("This will be permanently deleted"),
-                              buttons: [
-                                t("Cancel"),
-                                {
-                                  text: t("Delete"),
-                                  handler: (d) => {
-                                    deleteEvent(item);
-                                  },
-                                },
-                              ],
-                            });
-                          }}
-                          style={{ fontSize: "large" }}
-                          hidden={
-                            userId !== item.userId &&
-                            userEmail !== "clbclcmultimedia@gmail.com"
-                          }
-                        />
-
-                        <p
-                          style={{
-                            fontSize: "x-large",
-                          }}
-                        >
-                          <b>{item.title}</b>
-                        </p>
-                      </IonLabel>
-                      <IonLabel text-wrap>
-                        {item.description && <p>• {item.description}</p>}
-                        {item.location && <p>• {item.location}</p>}
-                      </IonLabel>
-                      <IonChip
-                        className="ion-no-margin"
-                        style={{ marginTop: 8 }}
-                        onClick={() => {
-                          history.push(`/my/user/${item.userId}`);
-                        }}
-                      >
-                        <IonAvatar>
                           <IonImg
                             src={
-                              item.avatar
-                                ? item.avatar
+                              document.avatar
+                                ? document.avatar
                                 : "/assets/image/placeholder.png"
                             }
                           />
                         </IonAvatar>
-                        <IonLabel>
-                          {item.fullName ? item.fullName : ""}
+                        <IonLabel text-wrap color="dark">
+                          <IonIcon
+                            icon={trashBin}
+                            className="ion-float-right"
+                            color="medium"
+                            onClick={() => {
+                              //delete document
+                              presentAlert({
+                                header: t("Are you sure?"),
+                                message: t("This will be permanently deleted"),
+                                buttons: [
+                                  t("Cancel"),
+                                  {
+                                    text: t("Delete"),
+                                    handler: (d) => {
+                                      deleteDocument(document);
+                                    },
+                                  },
+                                ],
+                              });
+                            }}
+                            hidden={
+                              userId !== document.userId &&
+                              userEmail !== "clbclcmultimedia@gmail.com"
+                            }
+                            style={{ fontSize: "large", paddingLeft: 8 }}
+                          />
+                          <IonText color="dark">
+                            <p
+                              onClick={() => {
+                                history.push(`/my/user/${document.userId}`);
+                              }}
+                            >
+                              <b>{document.fullName}</b>
+                            </p>
+                          </IonText>
+                          <IonLabel>
+                            <IonText color="medium">
+                              <i>
+                                {moment(document.timestamp)
+                                  .locale(
+                                    localStorage.getItem("i18nLanguage") || "vi"
+                                  )
+                                  .format("Do MMM, H:mm")}
+                              </i>
+                            </IonText>
+                          </IonLabel>
                         </IonLabel>
-                      </IonChip>
-                    </div>
-                    <IonNote slot="end" color="light">
-                      <IonLabel text-wrap></IonLabel>
-                    </IonNote>
-                  </IonItem>
-                ))}
-              </IonList>
+                      </IonItem>
+                      <IonCardContent
+                        style={{ paddingTop: 0, paddingBottom: 0 }}
+                      >
+                        <IonLabel text-wrap color="dark">
+                          {document.description}
+                        </IonLabel>
+                        <div style={{ marginTop: 16, marginBottom: 16 }}>
+                          <IonButton
+                            color="primary"
+                            expand="block"
+                            shape="round"
+                            onClick={() => {
+                              window.open(document.url, "_blank");
+                            }}
+                          >
+                            {t("Visit link")}
+                          </IonButton>
+                        </div>
+                      </IonCardContent>
+                    </IonCard>
+                  ))
+              ) : (
+                <EmptyUI />
+              )}
             </div>
-          ))
-        ) : (
-          <EmptyUI />
-        )}
 
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton
-            onClick={() => {
-              if (isVerify) {
-                setSegmentValue("document");
-                setNewDocument({
-                  week:
-                    moment().startOf("week").format("D/M") +
-                    " - " +
-                    moment().endOf("week").format("D/M/YYYY"),
-                  description: "",
-                  file: undefined,
-                  url: "",
-                });
-                setNewEvent({
-                  start: "",
-                  end: "",
-                  title: "",
-                  description: "",
-                  location: "",
-                  date: moment().format(),
-                });
-                setShowAddModal(true);
-              } else
-                presentAlert({
-                  header: t("Warning"),
-                  message: t(
-                    "You need to complete 3 verification steps to be able to use this feature!"
-                  ),
-                  buttons: [{ text: "OK" }],
-                });
-            }}
-          >
-            <IonIcon icon={add} />
-          </IonFabButton>
-        </IonFab>
-
-        <IonModal
-          isOpen={showAddModal}
-          cssClass="my-custom-class"
-          onDidDismiss={() => setShowAddModal(false)}
-        >
-          <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton
-                  onClick={() => {
-                    setShowAddModal(false);
-                  }}
-                >
-                  {t("Cancel")}
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton
-                  disabled={false}
-                  onClick={() => {
-                    if (segmentValue === "document") saveDocument();
-                    else saveEvent();
-                  }}
-                >
-                  <b>{t("Save")}</b>
-                </IonButton>
-              </IonButtons>
-              <IonTitle>{t("Create")}</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
             <br />
-            <IonButton hidden onClick={() => console.log(chosenWeek)}>
-              Debug button
-            </IonButton>
-
-            <div className="ion-padding-horizontal ion-padding-bottom">
-              <IonSegment
-                color="primary"
-                value={segmentValue}
-                onIonChange={(e) => {
-                  setSegmentValue(e.detail.value);
+            <hr />
+            <IonListHeader>
+              <IonLabel style={{ margin: 0 }}>{t("Events")}</IonLabel>
+              <IonButton
+                hidden={!eventList || eventList.length === 0}
+                style={{ margin: 0 }}
+                onClick={() => {
+                  const array = [
+                    ["blue1", "blue2", "blue3", "blue4", "blue5", "blue6"],
+                    [
+                      "lovewins1",
+                      "lovewins2",
+                      "lovewins3",
+                      "lovewins4",
+                      "lovewins5",
+                      "lovewins6",
+                    ],
+                    [
+                      "green1",
+                      "green2",
+                      "green3",
+                      "green4",
+                      "green5",
+                      "green6",
+                    ],
+                  ].filter((items) => {
+                    return items[0] !== color[0];
+                  });
+                  setColor(array[Math.floor(Math.random() * array.length)]);
                 }}
               >
-                <IonSegmentButton value="document">
-                  {t("Document")}
-                </IonSegmentButton>
-                <IonSegmentButton value="event">{t("Event")}</IonSegmentButton>
-              </IonSegment>
-            </div>
+                <IonIcon icon={colorWandOutline} />
+              </IonButton>
+            </IonListHeader>
+            {eventList && eventList.length > 0 ? (
+              eventList.map((group, index) => (
+                <div key={index} className="event-item">
+                  <IonCardSubtitle
+                    className="ion-margin"
+                    style={{ marginTop: 26 }}
+                    color="primary"
+                  >
+                    {moment(group.date, "D/M/YYYY")
+                      .locale(localStorage.getItem("i18nLanguage") || "vi")
+                      .format("dddd, D/M/YYYY")}
+                  </IonCardSubtitle>
+                  <IonList lines="none" style={{ width: "100%" }}>
+                    {group.events.map((item, index) => (
+                      <IonItem
+                        className={`${color[item.index % 6]}`}
+                        key={index}
+                      >
+                        <IonNote slot="start" style={{ width: 55 }}>
+                          <IonLabel>
+                            <IonText color="light">
+                              {item.start || item.end ? (
+                                <>
+                                  <p>{item.start}</p>
+                                  <p>{item.end}</p>
+                                </>
+                              ) : (
+                                <p>{t("All day")}</p>
+                              )}
+                            </IonText>
+                          </IonLabel>
+                        </IonNote>
+                        <div
+                          style={{
+                            marginTop: 16,
+                            marginBottom: 16,
+                            width: "100%",
+                          }}
+                        >
+                          <IonLabel
+                            text-wrap
+                            style={{
+                              paddingBottom: 5,
+                              width: "100%",
+                            }}
+                          >
+                            <IonIcon
+                              icon={trashBin}
+                              className="ion-float-right"
+                              onClick={() => {
+                                presentAlert({
+                                  header: t("Are you sure?"),
+                                  message: t(
+                                    "This will be permanently deleted"
+                                  ),
+                                  buttons: [
+                                    t("Cancel"),
+                                    {
+                                      text: t("Delete"),
+                                      handler: (d) => {
+                                        deleteEvent(item);
+                                      },
+                                    },
+                                  ],
+                                });
+                              }}
+                              style={{ fontSize: "large" }}
+                              hidden={
+                                userId !== item.userId &&
+                                userEmail !== "clbclcmultimedia@gmail.com"
+                              }
+                            />
 
-            {segmentValue === "document" ? (
-              <IonList lines="full">
-                <IonItem>
-                  <IonLabel position="stacked">
-                    {t("Select week")} <span style={{ color: "red" }}>*</span>
-                  </IonLabel>
+                            <p
+                              style={{
+                                fontSize: "x-large",
+                              }}
+                            >
+                              <b>{item.title}</b>
+                            </p>
+                          </IonLabel>
+                          <IonLabel text-wrap>
+                            {item.description && <p>• {item.description}</p>}
+                            {item.location && <p>• {item.location}</p>}
+                          </IonLabel>
+                          <IonChip
+                            className="ion-no-margin"
+                            style={{ marginTop: 8 }}
+                            onClick={() => {
+                              history.push(`/my/user/${item.userId}`);
+                            }}
+                          >
+                            <IonAvatar>
+                              <IonImg
+                                src={
+                                  item.avatar
+                                    ? item.avatar
+                                    : "/assets/image/placeholder.png"
+                                }
+                              />
+                            </IonAvatar>
+                            <IonLabel>
+                              {item.fullName ? item.fullName : ""}
+                            </IonLabel>
+                          </IonChip>
+                        </div>
+                        <IonNote slot="end" color="light">
+                          <IonLabel text-wrap></IonLabel>
+                        </IonNote>
+                      </IonItem>
+                    ))}
+                  </IonList>
+                </div>
+              ))
+            ) : (
+              <EmptyUI />
+            )}
 
-                  <IonSelect
-                    interface="action-sheet"
-                    value={newDocument.week}
+            <IonFab vertical="bottom" horizontal="end" slot="fixed">
+              <IonFabButton
+                onClick={() => {
+                  if (isVerify) {
+                    setSegmentValue("document");
+                    setNewDocument({
+                      week:
+                        moment().add(1, "day").startOf("week").format("D/M") +
+                        " - " +
+                        moment().add(1, "day").endOf("week").format("D/M/YYYY"),
+                      description: "",
+                      file: undefined,
+                      url: "",
+                    });
+                    setNewEvent({
+                      start: "",
+                      end: "",
+                      title: "",
+                      description: "",
+                      location: "",
+                      date: moment().add(1, "day").format(),
+                    });
+                    setShowAddModal(true);
+                  } else
+                    presentAlert({
+                      header: t("Warning"),
+                      message: t(
+                        "You need to complete 3 verification steps to be able to use this feature!"
+                      ),
+                      buttons: [{ text: "OK" }],
+                    });
+                }}
+              >
+                <IonIcon icon={add} />
+              </IonFabButton>
+            </IonFab>
+
+            <IonModal
+              isOpen={showAddModal}
+              cssClass="my-custom-class"
+              onDidDismiss={() => setShowAddModal(false)}
+            >
+              <IonHeader>
+                <IonToolbar>
+                  <IonButtons slot="start">
+                    <IonButton
+                      onClick={() => {
+                        setShowAddModal(false);
+                      }}
+                    >
+                      {t("Cancel")}
+                    </IonButton>
+                  </IonButtons>
+                  <IonButtons slot="end">
+                    <IonButton
+                      disabled={
+                        (segmentValue === "document" &&
+                          (!newDocument.week ||
+                            !newDocument.description ||
+                            !newDocument.file)) ||
+                        (segmentValue === "event" &&
+                          (!newEvent.title ||
+                            !newEvent.description ||
+                            !newEvent.date))
+                      }
+                      onClick={() => {
+                        if (segmentValue === "document") saveDocument();
+                        else saveEvent();
+                      }}
+                    >
+                      <b>{t("Save")}</b>
+                    </IonButton>
+                  </IonButtons>
+                  <IonTitle>{t("Create")}</IonTitle>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent>
+                <br />
+                <IonButton hidden onClick={() => console.log(chosenWeek)}>
+                  Debug button
+                </IonButton>
+
+                <div className="ion-padding-horizontal ion-padding-bottom">
+                  <IonSegment
+                    color="primary"
+                    value={segmentValue}
                     onIonChange={(e) => {
-                      setNewDocument({ ...newDocument, week: e.detail.value });
+                      setSegmentValue(e.detail.value);
                     }}
                   >
-                    {weekList
-                      .filter((item) => {
-                        const current =
-                          moment().startOf("week").format("D/M") +
-                          " - " +
-                          moment().endOf("week").format("D/M/YYYY");
-                        const index = weekList.indexOf(current);
-                        return weekList.indexOf(item) <= index;
-                      })
-                      .map((item, index) => (
-                        <IonSelectOption key={index}>{item}</IonSelectOption>
-                      ))}
-                  </IonSelect>
-                </IonItem>
+                    <IonSegmentButton value="document">
+                      {t("Document")}
+                    </IonSegmentButton>
+                    <IonSegmentButton value="event">
+                      {t("Event")}
+                    </IonSegmentButton>
+                  </IonSegment>
+                </div>
 
-                <IonItem>
-                  <IonLabel position="stacked">
-                    {t("Description")} <span style={{ color: "red" }}>*</span>
-                  </IonLabel>
-                  <IonInput
-                    type="text"
-                    value={newDocument.description}
-                    onIonChange={(e) => {
-                      setNewDocument({
-                        ...newDocument,
-                        description: e.detail.value,
-                      });
-                    }}
-                    placeholder={t("Enter text")}
-                  />
-                </IonItem>
-                <br />
-                {newDocument && newDocument.file && (
-                  <IonItem lines="none">
-                    <div>
-                      <IonCardSubtitle color="primary">
-                        {t("Selected file")}
-                      </IonCardSubtitle>
-                      <IonLabel text-wrap>{newDocument.file.name}</IonLabel>
-                      <IonLabel text-wrap>
-                        {formatBytes(newDocument.file.size)}
+                {segmentValue === "document" ? (
+                  <IonList lines="full">
+                    <IonItem>
+                      <IonLabel position="stacked">
+                        {t("Select week")}{" "}
+                        <span style={{ color: "red" }}>*</span>
                       </IonLabel>
-                    </div>
-                  </IonItem>
-                )}
 
-                <br />
-                <input
-                  type="file"
-                  name="upload"
-                  hidden
-                  multiple={false}
-                  ref={fileInputRef}
-                  onChange={(e) => {
-                    if (e.target.files.length > 0) {
-                      const file = e.target.files.item(0);
-                      if (file.size > 1024 * 1024)
-                        presentAlert({
-                          header: t("Warning"),
-                          message: t("Please choose a file smaller than 1 MB"),
-                          buttons: [{ text: "OK" }],
-                        });
-                      else {
-                        const url = URL.createObjectURL(file);
-                        setNewDocument({ ...newDocument, file, url });
-                      }
-                    }
-                  }}
-                />
+                      <IonSelect
+                        interface="action-sheet"
+                        value={newDocument.week}
+                        onIonChange={(e) => {
+                          setNewDocument({
+                            ...newDocument,
+                            week: e.detail.value,
+                          });
+                        }}
+                      >
+                        {weekList
+                          .filter((item) => {
+                            const current =
+                              moment().startOf("week").format("D/M") +
+                              " - " +
+                              moment().endOf("week").format("D/M/YYYY");
+                            const index = weekList.indexOf(current);
+                            return weekList.indexOf(item) <= index;
+                          })
+                          .map((item, index) => (
+                            <IonSelectOption key={index}>
+                              {item}
+                            </IonSelectOption>
+                          ))}
+                      </IonSelect>
+                    </IonItem>
 
-                <IonButton
-                  expand="block"
-                  shape="round"
-                  className="ion-margin"
-                  onClick={() => {
-                    fileInputRef.current.click();
-                  }}
-                >
-                  {t("Select file")}
-                </IonButton>
-              </IonList>
-            ) : (
-              <IonList lines="full">
-                <IonItem>
-                  <IonLabel position="stacked">
-                    {t("Title")} <span style={{ color: "red" }}>*</span>
-                  </IonLabel>
-                  <IonInput
-                    type="text"
-                    value={newEvent.title}
-                    onIonChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        title: e.detail.value,
-                      });
-                    }}
-                    placeholder={t("Maximum 80 characters")}
-                    maxlength={80}
-                  />
-                </IonItem>
-                <IonItem>
-                  <IonLabel position="stacked">
-                    {t("Description")} <span style={{ color: "red" }}>*</span>
-                  </IonLabel>
-                  <IonInput
-                    type="text"
-                    value={newEvent.description}
-                    onIonChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        description: e.detail.value,
-                      });
-                    }}
-                    placeholder={t("Enter text")}
-                  />
-                </IonItem>
-                <IonItem>
-                  <IonLabel position="stacked">{t("Location")}</IonLabel>
-                  <IonInput
-                    type="text"
-                    value={newEvent.location}
-                    onIonChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        location: e.detail.value,
-                      });
-                    }}
-                    placeholder={t("Enter text")}
-                  />
-                </IonItem>
+                    <IonItem>
+                      <IonLabel position="stacked">
+                        {t("Description")}{" "}
+                        <span style={{ color: "red" }}>*</span>
+                      </IonLabel>
+                      <IonInput
+                        type="text"
+                        value={newDocument.description}
+                        onIonChange={(e) => {
+                          setNewDocument({
+                            ...newDocument,
+                            description: e.detail.value,
+                          });
+                        }}
+                        placeholder={t("Enter text")}
+                      />
+                    </IonItem>
+                    <br />
+                    {newDocument && newDocument.file && (
+                      <IonItem lines="none">
+                        <div>
+                          <IonCardSubtitle color="primary">
+                            {t("Selected file")}
+                          </IonCardSubtitle>
+                          <IonLabel text-wrap>{newDocument.file.name}</IonLabel>
+                          <IonLabel text-wrap>
+                            {formatBytes(newDocument.file.size)}
+                          </IonLabel>
+                        </div>
+                      </IonItem>
+                    )}
 
-                <IonItem>
-                  <IonLabel position="fixed">
-                    {t("Date")} <span style={{ color: "red" }}>*</span>
-                  </IonLabel>
-                  <IonDatetime
-                    displayFormat="D/M/YYYY"
-                    value={newEvent.date}
-                    onIonChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        date: e.detail.value,
-                      });
-                    }}
-                    max={moment().add(3, "years").format("YYYY-MM-DD")}
-                    min={moment().subtract(3, "months").format("YYYY-MM-DD")}
-                  />
-                </IonItem>
-                <IonItem>
-                  <IonLabel position="fixed">{t("Start")}</IonLabel>
-                  <IonDatetime
-                    displayFormat="HH:mm"
-                    minuteValues="00,05,10,15,20,25,30,35,40,45,50,55"
-                    value={newEvent.start}
-                    onIonChange={(e) => {
-                      setNewEvent({
-                        ...newEvent,
-                        start: e.detail.value,
-                      });
-                    }}
-                    placeholder="00:00"
-                  />
-                </IonItem>
-                {newEvent && newEvent.start && (
-                  <IonItem>
-                    <IonLabel position="fixed">{t("End")}</IonLabel>
-                    <IonDatetime
-                      displayFormat="HH:mm"
-                      minuteValues="00,05,10,15,20,25,30,35,40,45,50,55"
-                      value={newEvent.end}
-                      onIonChange={(e) => {
-                        setNewEvent({
-                          ...newEvent,
-                          end: e.detail.value,
-                        });
+                    <br />
+                    <input
+                      type="file"
+                      name="upload"
+                      hidden
+                      multiple={false}
+                      ref={fileInputRef}
+                      onChange={(e) => {
+                        if (e.target.files.length > 0) {
+                          const file = e.target.files.item(0);
+                          if (file.size > 1024 * 1024)
+                            presentAlert({
+                              header: t("Warning"),
+                              message: t(
+                                "Please choose a file smaller than 1 MB"
+                              ),
+                              buttons: [{ text: "OK" }],
+                            });
+                          else {
+                            const url = URL.createObjectURL(file);
+                            setNewDocument({ ...newDocument, file, url });
+                          }
+                        }
                       }}
-                      placeholder="00:00"
                     />
-                  </IonItem>
-                )}
-              </IonList>
-            )}
-          </IonContent>
-        </IonModal>
 
-        <IonLoading isOpen={loading} />
+                    <IonButton
+                      expand="block"
+                      shape="round"
+                      className="ion-margin"
+                      onClick={() => {
+                        fileInputRef.current.click();
+                      }}
+                    >
+                      {t("Select file")}
+                    </IonButton>
+                  </IonList>
+                ) : (
+                  <IonList lines="full">
+                    <IonItem>
+                      <IonLabel position="stacked">
+                        {t("Title")} <span style={{ color: "red" }}>*</span>
+                      </IonLabel>
+                      <IonInput
+                        type="text"
+                        value={newEvent.title}
+                        onIonChange={(e) => {
+                          setNewEvent({
+                            ...newEvent,
+                            title: e.detail.value,
+                          });
+                        }}
+                        placeholder={t("Maximum 80 characters")}
+                        maxlength={80}
+                      />
+                    </IonItem>
+                    <IonItem>
+                      <IonLabel position="stacked">
+                        {t("Description")}{" "}
+                        <span style={{ color: "red" }}>*</span>
+                      </IonLabel>
+                      <IonInput
+                        type="text"
+                        value={newEvent.description}
+                        onIonChange={(e) => {
+                          setNewEvent({
+                            ...newEvent,
+                            description: e.detail.value,
+                          });
+                        }}
+                        placeholder={t("Enter text")}
+                      />
+                    </IonItem>
+                    <IonItem>
+                      <IonLabel position="stacked">{t("Location")}</IonLabel>
+                      <IonInput
+                        type="text"
+                        value={newEvent.location}
+                        onIonChange={(e) => {
+                          setNewEvent({
+                            ...newEvent,
+                            location: e.detail.value,
+                          });
+                        }}
+                        placeholder={t("Enter text")}
+                      />
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel position="fixed">
+                        {t("Date")} <span style={{ color: "red" }}>*</span>
+                      </IonLabel>
+                      <IonDatetime
+                        displayFormat="D/M/YYYY"
+                        value={newEvent.date}
+                        onIonChange={(e) => {
+                          setNewEvent({
+                            ...newEvent,
+                            date: e.detail.value,
+                          });
+                        }}
+                        max={moment().add(3, "years").format("YYYY-MM-DD")}
+                        min={moment()
+                          .subtract(3, "months")
+                          .format("YYYY-MM-DD")}
+                      />
+                    </IonItem>
+                    <IonItem>
+                      <IonLabel position="fixed">{t("Start")}</IonLabel>
+                      <IonDatetime
+                        displayFormat="HH:mm"
+                        minuteValues="00,05,10,15,20,25,30,35,40,45,50,55"
+                        value={newEvent.start}
+                        onIonChange={(e) => {
+                          setNewEvent({
+                            ...newEvent,
+                            start: e.detail.value,
+                          });
+                        }}
+                        placeholder="00:00"
+                      />
+                    </IonItem>
+                    {newEvent && newEvent.start && (
+                      <IonItem>
+                        <IonLabel position="fixed">{t("End")}</IonLabel>
+                        <IonDatetime
+                          displayFormat="HH:mm"
+                          minuteValues="00,05,10,15,20,25,30,35,40,45,50,55"
+                          value={newEvent.end}
+                          onIonChange={(e) => {
+                            setNewEvent({
+                              ...newEvent,
+                              end: e.detail.value,
+                            });
+                          }}
+                          placeholder="00:00"
+                        />
+                      </IonItem>
+                    )}
+                  </IonList>
+                )}
+              </IonContent>
+            </IonModal>
+
+            <div style={{ textAlign: "center" }}>
+              <br />
+              <br />
+              <IonChip color="primary">
+                <IonText>
+                  <IonIcon icon={eyeOutline} style={{ verticalAlign: -2 }} />{" "}
+                  {viewer} {t("views")}
+                </IonText>
+              </IonChip>
+            </div>
+
+            <IonLoading isOpen={loading} />
+          </>
+        )}
       </IonContent>
     </IonPage>
   );

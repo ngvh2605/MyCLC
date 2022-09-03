@@ -3,11 +3,11 @@ import { t } from "i18next";
 import React from "react";
 
 export const WeekPopover: React.FC<{
-  list: String[];
-  current: String;
-  selected: String;
+  list: string[];
+  current: string;
+  selected: string;
   onHide: () => void;
-  onSelect: (item: String) => void;
+  onSelect: (item: string) => void;
 }> = ({ list, current, selected, onHide, onSelect }) => (
   <IonList>
     <IonListHeader>{t("Select week")}</IonListHeader>
