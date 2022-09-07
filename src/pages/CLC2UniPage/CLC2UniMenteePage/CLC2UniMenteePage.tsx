@@ -9,7 +9,7 @@ import {
 } from "@ionic/react";
 import React from "react";
 
-const OnePage: React.FC = () => {
+const CLC2UniMenteePage: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
@@ -17,7 +17,7 @@ const OnePage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>One</IonTitle>
+          <IonTitle>Two</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent></IonContent>
@@ -25,4 +25,4 @@ const OnePage: React.FC = () => {
   );
 };
 
-export default OnePage;
+export default CLC2UniMenteePage;

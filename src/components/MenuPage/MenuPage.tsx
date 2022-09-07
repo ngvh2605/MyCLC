@@ -112,6 +112,13 @@ const MenuPage = () => {
       isShown: remoteConfig.getBoolean("showIn2CLC"),
     },
     {
+      text: "CLC2Uni",
+      url: "clc2uni",
+      icon: bookOutline,
+      requireVerify: false,
+      isShown: remoteConfig.getBoolean("showCLC2Uni"),
+    },
+    {
       text: t("Chat rooms"),
       url: "chat",
       icon: chatbubbleEllipsesOutline,
