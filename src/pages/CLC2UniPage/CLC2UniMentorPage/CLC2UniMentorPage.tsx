@@ -12,17 +12,21 @@ import {
   IonLabel,
   IonMenuButton,
   IonPage,
+  IonSearchbar,
   IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { t } from "i18next";
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import "./CLC2UniMentorPage.scss";
 
 const CLC2UniMentorPage: React.FC = () => {
   const history = useHistory();
+
+  const [search, setSearch] = useState("");
+
   return (
     <IonPage id="clc2uni-mentor-page">
       <IonHeader>
@@ -34,6 +38,16 @@ const CLC2UniMentorPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <IonSearchbar
+            placeholder={t("Search")}
+            style={{ paddingBottom: 0 }}
+            onIonChange={(e) => {
+              setSearch(e.detail.value);
+            }}
+          />
+        </div>
+
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <IonCard>
             <IonItem lines="none" style={{ marginTop: 10 }}>
@@ -59,9 +73,11 @@ const CLC2UniMentorPage: React.FC = () => {
             </IonItem>
             <IonCardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
               <IonLabel text-wrap color="dark">
-                {
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                }
+                {"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".substring(
+                  0,
+                  200
+                )}
+                ...
               </IonLabel>
 
               <div style={{ marginTop: 8, marginBottom: 16 }}>

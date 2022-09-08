@@ -53,7 +53,7 @@ interface RouteParams {
   id: string;
 }
 
-interface User {
+export interface User {
   fullName: string;
   birth: string;
   gender: string;
