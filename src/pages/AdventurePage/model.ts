@@ -7,6 +7,7 @@ export interface Team {
   score?: number;
   total?: number;
   playerInfo?: any[];
+  name?: string;
 }
 
 export interface Player {
@@ -15,21 +16,25 @@ export interface Player {
 }
 
 export interface Mission {
-  key: string;
+  key: number;
   title: string;
   body: string;
   point: number;
   answer?: Answer;
+  userId?: string;
 }
 
 export interface Answer {
   teamId?: string;
-  key?: string;
+  teamName?: string;
+  userId?: string;
+  key?: number;
   text: string;
   image: string;
   score?: number;
   isMarked?: boolean;
   timestamp?: number;
+  mission?: Mission;
 }
 
 export function toAnswer(doc: firebase.firestore.DocumentSnapshot): Answer {

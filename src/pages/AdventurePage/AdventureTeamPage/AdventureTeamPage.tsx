@@ -32,6 +32,8 @@ import {
   checkmarkCircle,
   close,
   closeCircle,
+  copyOutline,
+  helpCircleOutline,
   time,
   trophy,
   warning,
@@ -40,13 +42,15 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useAuth } from "../../../auth";
+import { copyToClipboard } from "../../../common/services";
 import useCheckUserVerify from "../../../common/useCheckUserVerify";
 import useUploadFile from "../../../common/useUploadFile";
+import { EmptyUI } from "../../../components/CommonUI/EmptyUI";
 import RefresherItem from "../../../components/CommonUI/RefresherItem";
 import { UnAuth } from "../../../components/CommonUI/UnAuth";
 import { firestore } from "../../../firebase";
 import { resizeImage } from "../../../utils/helpers/helpers";
-import { getInfoByUserId } from "../../HomePage/services";
+import { getNameAndAvatarByUserId } from "../../HomePage/services";
 import { Answer, Mission } from "../model";
 import useAdventureCheck from "../useAdventureCheck";
 
@@ -71,7 +75,7 @@ const AdventureTeamPage: React.FC = () => {
   const [data, setData] = useState<Mission[]>();
   const [missions, setMissons] = useState<Mission[]>();
   const [chosenMission, setChosenMission] = useState<Mission>({
-    key: "",
+    key: 0,
     title: "",
     body: "",
     point: 0,
@@ -90,24 +94,22 @@ const AdventureTeamPage: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      if (
-        teamInfo &&
-        teamInfo.player &&
-        teamInfo.player.length > 0 &&
-        !teamInfo.isStarted
-      ) {
-        let tempInfo = [];
-        for (let player of teamInfo.player) {
-          tempInfo.push({ ...(await getInfoByUserId(player)), id: player });
+      if (teamInfo && teamInfo.player && teamInfo.player.length > 0) {
+        if (teamInfo.isStarted) {
+          fetchMissions();
+        } else {
+          let tempInfo = [];
+          for (let player of teamInfo.player) {
+            tempInfo.push({
+              ...(await getNameAndAvatarByUserId(player)),
+              id: player,
+            });
+          }
+          setPlayerInfo(tempInfo);
         }
-        setPlayerInfo(tempInfo);
       }
     })();
   }, [teamInfo]);
-
-  useEffect(() => {
-    fetchMissions();
-  }, []);
 
   useEffect(() => {
     if (data && teamAnswers && teamAnswers.length > 0) {
@@ -135,7 +137,19 @@ const AdventureTeamPage: React.FC = () => {
       .doc("data")
       .get()
       .then((doc) => {
-        setData(shuffleArray(JSON.parse(doc.data().info)));
+        if (doc.exists) {
+          let temp: Mission[] = [];
+          for (var prop in doc.data()) {
+            if (doc.data().hasOwnProperty(prop)) {
+              const propData: Mission[] = JSON.parse(doc.data()[prop]);
+              const userId = prop;
+              temp = temp.concat(
+                propData.map((item) => Object.assign(item, { userId: userId }))
+              );
+            }
+          }
+          setData(shuffleArray(temp));
+        }
       });
   };
 
@@ -170,6 +184,8 @@ const AdventureTeamPage: React.FC = () => {
           isMarked: false,
           score: 0,
           timestamp: moment().valueOf(),
+          userId: chosenMission.userId,
+          teamName: teamInfo && teamInfo.name ? teamInfo.name : "",
         });
 
       presentToast({
@@ -195,6 +211,25 @@ const AdventureTeamPage: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+          {teamInfo && teamInfo.isStarted && (
+            <IonButtons slot="end">
+              <IonButton
+                onClick={() => {
+                  presentAlert({
+                    header: teamInfo && teamInfo.name ? teamInfo.name : "",
+                    subHeader: `Tổng điểm: ${
+                      teamInfo && teamInfo.score ? teamInfo.score : 0
+                    }`,
+                    message: `Người chơi: ${
+                      teamInfo && teamInfo.player ? teamInfo.player.length : ""
+                    }`,
+                  });
+                }}
+              >
+                <IonIcon icon={helpCircleOutline} />
+              </IonButton>
+            </IonButtons>
+          )}
           <IonTitle>Adventure Hunt</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -206,50 +241,70 @@ const AdventureTeamPage: React.FC = () => {
                 fetchMissions();
               }}
             />
+            <div style={{ maxWidth: 680, margin: "0 auto" }}>
+              <div className="ion-padding">
+                <IonSegment
+                  color="primary"
+                  value={segment}
+                  onIonChange={(e) => setSegment(e.detail.value)}
+                >
+                  <IonSegmentButton value="remain">Chưa làm</IonSegmentButton>
+                  <IonSegmentButton value="complete">Đã nộp</IonSegmentButton>
+                </IonSegment>
+              </div>
 
-            <div className="ion-padding">
-              <IonSegment
-                color="primary"
-                value={segment}
-                onIonChange={(e) => setSegment(e.detail.value)}
-              >
-                <IonSegmentButton value="remain">Chưa làm</IonSegmentButton>
-                <IonSegmentButton value="complete">Đã nộp</IonSegmentButton>
-              </IonSegment>
-            </div>
-            {missions &&
-              missions.length > 0 &&
-              (segment === "remain"
-                ? missions
-                    .filter((item) => {
-                      return !!!item.answer;
-                    })
-                    .map((mission, index) => (
-                      <IonCard
-                        key={index}
-                        onClick={() => {
-                          setAnswer({ text: "", image: "" });
-                          setSubmitDisabled(false);
-                          setChosenMission(mission);
-                          setMissionModal(true);
-                        }}
-                      >
-                        <IonCardContent>
-                          <IonCardSubtitle color="primary">
-                            <IonText style={{ float: "right" }} color="warning">
-                              {mission.point}{" "}
-                              <IonIcon icon={trophy} style={{ fontSize: 9 }} />
-                            </IonText>
-                            {mission.title}
-                          </IonCardSubtitle>
+              {missions &&
+                missions.length > 0 &&
+                (segment === "remain" ? (
+                  missions.filter((item) => {
+                    return !!!item.answer;
+                  }).length > 0 ? (
+                    missions
+                      .filter((item) => {
+                        return !!!item.answer;
+                      })
+                      .map((mission, index) => (
+                        <IonCard
+                          key={index}
+                          onClick={() => {
+                            setAnswer({ text: "", image: "" });
+                            setSubmitDisabled(false);
+                            setChosenMission(mission);
+                            setMissionModal(true);
+                          }}
+                        >
+                          <IonCardContent>
+                            <IonCardSubtitle color="primary">
+                              <IonText
+                                style={{ float: "right" }}
+                                color={
+                                  mission.point < 400
+                                    ? "success"
+                                    : mission.point < 800
+                                    ? "warning"
+                                    : "danger"
+                                }
+                              >
+                                {mission.point}{" "}
+                                <IonIcon
+                                  icon={trophy}
+                                  style={{ fontSize: 11, verticalAlign: -1 }}
+                                />
+                              </IonText>
+                              {mission.title}
+                            </IonCardSubtitle>
 
-                          <IonLabel text-wrap color="dark">
-                            {mission.body}
-                          </IonLabel>
-                        </IonCardContent>
-                      </IonCard>
-                    ))
-                : missions
+                            <IonLabel text-wrap color="dark">
+                              {mission.body}
+                            </IonLabel>
+                          </IonCardContent>
+                        </IonCard>
+                      ))
+                  ) : (
+                    <EmptyUI />
+                  )
+                ) : (
+                  missions
                     .filter((item) => {
                       return !!item.answer;
                     })
@@ -270,7 +325,16 @@ const AdventureTeamPage: React.FC = () => {
                       >
                         <IonCardContent>
                           <IonCardSubtitle color="primary">
-                            <IonText style={{ float: "right" }} color="warning">
+                            <IonText
+                              style={{ float: "right" }}
+                              color={
+                                mission.point < 400
+                                  ? "success"
+                                  : mission.point < 800
+                                  ? "warning"
+                                  : "danger"
+                              }
+                            >
                               {mission.point}{" "}
                               <IonIcon icon={trophy} style={{ fontSize: 9 }} />
                             </IonText>
@@ -301,19 +365,26 @@ const AdventureTeamPage: React.FC = () => {
                           )}
                         </IonCardContent>
                       </IonCard>
-                    )))}
-
-            <IonModal isOpen={missionModal}>
+                    ))
+                ))}
+            </div>
+            <IonModal
+              isOpen={missionModal}
+              onDidDismiss={() => setMissionModal(false)}
+            >
               <IonHeader>
                 <IonToolbar>
                   <IonTitle>Thử thách</IonTitle>
-                  <IonButtons slot="end" onClick={() => setMissionModal(false)}>
+                  <IonButtons
+                    slot="start"
+                    onClick={() => setMissionModal(false)}
+                  >
                     <IonButton>
                       <IonIcon icon={close} color="primary" />
                     </IonButton>
                   </IonButtons>
                   {!submitDisabled && (
-                    <IonButtons slot="start">
+                    <IonButtons slot="end">
                       <IonButton
                         disabled={!answer.image && !answer.text}
                         onClick={() => {
@@ -347,11 +418,27 @@ const AdventureTeamPage: React.FC = () => {
                   </IonListHeader>
                   <IonListHeader>
                     <IonLabel className="ion-no-margin">
-                      <IonText color="warning">{chosenMission.point}</IonText>{" "}
+                      <IonText
+                        color={
+                          chosenMission.point < 400
+                            ? "success"
+                            : chosenMission.point < 800
+                            ? "warning"
+                            : "danger"
+                        }
+                      >
+                        {chosenMission.point}
+                      </IonText>{" "}
                       <IonIcon
-                        color="warning"
+                        color={
+                          chosenMission.point < 400
+                            ? "success"
+                            : chosenMission.point < 800
+                            ? "warning"
+                            : "danger"
+                        }
                         icon={trophy}
-                        style={{ fontSize: 16 }}
+                        style={{ fontSize: 20, verticalAlign: -1 }}
                       />
                     </IonLabel>
                   </IonListHeader>
@@ -370,16 +457,16 @@ const AdventureTeamPage: React.FC = () => {
                           style={{ height: "max-content", marginBottom: 10 }}
                         >
                           <IonLabel text-wrap className="ion-padding">
-                            Lưu ý: Sau khi một thành viên bất kỳ ấn nộp thì đội
-                            chơi không thể sửa câu trả lời
+                            Lưu ý: Sau khi một thành viên ấn nộp thì đội chơi
+                            không thể sửa câu trả lời
                           </IonLabel>
                         </IonChip>
                       </IonItem>
                     </>
                   )}
                   <br />
-                  <IonItem>
-                    <IonLabel position="fixed">Trả lời</IonLabel>
+                  <IonItem lines="inset">
+                    <IonLabel position="stacked">Trả lời</IonLabel>
                     <IonInput
                       placeholder="Nhập câu trả lời"
                       value={answer.text}
@@ -477,72 +564,92 @@ const AdventureTeamPage: React.FC = () => {
           </IonContent>
         ) : (
           <IonContent className="ion-padding">
-            <IonButton hidden onClick={() => console.log(teamInfo)}>
-              Click
-            </IonButton>
-            <div style={{ width: "100%", textAlign: "center" }}>
-              <IonText color="primary" style={{ fontSize: "xxx-large" }}>
-                <b>{teamId}</b>
-              </IonText>
-            </div>
-            <br />
-            <IonList lines="none">
-              <IonListHeader>Danh sách người chơi</IonListHeader>
-              {playerInfo &&
-                playerInfo.length > 0 &&
-                playerInfo.map((player, index) => (
-                  <IonItem
-                    key={index}
+            <div style={{ maxWidth: 680, margin: "0 auto" }}>
+              <div style={{ width: "100%", textAlign: "center" }}>
+                <IonText color="primary" style={{ fontSize: "xx-large" }}>
+                  <b>{teamInfo && teamInfo.name ? teamInfo.name : ""}</b>
+                </IonText>
+
+                <p>
+                  Mã đội:{" "}
+                  <IonChip
+                    color="primary"
                     onClick={() => {
-                      history.push(`/my/user/${player.id}`);
+                      copyToClipboard(teamId);
+                      presentToast({
+                        message: "Đã sao chép mã đội",
+                        duration: 3000,
+                        color: "success",
+                      });
                     }}
-                    className="ion-margin-vertical"
                   >
-                    <IonAvatar slot="start">
-                      <IonImg
-                        src={player.avatar || "/assets/image/placeholder.png"}
-                      />
-                    </IonAvatar>
-                    <IonLabel>{player.fullName || ""}</IonLabel>
-                  </IonItem>
-                ))}
-            </IonList>
+                    <IonIcon icon={copyOutline} />
+                    <b>{teamId}</b>
+                  </IonChip>
+                </p>
+              </div>
 
-            <IonChip
-              color="warning"
-              style={{ height: "max-content", marginBottom: 10 }}
-            >
-              <IonLabel text-wrap className="ion-padding">
-                Lưu ý: Sau khi một thành viên bất kỳ bắt đầu trò chơi thì đội
-                chơi không thể thêm thành viên được nữa
-              </IonLabel>
-            </IonChip>
+              <IonList lines="none">
+                <IonListHeader>Danh sách người chơi</IonListHeader>
+                {playerInfo &&
+                  playerInfo.length > 0 &&
+                  playerInfo.map((player, index) => (
+                    <IonItem
+                      key={index}
+                      onClick={() => {
+                        history.push(`/my/user/${player.id}`);
+                      }}
+                      className="ion-margin-vertical"
+                    >
+                      <IonAvatar slot="start">
+                        <IonImg
+                          src={player.avatar || "/assets/image/placeholder.png"}
+                        />
+                      </IonAvatar>
+                      <IonLabel>{player.fullName || ""}</IonLabel>
+                    </IonItem>
+                  ))}
+              </IonList>
 
-            <IonButton
-              expand="block"
-              shape="round"
-              color="warning"
-              onClick={() =>
-                presentAlert({
-                  header: "Bắt đầu trò chơi?",
-                  message:
-                    "Sau khi bắt đầu thì đội chơi không thể thêm thành viên được nữa",
-                  buttons: [
-                    "Huỷ",
-                    {
-                      text: "Đồng ý",
-                      handler: () => {
-                        startGame();
+              <IonChip
+                color="warning"
+                style={{ height: "max-content", marginBottom: 10 }}
+              >
+                <IonLabel text-wrap className="ion-padding">
+                  <b>Lưu ý:</b>
+                  <br />• Mỗi đội tối đa 4 người chơi
+                  <br />• Chia sẻ mã đội cho bạn bè để cùng tham gia đội
+                  <br />• Sau khi một thành viên bắt đầu trò chơi thì đội chơi
+                  không thể thêm thành viên được nữa
+                </IonLabel>
+              </IonChip>
+
+              <IonButton
+                expand="block"
+                shape="round"
+                color="warning"
+                onClick={() =>
+                  presentAlert({
+                    header: "Bắt đầu trò chơi?",
+                    message:
+                      "Sau khi bắt đầu thì đội chơi không thể thêm thành viên được nữa",
+                    buttons: [
+                      "Huỷ",
+                      {
+                        text: "Đồng ý",
+                        handler: () => {
+                          startGame();
+                        },
                       },
-                    },
-                  ],
-                })
-              }
-            >
-              <IonIcon icon={warning} slot="start" />
-              <IonIcon icon={warning} slot="end" />
-              Bắt đầu trò chơi
-            </IonButton>
+                    ],
+                  })
+                }
+              >
+                <IonIcon icon={warning} slot="start" />
+                <IonIcon icon={warning} slot="end" />
+                Bắt đầu trò chơi
+              </IonButton>
+            </div>
           </IonContent>
         )
       ) : (

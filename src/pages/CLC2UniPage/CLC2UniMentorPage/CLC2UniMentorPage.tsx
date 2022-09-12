@@ -4,7 +4,6 @@ import {
   IonButtons,
   IonCard,
   IonCardContent,
-  IonChip,
   IonContent,
   IonHeader,
   IonImg,

@@ -102,7 +102,8 @@ const MenuPage = () => {
       text: "Adventure Hunt",
       url: "adventure",
       icon: gameControllerOutline,
-      isShown: remoteConfig.getBoolean("showAdventure"),
+      // isShown: remoteConfig.getBoolean("showAdventure"),
+      isShown: false,
     },
     {
       text: "In2CLC",
@@ -116,7 +117,8 @@ const MenuPage = () => {
       url: "clc2uni",
       icon: bookOutline,
       requireVerify: false,
-      isShown: remoteConfig.getBoolean("showCLC2Uni"),
+      // isShown: remoteConfig.getBoolean("showCLC2Uni"),
+      isShown: false,
     },
     {
       text: t("Chat rooms"),

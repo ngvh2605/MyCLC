@@ -69,7 +69,7 @@ const AdventurePage: React.FC = () => {
         {allowMark && (
           <IonTabButton tab="four" href="/my/adventure/mark">
             <IonIcon icon={ribbonOutline} />
-            <IonLabel>Chấm điểm</IonLabel>
+            <IonLabel>Xét duyệt</IonLabel>
           </IonTabButton>
         )}
       </IonTabBar>

@@ -13,12 +13,11 @@ import {
   IonMenuButton,
   IonModal,
   IonPage,
-  IonRadio,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { checkmark } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../../auth";
 import { getInfoByUserId } from "../../HomePage/services";
 import { User } from "../../UserPage/UserPage";

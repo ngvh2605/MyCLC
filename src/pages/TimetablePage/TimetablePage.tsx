@@ -48,6 +48,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router";
 import { useAuth } from "../../auth";
+import { copyToClipboard } from "../../common/services";
 import useCheckUserVerify from "../../common/useCheckUserVerify";
 import useUploadFile from "../../common/useUploadFile";
 import { EmptyUI } from "../../components/CommonUI/EmptyUI";
@@ -419,7 +420,7 @@ const TimetablePage: React.FC = () => {
             <IonButton
               onClick={() => {
                 const endDate = chosenWeek.replace(/\s/g, "").split("-")[1];
-                navigator.clipboard.writeText(
+                copyToClipboard(
                   "https://myclcproject.web.app/my/timetable/" +
                     moment(endDate, "D/M/YYYY").format("DDMMYYYY")
                 );

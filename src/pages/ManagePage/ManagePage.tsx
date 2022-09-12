@@ -75,17 +75,21 @@ const ManagePage: React.FC = () => {
           }}
         />
 
-        <div style={{ margin: 16 }}>
-          <IonSegment
-            value={segment}
-            onIonChange={(e) => setSegment(e.detail.value)}
-            color="primary"
-          >
-            <IonSegmentButton value="new">
-              {t("Upcoming events")}
-            </IonSegmentButton>
-            <IonSegmentButton value="old">{t("Past events")}</IonSegmentButton>
-          </IonSegment>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <div style={{ margin: 16 }}>
+            <IonSegment
+              value={segment}
+              onIonChange={(e) => setSegment(e.detail.value)}
+              color="primary"
+            >
+              <IonSegmentButton value="new">
+                {t("Upcoming events")}
+              </IonSegmentButton>
+              <IonSegmentButton value="old">
+                {t("Past events")}
+              </IonSegmentButton>
+            </IonSegment>
+          </div>
         </div>
         {segment === "new" &&
           (events && events.length > 0 ? (
