@@ -127,8 +127,8 @@ const AddEventPage: React.FC = () => {
         location,
         description,
         body: encodeURI(body),
-        sellTicket,
-        sellInApp,
+        sellTicket: !!sellTicket,
+        sellInApp: !!sellInApp,
         totalTicket,
         externalLink,
         pictureUrl: uploadedUrl,
@@ -161,7 +161,7 @@ const AddEventPage: React.FC = () => {
         body: encodeURI(body),
         sellTicket: !!sellTicket,
         sellInApp: !!sellInApp,
-        totalTicket,
+        totalTicket: totalTicket ? totalTicket : 0,
         externalLink,
         pictureUrl:
           pictureUrl && pictureUrl !== events.pictureUrl
@@ -186,7 +186,14 @@ const AddEventPage: React.FC = () => {
           </IonButtons>
           <IonButtons slot="end">
             <IonButton
-              disabled={body.length < 50}
+              disabled={
+                !title ||
+                !startDate ||
+                !endDate ||
+                !location ||
+                !pictureUrl ||
+                body.length < 50
+              }
               onClick={() => {
                 if (events) handleEdit();
                 else handlePost();
@@ -207,7 +214,7 @@ const AddEventPage: React.FC = () => {
         >
           Debug
         </IonButton>
-        <IonList lines="full">
+        <IonList lines="inset">
           <IonListHeader>{t("Event cover")}</IonListHeader>
           <input
             type="file"

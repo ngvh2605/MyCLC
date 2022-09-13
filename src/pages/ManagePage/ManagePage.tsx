@@ -57,6 +57,10 @@ const ManagePage: React.FC = () => {
     setOldEvents(oldDocs.map(toEvents));
   };
 
+  function handleDelete(id: string) {
+    setEvents(events.filter((p) => p.id !== id));
+  }
+
   return (
     <IonPage id="manage-page">
       <IonHeader>
@@ -96,7 +100,12 @@ const ManagePage: React.FC = () => {
             events
               .sort((a, b) => a.startDate - b.startDate)
               .map((item, index) => (
-                <ManageCard event={item} key={index} allowEdit={true} />
+                <ManageCard
+                  event={item}
+                  key={index}
+                  allowEdit={true}
+                  handleDelete={handleDelete}
+                />
               ))
           ) : (
             <EmptyUI />
@@ -106,7 +115,12 @@ const ManagePage: React.FC = () => {
             oldEvents
               .sort((a, b) => b.startDate - a.startDate)
               .map((item, index) => (
-                <ManageCard event={item} key={index} allowEdit={false} />
+                <ManageCard
+                  event={item}
+                  key={index}
+                  allowEdit={false}
+                  handleDelete={handleDelete}
+                />
               ))
           ) : (
             <EmptyUI />

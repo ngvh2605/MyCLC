@@ -32,22 +32,47 @@ import {
   EventSkeleton,
 } from "../../EventPage/EventCard/EventCard";
 import { useTranslation } from "react-i18next";
+import { firestore, storage } from "../../../firebase";
 
 interface Props {
   event: Events;
   allowEdit?: boolean;
+  handleDelete?: any;
 }
 
 const ManageCard: React.FC<Props> = (props) => {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const { event, allowEdit } = props;
+  const { event, allowEdit, handleDelete } = props;
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [presentAlert] = useIonAlert();
 
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
+
+  const deleteEvent = async (event: Events) => {
+    const task: Promise<void>[] = [];
+    //delete picture from storage
+    if (event.pictureUrl)
+      task.push(storage.refFromURL(event.pictureUrl).delete());
+    //delete participants
+    const { docs: participants } = await firestore
+      .collection("eventsTicket")
+      .where("eventId", "==", event.id)
+      .get();
+
+    task.push(
+      ...participants
+        .filter((doc) => doc.exists)
+        .map((doc) => firestore.collection("eventsTicket").doc(doc.id).delete())
+    );
+
+    //delete event
+    task.push(firestore.collection("events").doc(event.id).delete());
+
+    return Promise.all(task);
+  };
 
   return (
     <>
@@ -169,12 +194,11 @@ const ManageCard: React.FC<Props> = (props) => {
                           {
                             text: t("Delete"),
                             handler: (d) => {
-                              //setNews({ ...news, body: "" });
-                              //deleteNews(news);
+                              deleteEvent(event);
+                              handleDelete(event.id);
                             },
                           },
                         ],
-                        onDidDismiss: (e) => console.log("did dismiss"),
                       });
                     },
                   },
